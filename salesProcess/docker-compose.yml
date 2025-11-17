@@ -1,0 +1,51 @@
+services:
+  # PostgreSQL Database
+  database:
+    image: postgres:15-alpine
+    container_name: sales_process_db
+    environment:
+      POSTGRES_DB: sales_process
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - sales_network
+
+  # Backend API Service
+  backend:
+    build: ./backend
+    container_name: sales_process_backend
+    environment:
+      NODE_ENV: development
+      DB_HOST: database
+      DB_PORT: 5432
+      DB_NAME: sales_process
+      DB_USER: postgres
+      DB_PASSWORD: password
+    ports:
+      - "3000:3000"
+    depends_on:
+      - database
+    networks:
+      - sales_network
+
+  # Frontend Web Service
+  frontend:
+    build: ./frontend/salesProcess
+    container_name: sales_process_frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    networks:
+      - sales_network
+
+volumes:
+  postgres_data:
+
+networks:
+  sales_network:
+    driver: bridge
