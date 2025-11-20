@@ -10,7 +10,6 @@ const salesRoutes = require('./routes/sales.routes');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Initialize Prisma Client
 const prisma = new PrismaClient();
 
 // Middleware

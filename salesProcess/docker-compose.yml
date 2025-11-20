@@ -30,6 +30,7 @@ services:
       CORS_ORIGIN: ${CORS_ORIGIN}
     ports:
       - "${BACKEND_PORT}:3000"
+      - "5555:5555"  # Prisma Studio
     depends_on:
       - database
     networks:
