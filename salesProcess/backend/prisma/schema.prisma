@@ -138,7 +138,6 @@ model SaleProduct {
   saleId    Int
   productId Int
   quantity  Int      @default(1)
-  unitPrice Decimal?
 
   createdAt DateTime @default(now())
 
