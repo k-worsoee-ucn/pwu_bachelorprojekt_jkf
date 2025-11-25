@@ -1,0 +1,55 @@
+services:
+  # PostgreSQL Database
+  database:
+    image: postgres:15-alpine
+    container_name: sales_process_db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - sales_network
+
+  # Backend API Service
+  backend:
+    build: ./backend
+    container_name: sales_process_backend
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${POSTGRES_DB}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DATABASE_URL: ${DATABASE_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      CORS_ORIGIN: ${CORS_ORIGIN}
+    ports:
+      - "${BACKEND_PORT}:3000"
+      - "5555:5555"  # Prisma Studio
+    depends_on:
+      - database
+    networks:
+      - sales_network
+
+  # Frontend Web Service
+  frontend:
+    build: ./frontend
+    container_name: sales_process_frontend
+    ports:
+      - "${FRONTEND_PORT}:5173"
+    depends_on:
+      - backend
+    networks:
+      - sales_network
+
+volumes:
+  postgres_data:
+
+networks:
+  sales_network:
+    driver: bridge

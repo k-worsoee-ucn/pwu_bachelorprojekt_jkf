@@ -1,0 +1,166 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// PREDEFINED VALUES (ENUMERATIONS)
+
+enum ProcessStatus {
+  done
+  ongoing
+  locked
+}
+
+enum UserRole {
+  salesManager
+  marketingManager
+  productionManager
+  viewer
+}
+
+// MODELS
+
+model Process {
+  id     Int           @id @default(autoincrement())
+  title  String
+  caseNo Int           @unique
+  status ProcessStatus @default(ongoing)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Many-to-many with users through join table
+  processUsers ProcessUser[]
+
+  // One-to-one relationship
+  sale Sale?
+
+  @@map("processes")
+}
+
+model Sale {
+  id               Int    @id @default(autoincrement())
+  filterType       String
+  fanType          String
+  ductSystem       String
+  extractionVolume Int
+  volumeFlow       Int
+
+  // FK
+  processId      Int @unique @map("process_id")
+  customerId     Int @map("customer_id")
+  salesManagerId Int @map("sales_manager_id")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  process      Process  @relation(fields: [processId], references: [id], onDelete: Cascade)
+  customer     Customer @relation(fields: [customerId], references: [id])
+  salesManager User     @relation("OwnedSales", fields: [salesManagerId], references: [id])
+
+  // Many-to-many
+  saleProducts SaleProduct[]
+
+  @@map("sales")
+}
+
+model User {
+  id       Int      @id @default(autoincrement())
+  username String   @unique
+  email    String   @unique
+  password String   @unique
+  name     String
+  role     UserRole @default(viewer)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  processUsers ProcessUser[]
+
+  // Direct sale ownership  
+  ownedSales Sale[] @relation("OwnedSales")
+
+  // Customer management - sales managers have assigned customers
+  managedCustomers Customer[] @relation("CustomerSalesManager")
+
+  @@map("users")
+}
+
+model ProcessUser {
+  processId  Int
+  userId     Int
+  role       UserRole
+  assignedAt DateTime @default(now())
+  assignedBy Int?
+  isActive   Boolean  @default(true)
+
+  process Process @relation(fields: [processId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([processId, userId, role])
+  @@map("process_users")
+}
+
+model Customer {
+  id       Int    @id @default(autoincrement())
+  name     String @unique
+  industry String
+  country  String
+
+  // Each customer has exactly ONE sales manager
+  salesManagerId Int @map("sales_manager_id")
+
+  createdAt DateTime @default(now())
+
+  // Relationships
+  salesManager User   @relation("CustomerSalesManager", fields: [salesManagerId], references: [id])
+  sales        Sale[]
+
+  @@map("customers")
+}
+
+model Product {
+  id    Int    @id @default(autoincrement())
+  title String
+
+  saleProducts SaleProduct[]
+
+  @@map("products")
+}
+
+model SaleProduct {
+  saleId    Int
+  productId Int
+  quantity  Int      @default(1)
+
+  createdAt DateTime @default(now())
+
+  sale    Sale    @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@id([saleId, productId])
+  @@map("sale_products")
+}
+
+model Reference {
+  id Int @id @default(autoincrement())
+
+  createdAt DateTime @default(now())
+
+  @@map("references")
+}
+
+model Case {
+  id      Int    @id @default(autoincrement())
+  content String
+
+  createdAt DateTime @default(now())
+
+  @@map("cases")
+}
