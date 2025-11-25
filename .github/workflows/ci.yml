@@ -14,9 +14,9 @@ jobs:
       postgres:
         image: postgres:15-alpine
         env:
-          POSTGRES_USER: ${{ secrets.POSTGRES_USER || 'postgres' }}
-          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD || 'postgres' }}
-          POSTGRES_DB: ${{ secrets.POSTGRES_DB || 'sales_process' }}
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: testpass
+          POSTGRES_DB: sales_process
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -39,6 +39,15 @@ jobs:
           cd salesProcess/backend
           npm ci
 
+      - name: Wait for PostgreSQL
+        run: |
+          until pg_isready -h localhost -p 5432 -U postgres; do
+            echo "Waiting for PostgreSQL..."
+            sleep 2
+          done
+        env:
+          PGPASSWORD: testpass
+
       - name: Generate Prisma client
         run: |
           cd salesProcess/backend
@@ -49,11 +58,11 @@ jobs:
           cd salesProcess/backend
           npx prisma db push
         env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/sales_process
+          DATABASE_URL: postgresql://postgres:testpass@localhost:5432/sales_process
 
       - name: Run backend tests
         run: |
           cd salesProcess/backend
           npm test
         env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/sales_process
+          DATABASE_URL: postgresql://postgres:testpass@localhost:5432/sales_process
