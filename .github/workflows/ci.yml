@@ -39,10 +39,21 @@ jobs:
           cd salesProcess/backend
           npm ci
 
+      - name: Generate Prisma client
+        run: |
+          cd salesProcess/backend
+          npx prisma generate
+
+      - name: Run database migrations
+        run: |
+          cd salesProcess/backend
+          npx prisma db push
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/sales_process
+
       - name: Run backend tests
         run: |
           cd salesProcess/backend
           npm test
-          
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/sales_process
