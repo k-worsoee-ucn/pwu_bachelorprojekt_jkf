@@ -43,3 +43,6 @@ jobs:
         run: |
           cd salesProcess/backend
           npm test
+          
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/sales_process
