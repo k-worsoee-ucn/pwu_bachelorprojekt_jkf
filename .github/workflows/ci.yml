@@ -36,10 +36,10 @@ jobs:
 
       - name: Install backend dependencies
         run: |
-          cd backend
+          cd salesProcess/backend
           npm ci
 
       - name: Run backend tests
         run: |
-          cd backend
+          cd salesProcess/backend
           npm test
