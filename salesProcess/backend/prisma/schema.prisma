@@ -39,11 +39,18 @@ model Process {
   // One-to-one relationship
   sale Sale?
 
+  // One-to-many relationships
+  references Reference[]
+  products   Product[]
+  cases      Case[]
+
   @@map("processes")
 }
 
 model Sale {
   id               Int    @id @default(autoincrement())
+  industry         String
+  country          String
   filterType       String
   fanType          String
   ductSystem       String
@@ -63,7 +70,6 @@ model Sale {
   customer     Customer @relation(fields: [customerId], references: [id])
   salesManager User     @relation("OwnedSales", fields: [salesManagerId], references: [id])
 
-  // Many-to-many
   saleProducts SaleProduct[]
 
   @@map("sales")
@@ -82,10 +88,8 @@ model User {
 
   processUsers ProcessUser[]
 
-  // Direct sale ownership  
   ownedSales Sale[] @relation("OwnedSales")
 
-  // Customer management - sales managers have assigned customers
   managedCustomers Customer[] @relation("CustomerSalesManager")
 
   @@map("users")
@@ -109,8 +113,6 @@ model ProcessUser {
 model Customer {
   id       Int    @id @default(autoincrement())
   name     String @unique
-  industry String
-  country  String
 
   // Each customer has exactly ONE sales manager
   salesManagerId Int @map("sales_manager_id")
@@ -125,9 +127,16 @@ model Customer {
 }
 
 model Product {
-  id    Int    @id @default(autoincrement())
-  title String
+  id          Int    @id @default(autoincrement())
+  title       String
+  processId   Int?   @map("process_id")
+  referenceId Int?   @map("reference_id")
+  caseId      Int?   @map("case_id")
 
+  // Relationships
+  process      Process?   @relation(fields: [processId], references: [id])
+  reference    Reference? @relation(fields: [referenceId], references: [id])
+  case         Case?      @relation(fields: [caseId], references: [id])
   saleProducts SaleProduct[]
 
   @@map("products")
@@ -136,7 +145,7 @@ model Product {
 model SaleProduct {
   saleId    Int
   productId Int
-  quantity  Int      @default(1)
+  quantity  Int @default(1)
 
   createdAt DateTime @default(now())
 
@@ -148,18 +157,31 @@ model SaleProduct {
 }
 
 model Reference {
-  id Int @id @default(autoincrement())
+  id        Int @id @default(autoincrement())
+  processId Int? @map("process_id")
 
   createdAt DateTime @default(now())
+
+  // Relationships
+  process  Process? @relation(fields: [processId], references: [id])
+  products Product[]
+  cases    Case[]
 
   @@map("references")
 }
 
 model Case {
-  id      Int    @id @default(autoincrement())
-  content String
+  id          Int    @id @default(autoincrement())
+  content     String
+  processId   Int?   @map("process_id")
+  referenceId Int?   @map("reference_id")
 
   createdAt DateTime @default(now())
+
+  // Relationships
+  process   Process?   @relation(fields: [processId], references: [id])
+  reference Reference? @relation(fields: [referenceId], references: [id])
+  products  Product[]
 
   @@map("cases")
 }
