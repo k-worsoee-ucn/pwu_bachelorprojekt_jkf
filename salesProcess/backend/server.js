@@ -6,6 +6,11 @@ require('dotenv').config();
 // Import routes
 const processRoutes = require('./routes/process.routes');
 const salesRoutes = require('./routes/sales.routes');
+const customerRoutes = require('./routes/customer.routes');
+const userRoutes = require('./routes/user.routes');
+const productRoutes = require('./routes/product.routes');
+const referenceRoutes = require('./routes/reference.routes');
+const caseRoutes = require('./routes/case.routes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -32,6 +37,11 @@ app.get('/health', (req, res) => {
 // Routes
 app.use('/api/processes', processRoutes);
 app.use('/api/sales', salesRoutes);
+app.use('/api/customers', customerRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/references', referenceRoutes);
+app.use('/api/cases', caseRoutes);
 
 // Start server
 app.listen(PORT, '0.0.0.0', () => {
