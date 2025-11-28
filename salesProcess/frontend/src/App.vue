@@ -1,30 +1,42 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
 </script>
 
 <template>
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
-  </div>
-  <HelloWorld msg="Vite + Vue" />
+  <nav>
+    <RouterLink to="/">Home</RouterLink>
+    <RouterLink to="/login">Login</RouterLink>
+    <RouterLink to="/my-processes">My Processes</RouterLink>
+    <RouterLink to="/all-processes">All Processes</RouterLink>
+    <RouterLink to="/create-new-process">Create New Process</RouterLink>
+  </nav>
+  
+  <RouterView />
 </template>
 
-<style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+<style scoped lang="scss">
+nav {
+  padding: 1rem;
+  border-bottom: 1px solid #ccc;
+
+  a {
+    margin-right: 1rem;
+    text-decoration: none;
+    color: #333;
+
+    &:hover {
+      color: #666;
+    }
+  }
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+</style>
+
+<style lang="scss">
+* {
+  font-family: Titillium Web;
 }
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
+
+body {
+  max-width: 1920px;
+  margin: 0 auto;
 }
 </style>
