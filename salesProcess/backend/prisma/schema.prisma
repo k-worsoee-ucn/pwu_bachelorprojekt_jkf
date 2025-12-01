@@ -16,9 +16,9 @@ enum ProcessStatus {
 }
 
 enum UserRole {
+  admin
   salesManager
   marketingManager
-  productionManager
   viewer
 }
 
@@ -79,7 +79,7 @@ model User {
   id       Int      @id @default(autoincrement())
   username String   @unique
   email    String   @unique
-  password String   @unique
+  password String
   name     String
   role     UserRole @default(viewer)
 
