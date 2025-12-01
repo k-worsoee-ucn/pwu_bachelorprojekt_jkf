@@ -1,4 +1,6 @@
 const prisma = require("./prisma");
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 async function getAllUsers(req, res) {
   try {
@@ -59,8 +61,10 @@ async function createUser(req, res) {
         .json({ error: "username, email, password, and name are required" });
     }
 
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const user = await prisma.user.create({
-      data: { username, email, password, name, role: role || "viewer" },
+      data: { username, email, password: hashedPassword, name, role: role || "viewer" },
       select: {
         id: true,
         username: true,
@@ -156,6 +160,117 @@ async function getUserSales(req, res) {
   }
 }
 
+// async function registerUser(req, res) {
+//   try {
+//     const { username, email, password, name, role } = req.body;
+//     if (!username || !email || !password || !name) {
+//       return res.status(400).json({ 
+//         error: "username, email, password, and name are required" 
+//       });
+//     }
+
+//     // Check if user already exists
+//     const existingUser = await prisma.user.findFirst({
+//       where: {
+//         OR: [
+//           { username },
+//           { email }
+//         ]
+//       }
+//     });
+
+//     if (existingUser) {
+//       return res.status(409).json({ 
+//         error: "User with this username or email already exists" 
+//       });
+//     }
+
+//     // Hash password
+//     const hashedPassword = await bcrypt.hash(password, 10);
+
+//     const user = await prisma.user.create({
+//       data: { 
+//         username, 
+//         email, 
+//         password: hashedPassword, 
+//         name, 
+//         role: role || "viewer" 
+//       },
+//       select: {
+//         id: true,
+//         username: true,
+//         email: true,
+//         name: true,
+//         role: true,
+//         createdAt: true,
+//       },
+//     });
+
+//     // Generate JWT token
+//     const token = jwt.sign(
+//       { id: user.id, username: user.username, role: user.role },
+//       process.env.JWT_SECRET,
+//       { expiresIn: '24h' }
+//     );
+
+//     res.status(201).json({ user, token });
+//   } catch (error) {
+//     res.status(500).json({ error: error.message });
+//   }
+// }
+
+async function loginUser(req, res) {
+  try {
+    const { username, password } = req.body;
+    if (!username || !password) {
+      return res.status(400).json({ 
+        error: "username and password are required" 
+      });
+    }
+
+    const user = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { username },
+          { email: username }
+        ]
+      }
+    });
+
+    if (!user) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword) {
+      return res.status(401).json({ error: "Invalid credentials" });
+    }
+
+    const token = jwt.sign(
+      { id: user.id, username: user.username, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
+    res.json({ 
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        name: user.name,
+        role: user.role
+      }, 
+      token 
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
+async function getCurrentUser(req, res) {
+  res.json({ user: req.user });
+}
+
 module.exports = {
   getAllUsers,
   getUserById,
@@ -165,4 +280,7 @@ module.exports = {
   getUserProcesses,
   getUserCustomers,
   getUserSales,
+  // registerUser,
+  loginUser,
+  getCurrentUser,
 };
