@@ -16,7 +16,6 @@ enum ProcessStatus {
 }
 
 enum UserRole {
-  admin
   salesManager
   marketingManager
   viewer
