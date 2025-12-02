@@ -37,7 +37,8 @@ jobs:
       - name: Install backend dependencies
         run: |
           cd salesProcess/backend
-          npm ci
+          rm -rf node_modules package-lock.json
+          npm install
 
       - name: Wait for PostgreSQL
         run: |
