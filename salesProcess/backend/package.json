@@ -10,6 +10,7 @@
     "test:watch": "jest --watch",
     "prisma:generate": "prisma generate",
     "prisma:push": "prisma db push",
+    "prisma:migrate": "prisma migrate deploy",
     "prisma:push:local": "cross-env DATABASE_URL=postgresql://postgres:G7kP2bZ9QwL4xF@localhost:5432/sales_process prisma db push",
     "seed": "node prisma/seed.js",
     "sbom:generate": "cyclonedx-npm --output-file sbom.json",
