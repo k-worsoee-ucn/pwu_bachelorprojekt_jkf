@@ -17,7 +17,8 @@ const validateUserLogin = [
   handleValidationErrors
 ];
 
-const validateUserCreation = [
+const validateUserRegistration = [
+  body('accessCode').trim().notEmpty().withMessage('Access code is required'),
   body('username').trim().notEmpty().withMessage('Username is required'),
   body('email').trim().isEmail().withMessage('Valid email is required'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
@@ -32,6 +33,6 @@ const validateId = [
 
 module.exports = {
   validateUserLogin,
-  validateUserCreation,
+  validateUserRegistration,
   validateId
 };

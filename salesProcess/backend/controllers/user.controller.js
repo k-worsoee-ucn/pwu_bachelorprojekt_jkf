@@ -52,44 +52,18 @@ async function getUserById(req, res) {
   }
 }
 
-async function createUser(req, res) {
-  try {
-    const { username, email, password, name, role } = req.body;
-    if (!username || !email || !password || !name) {
-      return res
-        .status(400)
-        .json({ error: "username, email, password, and name are required" });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const user = await prisma.user.create({
-      data: { username, email, password: hashedPassword, name, role: role || "viewer" },
-      select: {
-        id: true,
-        username: true,
-        email: true,
-        name: true,
-        role: true,
-        createdAt: true,
-      },
-    });
-
-    res.status(201).json(user);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-}
-
-async function updateUser(req, res) {
+async function updateCurrentUser(req, res) {
   try {
     const { username, email, name, role } = req.body;
+    const userId = req.user.id; // Get current user's ID from token
+    
     const user = await prisma.user.update({
-      where: { id: parseInt(req.params.id) },
+      where: { id: userId },
       data: {
         ...(username && { username }),
         ...(email && { email }),
         ...(name && { name }),
+        // Note: Role updates could be restricted or removed entirely
         ...(role && { role }),
       },
       select: {
@@ -103,15 +77,6 @@ async function updateUser(req, res) {
     });
 
     res.json(user);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-}
-
-async function deleteUser(req, res) {
-  try {
-    await prisma.user.delete({ where: { id: parseInt(req.params.id) } });
-    res.status(204).send();
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -160,64 +125,66 @@ async function getUserSales(req, res) {
   }
 }
 
-// async function registerUser(req, res) {
-//   try {
-//     const { username, email, password, name, role } = req.body;
-//     if (!username || !email || !password || !name) {
-//       return res.status(400).json({ 
-//         error: "username, email, password, and name are required" 
-//       });
-//     }
+async function registerUser(req, res) {
+  try {
+    const { accessCode, username, email, password, name, role } = req.body;
+    
+    // Validate access code
+    if (accessCode !== process.env.REGISTRATION_ACCESS_CODE) {
+      return res.status(403).json({ 
+        error: 'Invalid access code' 
+      });
+    }
+    
+    // Check if user already exists
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { username },
+          { email }
+        ]
+      }
+    });
 
-//     // Check if user already exists
-//     const existingUser = await prisma.user.findFirst({
-//       where: {
-//         OR: [
-//           { username },
-//           { email }
-//         ]
-//       }
-//     });
+    if (existingUser) {
+      return res.status(409).json({ 
+        error: 'User with this username or email already exists' 
+      });
+    }
 
-//     if (existingUser) {
-//       return res.status(409).json({ 
-//         error: "User with this username or email already exists" 
-//       });
-//     }
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-//     // Hash password
-//     const hashedPassword = await bcrypt.hash(password, 10);
+    const user = await prisma.user.create({
+      data: { 
+        username, 
+        email, 
+        password: hashedPassword, 
+        name, 
+        role: role || "viewer" 
+      },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        name: true,
+        role: true,
+        createdAt: true,
+      },
+    });
 
-//     const user = await prisma.user.create({
-//       data: { 
-//         username, 
-//         email, 
-//         password: hashedPassword, 
-//         name, 
-//         role: role || "viewer" 
-//       },
-//       select: {
-//         id: true,
-//         username: true,
-//         email: true,
-//         name: true,
-//         role: true,
-//         createdAt: true,
-//       },
-//     });
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: user.id, username: user.username, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
 
-//     // Generate JWT token
-//     const token = jwt.sign(
-//       { id: user.id, username: user.username, role: user.role },
-//       process.env.JWT_SECRET,
-//       { expiresIn: '24h' }
-//     );
-
-//     res.status(201).json({ user, token });
-//   } catch (error) {
-//     res.status(500).json({ error: error.message });
-//   }
-// }
+    res.status(201).json({ user, token });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
 
 async function loginUser(req, res) {
   try {
@@ -274,13 +241,11 @@ async function getCurrentUser(req, res) {
 module.exports = {
   getAllUsers,
   getUserById,
-  createUser,
-  updateUser,
-  deleteUser,
+  updateCurrentUser,
   getUserProcesses,
   getUserCustomers,
   getUserSales,
-  // registerUser,
+  registerUser,
   loginUser,
   getCurrentUser,
 };

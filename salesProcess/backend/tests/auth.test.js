@@ -70,9 +70,9 @@ describe('Authentication Middleware - Critical Tests', () => {
     test('should block users without proper role', () => {
       const { requireRole } = require('../middleware/auth');
       mockReq.user = { role: 'viewer' };
-      const adminOnly = requireRole(['admin']);
+      const salesManagerOnly = requireRole(['salesManager']);
       
-      adminOnly(mockReq, mockRes, mockNext);
+      salesManagerOnly(mockReq, mockRes, mockNext);
 
       expect(mockRes.status).toHaveBeenCalledWith(403);
       expect(mockRes.json).toHaveBeenCalledWith({ error: "Insufficient permissions" });
@@ -80,10 +80,10 @@ describe('Authentication Middleware - Critical Tests', () => {
 
     test('should allow users with correct role', () => {
       const { requireRole } = require('../middleware/auth');
-      mockReq.user = { role: 'admin' };
-      const adminOnly = requireRole(['admin']);
+      mockReq.user = { role: 'salesManager' };
+      const salesManagerOnly = requireRole(['salesManager']);
       
-      adminOnly(mockReq, mockRes, mockNext);
+      salesManagerOnly(mockReq, mockRes, mockNext);
 
       expect(mockNext).toHaveBeenCalled();
       expect(mockRes.status).not.toHaveBeenCalled();
@@ -91,9 +91,9 @@ describe('Authentication Middleware - Critical Tests', () => {
 
     test('should block requests without user object', () => {
       const { requireRole } = require('../middleware/auth');
-      const adminOnly = requireRole(['admin']);
+      const salesManagerOnly = requireRole(['salesManager']);
       
-      adminOnly(mockReq, mockRes, mockNext);
+      salesManagerOnly(mockReq, mockRes, mockNext);
 
       expect(mockRes.status).toHaveBeenCalledWith(401);
       expect(mockRes.json).toHaveBeenCalledWith({ error: "Authentication required" });
