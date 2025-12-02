@@ -19,7 +19,6 @@ const verifyToken = async (req, res, next) => {
       where: { id: decoded.id },
       select: {
         id: true,
-        username: true,
         email: true,
         name: true,
         role: true

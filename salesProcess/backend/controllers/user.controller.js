@@ -12,7 +12,6 @@ async function getAllUsers(req, res) {
       where: whereClause,
       select: {
         id: true,
-        username: true,
         email: true,
         name: true,
         role: true,
@@ -33,7 +32,6 @@ async function getUserById(req, res) {
       where: { id: parseInt(req.params.id) },
       select: {
         id: true,
-        username: true,
         email: true,
         name: true,
         role: true,
@@ -54,13 +52,12 @@ async function getUserById(req, res) {
 
 async function updateCurrentUser(req, res) {
   try {
-    const { username, email, name, role } = req.body;
+    const { email, name, role } = req.body;
     const userId = req.user.id; // Get current user's ID from token
     
     const user = await prisma.user.update({
       where: { id: userId },
       data: {
-        ...(username && { username }),
         ...(email && { email }),
         ...(name && { name }),
         // Note: Role updates could be restricted or removed entirely
@@ -68,7 +65,6 @@ async function updateCurrentUser(req, res) {
       },
       select: {
         id: true,
-        username: true,
         email: true,
         name: true,
         role: true,
@@ -127,7 +123,7 @@ async function getUserSales(req, res) {
 
 async function registerUser(req, res) {
   try {
-    const { accessCode, username, email, password, name, role } = req.body;
+    const { accessCode, email, password, name, role } = req.body;
     
     // Validate access code
     if (accessCode !== process.env.REGISTRATION_ACCESS_CODE) {
@@ -137,18 +133,13 @@ async function registerUser(req, res) {
     }
     
     // Check if user already exists
-    const existingUser = await prisma.user.findFirst({
-      where: {
-        OR: [
-          { username },
-          { email }
-        ]
-      }
+    const existingUser = await prisma.user.findUnique({
+      where: { email }
     });
 
     if (existingUser) {
       return res.status(409).json({ 
-        error: 'User with this username or email already exists' 
+        error: 'User with this email already exists' 
       });
     }
 
@@ -157,7 +148,6 @@ async function registerUser(req, res) {
 
     const user = await prisma.user.create({
       data: { 
-        username, 
         email, 
         password: hashedPassword, 
         name, 
@@ -165,7 +155,6 @@ async function registerUser(req, res) {
       },
       select: {
         id: true,
-        username: true,
         email: true,
         name: true,
         role: true,
@@ -175,7 +164,7 @@ async function registerUser(req, res) {
 
     // Generate JWT token
     const token = jwt.sign(
-      { id: user.id, username: user.username, role: user.role },
+      { id: user.id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
@@ -188,20 +177,15 @@ async function registerUser(req, res) {
 
 async function loginUser(req, res) {
   try {
-    const { username, password } = req.body;
-    if (!username || !password) {
+    const { email, password } = req.body;
+    if (!email || !password) {
       return res.status(400).json({ 
-        error: "username and password are required" 
+        error: "email and password are required" 
       });
     }
 
-    const user = await prisma.user.findFirst({
-      where: {
-        OR: [
-          { username },
-          { email: username }
-        ]
-      }
+    const user = await prisma.user.findUnique({
+      where: { email }
     });
 
     if (!user) {
@@ -214,7 +198,7 @@ async function loginUser(req, res) {
     }
 
     const token = jwt.sign(
-      { id: user.id, username: user.username, role: user.role },
+      { id: user.id, email: user.email, role: user.role },
       process.env.JWT_SECRET,
       { expiresIn: '24h' }
     );
@@ -222,7 +206,7 @@ async function loginUser(req, res) {
     res.json({ 
       user: {
         id: user.id,
-        username: user.username,
+        email: user.email,
         email: user.email,
         name: user.name,
         role: user.role
