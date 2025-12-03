@@ -8,6 +8,8 @@ import Header from './components/Header.vue'
 </template>
 
 <style lang="scss">
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css');
+
 * {
   font-family: Titillium Web;
 }
