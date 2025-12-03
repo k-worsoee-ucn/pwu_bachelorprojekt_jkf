@@ -2,9 +2,27 @@ const prisma = require("./prisma");
 
 async function getAllSales(req, res) {
   try {
-    const sales = await prisma.sale.findMany();
+    const sales = await prisma.sale.findMany({
+      include: {
+        process: true,
+        customer: true,
+        salesManager: {
+          select: {
+            id: true,
+            name: true,
+            email: true
+          }
+        },
+        saleProducts: {
+          include: {
+            product: true
+          }
+        }
+      }
+    });
     res.json(sales);
   } catch (error) {
+    console.error('Error fetching sales:', error);
     res.status(500).json({ error: error.message });
   }
 }
@@ -13,10 +31,31 @@ async function getSaleById(req, res) {
   try {
     const sale = await prisma.sale.findUnique({
       where: { id: parseInt(req.params.id) },
+      include: {
+        process: true,
+        customer: true,
+        salesManager: {
+          select: {
+            id: true,
+            name: true,
+            email: true
+          }
+        },
+        saleProducts: {
+          include: {
+            product: true
+          }
+        }
+      }
     });
-    if (!sale) return res.status(404).json({ error: "Sale not found" });
+    
+    if (!sale) {
+      return res.status(404).json({ error: "Sale not found" });
+    }
+    
     res.json(sale);
   } catch (error) {
+    console.error('Error fetching sale:', error);
     res.status(500).json({ error: error.message });
   }
 }
@@ -24,68 +63,178 @@ async function getSaleById(req, res) {
 async function createSale(req, res) {
   try {
     const {
+      // Basic Information
+      endUser,
+      country,
+      industry,
+      customIndustry,
+      customerId,
+      salesManagerId,
+      // Product Selection
+      selectedFilters = [],
+      selectedFans = [],
+      selectedDucts = [],
+      // Technical Specifications
+      plantType,
       filterType,
       fanType,
+      dustType,
       ductSystem,
-      extractionVolume,
-      volumeFlow,
-      processId,
+      totalExtractionVolume,
+      volumeFlow
     } = req.body;
-    if (!processId)
-      return res.status(400).json({ error: "processId is required" });
 
-    const sale = await prisma.sale.create({
-      data: {
-        filterType,
-        fanType,
-        ductSystem,
-        extractionVolume,
-        volumeFlow,
-        processId,
-      },
-      include: { process: true },
+    if (!endUser || !country || !industry || !customerId || !salesManagerId) {
+      return res.status(400).json({ 
+        error: "Required fields: endUser, country, industry, customerId, salesManagerId" 
+      });
+    }
+
+    const customer = await prisma.customer.findUnique({
+      where: { id: customerId },
+      select: { name: true }
     });
 
-    res.status(201).json(sale);
+    if (!customer) {
+      return res.status(400).json({ error: "Customer not found" });
+    }
+
+    const lastProcess = await prisma.process.findFirst({
+      orderBy: { caseNo: 'desc' },
+      select: { caseNo: true }
+    });
+    const nextCaseNo = (lastProcess?.caseNo || 0) + 1;
+
+    const currentDate = new Date().toLocaleDateString('en-GB');
+    const processTitle = `${customer.name} - ${endUser} - ${currentDate}`;
+
+    const allSelectedProducts = [
+      ...selectedFilters,
+      ...selectedFans,
+      ...selectedDucts
+    ].filter(id => id);
+
+    const result = await prisma.$transaction(async (prisma) => {
+      const process = await prisma.process.create({
+        data: {
+          title: processTitle,
+          caseNo: nextCaseNo,
+          status: 'ongoing'
+        }
+      });
+
+      const sale = await prisma.sale.create({
+        data: {
+          title: processTitle,
+          endUser,
+          country,
+          industry,
+          customIndustry: industry === 'other' ? customIndustry : null,
+          plantType,
+          filterType,
+          fanType,
+          dustType,
+          ductSystem,
+          totalExtractionVolume: parseInt(totalExtractionVolume),
+          volumeFlow: parseInt(volumeFlow),
+          processId: process.id,
+          customerId,
+          salesManagerId
+        }
+      });
+
+      if (allSelectedProducts.length > 0) {
+        const saleProductData = allSelectedProducts.map(productId => ({
+          saleId: sale.id,
+          productId: parseInt(productId),
+          quantity: 1
+        }));
+
+        await prisma.saleProduct.createMany({
+          data: saleProductData
+        });
+      }
+
+      return await prisma.sale.findUnique({
+        where: { id: sale.id },
+        include: {
+          process: true,
+          customer: true,
+          salesManager: {
+            select: {
+              id: true,
+              name: true,
+              email: true
+            }
+          },
+          saleProducts: {
+            include: {
+              product: true
+            }
+          }
+        }
+      });
+    });
+
+    console.log(`Created sale and process: ${processTitle} (Case #${nextCaseNo})`);
+    res.status(201).json(result);
+
   } catch (error) {
+    console.error('Error creating sale:', error);
     res.status(500).json({ error: error.message });
   }
 }
 
 async function updateSale(req, res) {
   try {
-    const {
-      filterType,
-      fanType,
-      ductSystem,
-      extractionVolume,
-      volumeFlow,
-      processId,
-    } = req.body;
+    const { id } = req.params;
+    const updateData = req.body;
+
     const sale = await prisma.sale.update({
-      where: { id: parseInt(req.params.id) },
-      data: {
-        filterType,
-        fanType,
-        ductSystem,
-        extractionVolume,
-        volumeFlow,
-        ...(processId !== undefined && { processId }),
-      },
-      include: { process: true },
+      where: { id: parseInt(id) },
+      data: updateData,
+      include: {
+        process: true,
+        customer: true,
+        salesManager: {
+          select: {
+            id: true,
+            name: true,
+            email: true
+          }
+        },
+        saleProducts: {
+          include: {
+            product: true
+          }
+        }
+      }
     });
 
     res.json(sale);
   } catch (error) {
+    console.error('Error updating sale:', error);
     res.status(500).json({ error: error.message });
   }
 }
 
 async function deleteSale(req, res) {
   try {
-    await prisma.sale.delete({ where: { id: parseInt(req.params.id) } });
+    const { id } = req.params;
+
+    await prisma.$transaction(async (prisma) => {
+      await prisma.saleProduct.deleteMany({
+        where: { saleId: parseInt(id) }
+      });
+
+      await prisma.sale.delete({
+        where: { id: parseInt(id) }
+      });
+    });
+
     res.status(204).send();
   } catch (error) {
+    console.error('Error deleting sale:', error);
     res.status(500).json({ error: error.message });
   }
 }
