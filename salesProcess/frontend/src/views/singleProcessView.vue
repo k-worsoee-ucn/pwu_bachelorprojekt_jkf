@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { processes as mockProcesses } from '@/js/mockProcesses.js';
+import SalesStep from '@/components/SalesStep.vue'
 
 const route = useRoute();
 const router = useRouter();
@@ -34,6 +35,9 @@ const goBack = () => {
     </div>
     <div v-else>
         <p>Process not found</p>
+    </div>
+    <div>
+        <SalesStep :process="process" />
     </div>
 </template>
 

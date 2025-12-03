@@ -1,12 +1,10 @@
 <script setup>
 import Header from './components/Header.vue'
-import SalesStep from './components/SalesStep.vue'
 </script>
 
 <template>
   <Header />
   <RouterView />
-  <SalesStep />
 </template>
 
 <style lang="scss">

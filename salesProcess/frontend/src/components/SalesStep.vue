@@ -3,7 +3,6 @@
     <h2>Sale Information</h2>
     
     <form @submit.prevent="submitForm" class="form-grid">
-      <!-- Basic Information -->
       <div class="form-section">
         <h3>Basic Information</h3>
         
@@ -89,7 +88,6 @@
         </div>
       </div>
 
-      <!-- Technical Specifications -->
       <div class="form-section">
         <h3>Technical Specifications</h3>
         
@@ -175,7 +173,6 @@
         </div>
       </div>
 
-      <!-- Form Actions -->
       <div class="form-actions">
         <button type="button" @click="resetForm" class="btn-secondary">
           Reset
@@ -186,12 +183,10 @@
       </div>
     </form>
 
-    <!-- Error Display -->
     <div v-if="errorMessage" class="error-message">
       {{ errorMessage }}
     </div>
 
-    <!-- Success Display -->
     <div v-if="successMessage" class="success-message">
       {{ successMessage }}
     </div>
@@ -218,7 +213,6 @@ const props = defineProps({
 
 const emit = defineEmits(['sale-created', 'sale-updated', 'cancel'])
 
-// Reactive data
 const formData = reactive({
   endUser: '',
   country: '',
@@ -239,7 +233,6 @@ const isSubmitting = ref(false)
 const errorMessage = ref('')
 const successMessage = ref('')
 
-// Computed properties
 const isEdit = computed(() => props.sale !== null)
 
 const selectedCustomerWebsite = computed(() => {
@@ -247,7 +240,6 @@ const selectedCustomerWebsite = computed(() => {
   return selectedCustomer?.website || 'No website available'
 })
 
-// Methods
 const resetForm = () => {
   Object.assign(formData, {
     endUser: '',
@@ -298,7 +290,6 @@ const loadCustomers = async () => {
 }
 
 const onCustomerChange = () => {
-  // Reset custom industry when customer changes
   if (formData.industry !== 'other') {
     formData.customIndustry = ''
   }
@@ -313,10 +304,9 @@ const submitForm = async () => {
     const saleData = {
       ...formData,
       processId: props.processId,
-      salesManagerId: props.currentUserId // Sales manager is the current user
+      salesManagerId: props.currentUserId
     }
 
-    // Remove customIndustry if industry is not 'other'
     if (saleData.industry !== 'other') {
       saleData.customIndustry = null
     }
@@ -355,7 +345,6 @@ const submitForm = async () => {
   }
 }
 
-// Lifecycle
 onMounted(() => {
   loadCustomers()
   loadFormData()
