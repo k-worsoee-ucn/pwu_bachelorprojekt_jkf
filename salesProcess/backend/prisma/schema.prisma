@@ -21,6 +21,15 @@ enum UserRole {
   viewer
 }
 
+enum Industry {
+  woodworking @map("Woodworking")
+  agroAndMilling @map("Agro- and Milling")
+  recycling @map("Recycling")
+  metalworking @map("Metalworking")
+  paper @map("Paper")
+  other @map("Other")
+}
+
 // MODELS
 
 model Process {
@@ -47,14 +56,18 @@ model Process {
 }
 
 model Sale {
-  id               Int    @id @default(autoincrement())
-  industry         String
-  country          String
-  filterType       String
-  fanType          String
-  ductSystem       String
-  extractionVolume Int
-  volumeFlow       Int
+  id                     Int      @id @default(autoincrement())
+  title                  String
+  endUser                String   @map("end_user")
+  industry               Industry
+  customIndustry         String?  @map("custom_industry")
+  plantType              String   @map("plant_type")
+  filterType             String   @map("filter_type")
+  fanType                String   @map("fan_type")
+  dustType               String   @map("dust_type")
+  ductSystem             String   @map("duct_system")
+  totalExtractionVolume  Int      @map("total_extraction_volume")
+  volumeFlow             Int      @map("volume_flow")
 
   // FK
   processId      Int @unique @map("process_id")
@@ -111,6 +124,7 @@ model ProcessUser {
 model Customer {
   id       Int    @id @default(autoincrement())
   name     String @unique
+  website  String?
 
   // Each customer has exactly ONE sales manager
   salesManagerId Int @map("sales_manager_id")
