@@ -3,6 +3,7 @@ import LoginView from '../views/loginView.vue'
 import MyProcessesView from '../views/myProcessesView.vue'
 import AllProcessesView from '../views/allProcessesView.vue'
 import CreateNewProcessView from '../views/createNewProcessView.vue'
+import SingleProcessView from '../views/singleProcessView.vue'
 
 const routes = [
   {
@@ -28,6 +29,11 @@ const routes = [
     path: '/create-new-process',
     name: 'CreateNewProcess',
     component: CreateNewProcessView
+  },
+  {
+    path: '/process/:id',
+    name: 'SingleProcess',
+    component: SingleProcessView
   },
 
 ]
