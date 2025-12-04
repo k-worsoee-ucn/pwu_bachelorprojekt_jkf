@@ -10,26 +10,23 @@ async function getAllProducts(req, res) {
     if (caseId) whereClause.caseId = parseInt(caseId);
 
     const products = await prisma.product.findMany({
-      where: whereClause,
-      include: {
-        process: true,
-        reference: true,
-        case: true,
-        saleProducts: {
-          include: {
-            sale: {
-              include: {
-                customer: true,
-                process: true,
-              },
-            },
-          },
-        },
+      where: Object.keys(whereClause).length > 0 ? whereClause : undefined,
+      select: {
+        id: true,
+        title: true,
+        category: true,
+        processId: true,
+        referenceId: true,
+        caseId: true,
       },
+      orderBy: {
+        category: 'asc'
+      }
     });
 
     res.json(products);
   } catch (error) {
+    console.error('Error fetching products:', error);
     res.status(500).json({ error: error.message });
   }
 }
@@ -67,28 +64,36 @@ async function getProductById(req, res) {
 
 async function createProduct(req, res) {
   try {
-    const { title, processId, referenceId, caseId } = req.body;
+    const { title, category, processId, referenceId, caseId } = req.body;
 
     if (!title) {
       return res.status(400).json({ error: "title is required" });
+    }
+    if (!category) {
+      return res.status(400).json({ error: "category is required" });
     }
 
     const product = await prisma.product.create({
       data: {
         title,
+        category,
         ...(processId && { processId }),
         ...(referenceId && { referenceId }),
         ...(caseId && { caseId }),
       },
-      include: {
-        process: true,
-        reference: true,
-        case: true,
+      select: {
+        id: true,
+        title: true,
+        category: true,
+        processId: true,
+        referenceId: true,
+        caseId: true,
       },
     });
 
     res.status(201).json(product);
   } catch (error) {
+    console.error('Error creating product:', error);
     res.status(500).json({ error: error.message });
   }
 }

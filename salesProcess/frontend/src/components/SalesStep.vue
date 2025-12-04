@@ -5,7 +5,16 @@
     <form @submit.prevent="submitForm" class="form-grid">
       <div class="form-section">
         <h3>Basic Information</h3>
-        
+          <div class="form-group">
+            <label for="title">Process Title *</label>
+              <input
+                id="title"
+                v-model="formData.title"
+                type="text"
+                placeholder="Enter a descriptive title for this process"
+                required
+              />
+          </div>
         <div class="form-group">
           <label for="customerId">Plant Manufacturer *</label>
           <select
@@ -88,6 +97,69 @@
         </div>
       </div>
 
+      <!-- Product Selection -->
+      <div class="form-section">
+        <h3>Product Selection</h3>
+        
+        <div class="form-group">
+          <label for="filtersAndSeparators">Filters & Separators</label>
+          <select
+            id="filtersAndSeparators"
+            v-model="formData.selectedFilters"
+            multiple
+            class="multi-select"
+          >
+            <option
+              v-for="product in filterProducts"
+              :key="product.id"
+              :value="product.id"
+            >
+              {{ product.title }}
+            </option>
+          </select>
+          <small class="help-text">Hold Ctrl/Cmd to select multiple items</small>
+        </div>
+
+        <div class="form-group">
+          <label for="fanSystems">Fan Systems</label>
+          <select
+            id="fanSystems"
+            v-model="formData.selectedFans"
+            multiple
+            class="multi-select"
+          >
+            <option
+              v-for="product in fanProducts"
+              :key="product.id"
+              :value="product.id"
+            >
+              {{ product.title }}
+            </option>
+          </select>
+          <small class="help-text">Hold Ctrl/Cmd to select multiple items</small>
+        </div>
+
+        <div class="form-group">
+          <label for="ductSystems">Duct Systems</label>
+          <select
+            id="ductSystems"
+            v-model="formData.selectedDucts"
+            multiple
+            class="multi-select"
+          >
+            <option
+              v-for="product in ductProducts"
+              :key="product.id"
+              :value="product.id"
+            >
+              {{ product.title }}
+            </option>
+          </select>
+          <small class="help-text">Hold Ctrl/Cmd to select multiple items</small>
+        </div>
+      </div>
+
+      <!-- Technical Specifications -->
       <div class="form-section">
         <h3>Technical Specifications</h3>
         
@@ -214,10 +286,14 @@ const props = defineProps({
 const emit = defineEmits(['sale-created', 'sale-updated', 'cancel'])
 
 const formData = reactive({
+  title: '',
   endUser: '',
   country: '',
   industry: '',
   customIndustry: '',
+  selectedFilters: [],
+  selectedFans: [],
+  selectedDucts: [],
   plantType: '',
   filterType: '',
   fanType: '',
@@ -229,6 +305,7 @@ const formData = reactive({
 })
 
 const customers = ref([])
+const products = ref([])
 const isSubmitting = ref(false)
 const errorMessage = ref('')
 const successMessage = ref('')
@@ -240,12 +317,28 @@ const selectedCustomerWebsite = computed(() => {
   return selectedCustomer?.website || 'No website available'
 })
 
+const filterProducts = computed(() => {
+  return products.value.filter(p => p.category === 'filtersAndSeparators')
+})
+
+const fanProducts = computed(() => {
+  return products.value.filter(p => p.category === 'fanSystems')
+})
+
+const ductProducts = computed(() => {
+  return products.value.filter(p => p.category === 'ductSystems')
+})
+
+// Methods
 const resetForm = () => {
   Object.assign(formData, {
     endUser: '',
     country: '',
     industry: '',
     customIndustry: '',
+    selectedFilters: [],
+    selectedFans: [],
+    selectedDucts: [],
     plantType: '',
     filterType: '',
     fanType: '',
@@ -286,6 +379,17 @@ const loadCustomers = async () => {
     }
   } catch (error) {
     console.error('Error loading customers:', error)
+  }
+}
+
+const loadProducts = async () => {
+  try {
+    const response = await fetch('/api/products')
+    if (response.ok) {
+      products.value = await response.json()
+    }
+  } catch (error) {
+    console.error('Error loading products:', error)
   }
 }
 
@@ -345,8 +449,10 @@ const submitForm = async () => {
   }
 }
 
+// Lifecycle
 onMounted(() => {
   loadCustomers()
+  loadProducts()
   loadFormData()
 })
 </script>
@@ -475,6 +581,18 @@ onMounted(() => {
   border-radius: 4px;
   border: 1px solid #bbf7d0;
   margin-top: 1rem;
+}
+
+.multi-select {
+  min-height: 80px !important;
+  padding: 0.5rem !important;
+}
+
+.help-text {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  display: block;
 }
 
 @media (max-width: 768px) {

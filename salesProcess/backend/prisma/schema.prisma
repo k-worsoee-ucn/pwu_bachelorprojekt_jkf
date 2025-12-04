@@ -30,6 +30,12 @@ enum Industry {
   other @map("Other")
 }
 
+enum ProductCategory {
+  filtersAndSeparators @map("Filters & Separators")
+  fanSystems @map("Fan Systems")
+  ductSystems @map("Duct Systems")
+}
+
 // MODELS
 
 model Process {
@@ -59,6 +65,7 @@ model Sale {
   id                     Int      @id @default(autoincrement())
   title                  String
   endUser                String   @map("end_user")
+  country                String
   industry               Industry
   customIndustry         String?  @map("custom_industry")
   plantType              String   @map("plant_type")
@@ -139,11 +146,12 @@ model Customer {
 }
 
 model Product {
-  id          Int    @id @default(autoincrement())
+  id          Int             @id @default(autoincrement())
   title       String
-  processId   Int?   @map("process_id")
-  referenceId Int?   @map("reference_id")
-  caseId      Int?   @map("case_id")
+  category    ProductCategory
+  processId   Int?            @map("process_id")
+  referenceId Int?            @map("reference_id")
+  caseId      Int?            @map("case_id")
 
   // Relationships
   process      Process?   @relation(fields: [processId], references: [id])
