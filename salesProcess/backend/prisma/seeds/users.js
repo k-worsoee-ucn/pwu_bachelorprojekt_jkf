@@ -7,6 +7,10 @@ async function seedUsers() {
   
   // Use environment variable for seed password
   const seedPassword = process.env.SEED_PASSWORD
+  
+  if (!seedPassword) {
+    throw new Error('SEED_PASSWORD environment variable is required')
+  }
 
   const hashedPassword = await bcrypt.hash(seedPassword, 10)
   

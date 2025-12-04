@@ -18,7 +18,7 @@ services:
   backend:
     build: ./backend
     container_name: sales_process_backend
-    command: sh -c "npm run prisma:push && node prisma/seed.js && npm start"
+    command: sh -c "npm run prisma:push -- --accept-data-loss && node prisma/seed.js && npm start" # accept-data-loss for dev only
     environment:
       NODE_ENV: ${NODE_ENV}
       PORT: 3000
@@ -31,6 +31,7 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       CORS_ORIGIN: ${CORS_ORIGIN}
       REGISTRATION_ACCESS_CODE: ${REGISTRATION_ACCESS_CODE}
+      SEED_PASSWORD: ${SEED_PASSWORD}
     ports:
       - "${BACKEND_PORT}:3000"
       - "5555:5555"  # Prisma Studio
