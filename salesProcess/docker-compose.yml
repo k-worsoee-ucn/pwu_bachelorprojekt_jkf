@@ -18,7 +18,7 @@ services:
   backend:
     build: ./backend
     container_name: sales_process_backend
-    command: sh -c "npm run prisma:push && npm start"
+    command: sh -c "npm run prisma:push && node prisma/seed.js && npm start"
     environment:
       NODE_ENV: ${NODE_ENV}
       PORT: 3000
