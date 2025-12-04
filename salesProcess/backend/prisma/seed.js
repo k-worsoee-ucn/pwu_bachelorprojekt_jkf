@@ -6,7 +6,6 @@ const { seedProducts } = require('./seeds/products')
 const prisma = new PrismaClient()
 
 async function main() {
-  console.log('🌱 Starting seed process...')
 
   try {
     // Seed users first (required for customers)
@@ -19,13 +18,13 @@ async function main() {
     // Seed products (add dependencies if needed)
     const products = await seedProducts(/* pass dependencies here */)
 
-    console.log('🎉 Seed process completed successfully!')
+    console.log('Seed process completed successfully!')
     console.log('\nCreated data summary:')
     console.log(`- Users: ${users.length}`)
     console.log(`- Customers: ${customers.length}`)
     console.log(`- Products: ${products.length}`)
   } catch (error) {
-    console.error('❌ Seed process failed:', error)
+    console.error('Seed process failed:', error)
     throw error
   }
 }

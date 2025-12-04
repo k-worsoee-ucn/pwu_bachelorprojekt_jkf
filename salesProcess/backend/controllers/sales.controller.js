@@ -64,6 +64,7 @@ async function createSale(req, res) {
   try {
     const {
       // Basic Information
+      title,
       endUser,
       country,
       industry,
@@ -84,9 +85,9 @@ async function createSale(req, res) {
       volumeFlow
     } = req.body;
 
-    if (!endUser || !country || !industry || !customerId || !salesManagerId) {
+    if (!title || !endUser || !country || !industry || !customerId || !salesManagerId) {
       return res.status(400).json({ 
-        error: "Required fields: endUser, country, industry, customerId, salesManagerId" 
+        error: "Required fields: title, endUser, country, industry, customerId, salesManagerId" 
       });
     }
 
@@ -105,9 +106,6 @@ async function createSale(req, res) {
     });
     const nextCaseNo = (lastProcess?.caseNo || 0) + 1;
 
-    const currentDate = new Date().toLocaleDateString('en-GB');
-    const processTitle = `${customer.name} - ${endUser} - ${currentDate}`;
-
     const allSelectedProducts = [
       ...selectedFilters,
       ...selectedFans,
@@ -117,7 +115,7 @@ async function createSale(req, res) {
     const result = await prisma.$transaction(async (prisma) => {
       const process = await prisma.process.create({
         data: {
-          title: processTitle,
+          title: title,
           caseNo: nextCaseNo,
           status: 'ongoing'
         }
@@ -125,7 +123,7 @@ async function createSale(req, res) {
 
       const sale = await prisma.sale.create({
         data: {
-          title: processTitle,
+          title: title,
           endUser,
           country,
           industry,
@@ -176,7 +174,7 @@ async function createSale(req, res) {
       });
     });
 
-    console.log(`Created sale and process: ${processTitle} (Case #${nextCaseNo})`);
+    console.log(`Created sale and process: ${title} (Case #${nextCaseNo})`);
     res.status(201).json(result);
 
   } catch (error) {

@@ -5,7 +5,16 @@
     <form @submit.prevent="submitForm" class="form-grid">
       <div class="form-section">
         <h3>Basic Information</h3>
-        
+          <div class="form-group">
+            <label for="title">Process Title *</label>
+              <input
+                id="title"
+                v-model="formData.title"
+                type="text"
+                placeholder="Enter a descriptive title for this process"
+                required
+              />
+          </div>
         <div class="form-group">
           <label for="customerId">Plant Manufacturer *</label>
           <select
@@ -277,6 +286,7 @@ const props = defineProps({
 const emit = defineEmits(['sale-created', 'sale-updated', 'cancel'])
 
 const formData = reactive({
+  title: '',
   endUser: '',
   country: '',
   industry: '',
