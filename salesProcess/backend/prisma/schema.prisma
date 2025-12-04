@@ -65,6 +65,7 @@ model Sale {
   id                     Int      @id @default(autoincrement())
   title                  String
   endUser                String   @map("end_user")
+  country                String
   industry               Industry
   customIndustry         String?  @map("custom_industry")
   plantType              String   @map("plant_type")
