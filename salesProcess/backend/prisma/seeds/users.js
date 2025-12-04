@@ -5,7 +5,10 @@ const prisma = new PrismaClient()
 
 async function seedUsers() {
   
-  const hashedPassword = await bcrypt.hash('password123', 10)
+  // Use environment variable for seed password
+  const seedPassword = process.env.SEED_PASSWORD
+
+  const hashedPassword = await bcrypt.hash(seedPassword, 10)
   
   const users = await Promise.all([
     prisma.user.upsert({
