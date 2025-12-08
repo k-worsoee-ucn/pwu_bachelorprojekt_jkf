@@ -8,7 +8,7 @@ import SingleProcessView from '../views/singleProcessView.vue'
 const routes = [
   {
     path: '/',
-    redirect: '/login'
+    redirect: '/my-processes'
   },
   {
     path: '/login',
@@ -18,29 +18,45 @@ const routes = [
   {
     path: '/my-processes',
     name: 'MyProcesses',
-    component: MyProcessesView
+    component: MyProcessesView,
+    meta: { requiresAuth: true }
   },
   {
     path: '/all-processes',
     name: 'AllProcesses',
-    component: AllProcessesView
+    component: AllProcessesView,
+    meta: { requiresAuth: true }
   },
   {
     path: '/create-new-process',
     name: 'CreateNewProcess',
-    component: CreateNewProcessView
+    component: CreateNewProcessView,
+    meta: { requiresAuth: true }
   },
   {
     path: '/process/:id',
     name: 'SingleProcess',
-    component: SingleProcessView
+    component: SingleProcessView,
+    meta: { requiresAuth: true }
   },
-
 ]
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
   routes
+})
+
+// Route guard for authentication
+router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem('token')
+  
+  if (to.meta.requiresAuth && !token) {
+    next('/login')
+  } else if (to.path === '/login' && token) {
+    next('/my-processes') 
+  } else {
+    next()
+  }
 })
 
 export default router

@@ -1,5 +1,13 @@
 <script setup>
+import { onMounted } from 'vue'
 import Header from './components/Header.vue'
+import { useAuth } from '@/composables/useAuth'
+
+const { initAuth } = useAuth()
+
+onMounted(() => {
+  initAuth()
+})
 </script>
 
 <template>
