@@ -1,7 +1,8 @@
 <script setup>
 import { onMounted } from 'vue'
-import Header from './components/Header.vue'
 import { useAuth } from '@/composables/useAuth'
+import Header from './components/Header.vue'
+import TabHeader from './components/TabHeader.vue'
 
 const { initAuth } = useAuth()
 
@@ -12,6 +13,8 @@ onMounted(() => {
 
 <template>
   <Header />
+  <TabHeader />
+
   <RouterView />
 </template>
 
