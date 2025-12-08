@@ -26,19 +26,6 @@ async function getProcessById(req, res) {
   }
 }
 
-async function createProcess(req, res) {
-  try {
-    const { title, caseNo, status } = req.body;
-    const process = await prisma.process.create({
-      data: { title, caseNo, status },
-      include: { sale: true },
-    });
-    res.status(201).json(process);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-}
-
 async function updateProcess(req, res) {
   try {
     const { title, caseNo, status } = req.body;
@@ -65,7 +52,6 @@ async function deleteProcess(req, res) {
 module.exports = {
   getAllProcesses,
   getProcessById,
-  createProcess,
   updateProcess,
   deleteProcess,
 };

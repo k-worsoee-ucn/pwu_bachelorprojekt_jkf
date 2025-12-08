@@ -1,17 +1,31 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { processes as mockProcesses } from '@/js/mockProcesses.js';
+import { useAuth } from '@/composables/useAuth';
 import SalesStep from '@/components/SalesStep.vue'
 
 const route = useRoute();
 const router = useRouter();
+const { getAuthHeader } = useAuth();
 const processId = route.params.id;
 
 const process = ref(null);
+const isNewSale = processId === 'new';
 
-onMounted(() => {
-    process.value = mockProcesses.find(p => p.id === parseInt(processId));
+onMounted(async () => {
+    if (!isNewSale) {
+        try {
+            const response = await fetch(`/api/processes/${processId}`, {
+                headers: {
+                    ...getAuthHeader()
+                }
+            });
+            const data = await response.json();
+            process.value = data;
+        } catch (error) {
+            console.error('Error fetching process:', error);
+        }
+    }
 });
 
 const goBack = () => {
@@ -20,24 +34,34 @@ const goBack = () => {
 </script>
 
 <template>
-    <div class="single-process-container" v-if="process">
+    <div v-if="isNewSale" class="single-process-container">
         <button class="back-button" @click="goBack">
             <i class="fa-solid fa-chevron-left"></i> Back
         </button>
-        <h1>{{ process.name }}</h1>
-        <p><strong>Case Number:</strong> {{ process.caseNumber }}</p>
-        <p><strong>Start Date:</strong> {{ process.startDate }}</p>
-        <p><strong>Expected End Date:</strong> {{ process.expectedEndDate }}</p>
-        <p><strong>Current Step:</strong> {{ process.step }} / 6</p>
+        <h1>Create New Sale</h1>
+        <p><strong>Current Step:</strong> 1 / 6</p>
         <div class="progress-bar">
-            <div class="progress-fill" :style="{ width: (process.step / 6) * 100 + '%' }"></div>
+            <div class="progress-fill" :style="{ width: (1 / 6) * 100 + '%' }"></div>
+        </div>
+        <div>
+            <SalesStep :process="null" :isNew="true" />
         </div>
     </div>
-    <div v-else>
-        <p>Process not found</p>
-    </div>
-    <div>
-        <SalesStep :process="process" />
+
+    <div v-else-if="process" class="single-process-container">
+        <button class="back-button" @click="goBack">
+            <i class="fa-solid fa-chevron-left"></i> Back
+        </button>
+        <h1>{{ process.title }}</h1>
+        <p><strong>Case Number:</strong> {{ process.caseNo }}</p>
+        <p><strong>Status:</strong> {{ process.status }}</p>
+        <p><strong>Current Step:</strong> {{ process.currentStep }} / 6</p>
+        <div class="progress-bar">
+            <div class="progress-fill" :style="{ width: (process.currentStep / 6) * 100 + '%' }"></div>
+        </div>
+        <div>
+            <SalesStep :process="process" />
+        </div>
     </div>
 </template>
 

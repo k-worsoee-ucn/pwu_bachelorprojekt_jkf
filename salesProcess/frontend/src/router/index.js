@@ -1,14 +1,17 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
+import { useAuth } from '../composables/useAuth'
 import LoginView from '../views/loginView.vue'
 import MyProcessesView from '../views/myProcessesView.vue'
 import AllProcessesView from '../views/allProcessesView.vue'
-import CreateNewProcessView from '../views/createNewProcessView.vue'
 import SingleProcessView from '../views/singleProcessView.vue'
 
 const routes = [
   {
     path: '/',
-    redirect: '/my-processes'
+    redirect: () => {
+      const { isAuthenticated } = useAuth()
+      return isAuthenticated.value ? '/all-processes' : '/login'
+    }
   },
   {
     path: '/login',
@@ -19,19 +22,28 @@ const routes = [
     path: '/my-processes',
     name: 'MyProcesses',
     component: MyProcessesView,
-    meta: { requiresAuth: true }
+    meta: { 
+      requiresAuth: true,
+      allowedRoles: ['salesManager', 'marketingManager']
+    }
   },
   {
     path: '/all-processes',
     name: 'AllProcesses',
     component: AllProcessesView,
-    meta: { requiresAuth: true }
+    meta: { 
+      requiresAuth: true,
+      allowedRoles: ['viewer', 'salesManager', 'marketingManager']
+    }
   },
   {
-    path: '/create-new-process',
-    name: 'CreateNewProcess',
-    component: CreateNewProcessView,
-    meta: { requiresAuth: true }
+    path: '/new',
+    name: 'CreateNewSale',
+    component: SingleProcessView,
+    meta: { 
+      requiresAuth: true,
+      allowedRoles: ['salesManager']
+    }
   },
   {
     path: '/process/:id',
@@ -46,14 +58,38 @@ const router = createRouter({
   routes
 })
 
-// Route guard for authentication
 router.beforeEach((to, from, next) => {
-  const token = localStorage.getItem('token')
+  const { isAuthenticated, isSalesManager, isMarketingManager, isViewer } = useAuth()
   
-  if (to.meta.requiresAuth && !token) {
+  if (to.meta.requiresAuth && !isAuthenticated.value) {
     next('/login')
-  } else if (to.path === '/login' && token) {
-    next('/my-processes') 
+    return
+  }
+
+  if (to.meta.allowedRoles && isAuthenticated.value) {
+    const hasAccess = to.meta.allowedRoles.some(role => {
+      switch(role) {
+        case 'salesManager': return isSalesManager.value
+        case 'marketingManager': return isMarketingManager.value
+        case 'viewer': return isViewer.value
+        default: return false
+      }
+    })
+    
+    if (!hasAccess) {
+      if (isViewer.value) {
+        next('/all-processes')
+      } else if (isMarketingManager.value) {
+        next('/my-processes')
+      } else {
+        next('/all-processes')
+      }
+      return
+    }
+  }
+
+  if (to.path === '/login' && isAuthenticated.value) {
+    next('/all-processes') 
   } else {
     next()
   }

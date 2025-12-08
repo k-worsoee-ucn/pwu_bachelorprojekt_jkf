@@ -9,10 +9,9 @@ const {
   validateId
 } = require("../middleware/validation");
 
-// Registration-specific rate limiting (more restrictive)
 const registrationLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 3, // Only 3 registration attempts per IP per window
+  windowMs: 15 * 60 * 1000,
+  max: 3,
   message: { error: 'Too many registration attempts. Please try again later.' },
   standardHeaders: true,
   legacyHeaders: false,
