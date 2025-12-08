@@ -2,7 +2,7 @@
   <div class="sale-form">
     <h2>Sale Information</h2>
     
-    <form @submit.prevent="submitForm" class="form-grid">
+    <form @submit.prevent="submitForm" @click="closeCountryDropdown" class="form-grid">
       <div class="form-section">
         <h3>Basic Information</h3>
           <div class="form-group">
@@ -59,13 +59,30 @@
 
         <div class="form-group">
           <label for="country">Country *</label>
-          <input
-            id="country"
-            v-model="formData.country"
-            type="text"
-            placeholder="e.g., Germany, USA, France..."
-            required
-          />
+          <div class="country-dropdown-container" @click.stop>
+            <input
+              id="country"
+              v-model="formData.country"
+              type="text"
+              placeholder="Search and select a country..."
+              @focus="handleCountryInputFocus"
+              @input="countryQuery = formData.country; showCountryDropdown = true"
+              required
+            />
+            <div v-if="showCountryDropdown && filteredCountries.length > 0" class="country-dropdown">
+              <div
+                v-for="country in filteredCountries"
+                :key="country.code"
+                class="country-option"
+                @mousedown.prevent="selectCountry(country.name)"
+              >
+                {{ country.name }}
+              </div>
+            </div>
+            <div v-if="showCountryDropdown && filteredCountries.length === 0" class="country-dropdown">
+              <div class="no-results">No countries found</div>
+            </div>
+          </div>
         </div>
 
         <div class="form-group">
@@ -267,6 +284,7 @@
 
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue'
+import { countries } from 'countries-list'
 
 const props = defineProps({
   sale: {
@@ -309,8 +327,30 @@ const products = ref([])
 const isSubmitting = ref(false)
 const errorMessage = ref('')
 const successMessage = ref('')
+const countryQuery = ref('')
+const showCountryDropdown = ref(false)
 
 const isEdit = computed(() => props.sale !== null)
+
+const allCountries = computed(() => {
+  const countryList = Object.entries(countries).map(([code, data]) => {
+    // Handle both string values and object values
+    const name = typeof data === 'string' ? data : data.name || data
+    return { code, name: String(name).trim() }
+  })
+  return countryList.sort((a, b) => a.name.localeCompare(b.name))
+})
+
+const filteredCountries = computed(() => {
+  if (!countryQuery.value.trim()) {
+    return allCountries.value
+  }
+  
+  const query = countryQuery.value.toLowerCase()
+  return allCountries.value.filter(country =>
+    country.name.toLowerCase().includes(query)
+  )
+})
 
 const selectedCustomerWebsite = computed(() => {
   const selectedCustomer = customers.value.find(c => c.id === formData.customerId)
@@ -396,6 +436,23 @@ const loadProducts = async () => {
 const onCustomerChange = () => {
   if (formData.industry !== 'other') {
     formData.customIndustry = ''
+  }
+}
+
+const selectCountry = (countryName) => {
+  formData.country = countryName
+  showCountryDropdown.value = false
+}
+
+const handleCountryInputFocus = () => {
+  showCountryDropdown.value = true
+}
+
+const closeCountryDropdown = (event) => {
+  // Only close if clicking outside the country container
+  const countryContainer = event.target.closest('.country-dropdown-container')
+  if (!countryContainer) {
+    showCountryDropdown.value = false
   }
 }
 
@@ -593,6 +650,63 @@ onMounted(() => {
   font-size: 0.875rem;
   margin-top: 0.25rem;
   display: block;
+}
+
+.country-dropdown-container {
+  position: relative;
+}
+
+.country-dropdown-container input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.country-dropdown-container input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.country-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-top: none;
+  border-radius: 0 0 4px 4px;
+  max-height: 250px;
+  overflow-y: auto;
+  z-index: 10;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.country-option {
+  padding: 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.country-option:hover {
+  background-color: #e0e7ff;
+  color: #3b82f6;
+}
+
+.country-dropdown .no-results {
+  padding: 0.75rem;
+  color: #6b7280;
+  text-align: center;
+}
+
+.selected-country {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: #059669;
 }
 
 @media (max-width: 768px) {
