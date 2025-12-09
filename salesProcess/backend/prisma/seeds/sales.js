@@ -1,4 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
+const { PrismaClient } = require("@prisma/client");
 
 const salesData = [
   {
@@ -18,7 +18,7 @@ const salesData = [
     salesManagerId: 1,
     selectedFilters: [1, 2],
     selectedFans: [4, 5],
-    selectedDucts: [7]
+    selectedDucts: [7],
   },
   {
     title: "High-Volume Wood Chip Extraction - Furniture Factory",
@@ -37,7 +37,7 @@ const salesData = [
     salesManagerId: 2,
     selectedFilters: [3],
     selectedFans: [5, 6],
-    selectedDucts: [8, 9]
+    selectedDucts: [8, 9],
   },
   {
     title: "Custom Cyclone Separator - Sawmill Operations",
@@ -56,7 +56,7 @@ const salesData = [
     salesManagerId: 1,
     selectedFilters: [1, 3],
     selectedFans: [4],
-    selectedDucts: [10]
+    selectedDucts: [10],
   },
   {
     title: "Multi-Stage Filtration System - Plywood Manufacturing",
@@ -75,7 +75,7 @@ const salesData = [
     salesManagerId: 2,
     selectedFilters: [2, 3],
     selectedFans: [5, 6],
-    selectedDucts: [7, 8]
+    selectedDucts: [7, 8],
   },
   {
     title: "Pneumatic Conveying System - MDF Production",
@@ -94,24 +94,24 @@ const salesData = [
     salesManagerId: 1,
     selectedFilters: [1],
     selectedFans: [4, 6],
-    selectedDucts: [9, 10]
-  }
+    selectedDucts: [9, 10],
+  },
 ];
 
 async function seedSales(prisma) {
-  console.log('Seeding sales (which auto-creates processes)...');
+  console.log("Seeding sales (which auto-creates processes)...");
 
   const filterProducts = await prisma.product.findMany({
-    where: { category: 'filtersAndSeparators' },
-    select: { id: true }
+    where: { category: "filtersAndSeparators" },
+    select: { id: true },
   });
   const fanProducts = await prisma.product.findMany({
-    where: { category: 'fanSystems' },
-    select: { id: true }
+    where: { category: "fanSystems" },
+    select: { id: true },
   });
   const ductProducts = await prisma.product.findMany({
-    where: { category: 'ductSystems' },
-    select: { id: true }
+    where: { category: "ductSystems" },
+    select: { id: true },
   });
 
   const salesDataWithRealIds = [
@@ -130,9 +130,11 @@ async function seedSales(prisma) {
       volumeFlow: 25000,
       customerId: 1,
       salesManagerId: 1,
-      selectedFilters: [filterProducts[0]?.id, filterProducts[1]?.id].filter(id => id),
-      selectedFans: [fanProducts[0]?.id, fanProducts[1]?.id].filter(id => id),
-      selectedDucts: [ductProducts[0]?.id].filter(id => id)
+      selectedFilters: [filterProducts[0]?.id, filterProducts[1]?.id].filter(
+        (id) => id
+      ),
+      selectedFans: [fanProducts[0]?.id, fanProducts[1]?.id].filter((id) => id),
+      selectedDucts: [ductProducts[0]?.id].filter((id) => id),
     },
     {
       title: "High-Volume Wood Chip Extraction - Furniture Factory",
@@ -149,9 +151,11 @@ async function seedSales(prisma) {
       volumeFlow: 75000,
       customerId: 2,
       salesManagerId: 2,
-      selectedFilters: [filterProducts[2]?.id].filter(id => id),
-      selectedFans: [fanProducts[1]?.id, fanProducts[2]?.id].filter(id => id),
-      selectedDucts: [ductProducts[1]?.id, ductProducts[2]?.id].filter(id => id)
+      selectedFilters: [filterProducts[2]?.id].filter((id) => id),
+      selectedFans: [fanProducts[1]?.id, fanProducts[2]?.id].filter((id) => id),
+      selectedDucts: [ductProducts[1]?.id, ductProducts[2]?.id].filter(
+        (id) => id
+      ),
     },
     {
       title: "Custom Cyclone Separator - Sawmill Operations",
@@ -168,9 +172,11 @@ async function seedSales(prisma) {
       volumeFlow: 120000,
       customerId: 3,
       salesManagerId: 1,
-      selectedFilters: [filterProducts[0]?.id, filterProducts[2]?.id].filter(id => id),
-      selectedFans: [fanProducts[0]?.id].filter(id => id),
-      selectedDucts: [ductProducts[2]?.id].filter(id => id)
+      selectedFilters: [filterProducts[0]?.id, filterProducts[2]?.id].filter(
+        (id) => id
+      ),
+      selectedFans: [fanProducts[0]?.id].filter((id) => id),
+      selectedDucts: [ductProducts[2]?.id].filter((id) => id),
     },
     {
       title: "Multi-Stage Filtration System - Plywood Manufacturing",
@@ -187,9 +193,13 @@ async function seedSales(prisma) {
       volumeFlow: 45000,
       customerId: 4,
       salesManagerId: 2,
-      selectedFilters: [filterProducts[1]?.id, filterProducts[2]?.id].filter(id => id),
-      selectedFans: [fanProducts[1]?.id, fanProducts[2]?.id].filter(id => id),
-      selectedDucts: [ductProducts[0]?.id, ductProducts[1]?.id].filter(id => id)
+      selectedFilters: [filterProducts[1]?.id, filterProducts[2]?.id].filter(
+        (id) => id
+      ),
+      selectedFans: [fanProducts[1]?.id, fanProducts[2]?.id].filter((id) => id),
+      selectedDucts: [ductProducts[0]?.id, ductProducts[1]?.id].filter(
+        (id) => id
+      ),
     },
     {
       title: "Pneumatic Conveying System - MDF Production",
@@ -206,38 +216,59 @@ async function seedSales(prisma) {
       volumeFlow: 150000,
       customerId: 5,
       salesManagerId: 1,
-      selectedFilters: [filterProducts[0]?.id].filter(id => id),
-      selectedFans: [fanProducts[0]?.id, fanProducts[2]?.id].filter(id => id),
-      selectedDucts: [ductProducts[1]?.id, ductProducts[2]?.id].filter(id => id)
-    }
+      selectedFilters: [filterProducts[0]?.id].filter((id) => id),
+      selectedFans: [fanProducts[0]?.id, fanProducts[2]?.id].filter((id) => id),
+      selectedDucts: [ductProducts[1]?.id, ductProducts[2]?.id].filter(
+        (id) => id
+      ),
+    },
   ];
-  
+
+  let createdCount = 0;
+  let skippedCount = 0;
+
   for (const saleData of salesDataWithRealIds) {
-    const customer = await prisma.customer.findUnique({
-      where: { id: saleData.customerId },
-      select: { name: true }
+    // Check if sale already exists by title and customer
+    console.log(
+      `Checking for existing sale: "${saleData.title}" with customerId: ${saleData.customerId}`
+    );
+    const existingSale = await prisma.sale.findFirst({
+      where: {
+        title: saleData.title,
+        customerId: saleData.customerId,
+      },
     });
+    console.log(
+      `Found existing sale:`,
+      existingSale ? `Yes (ID: ${existingSale.id})` : "No"
+    );
+
+    if (existingSale) {
+      console.log(`Sale already exists: ${saleData.title} - skipping`);
+      skippedCount++;
+      continue;
+    }
 
     const lastProcess = await prisma.process.findFirst({
-      orderBy: { caseNo: 'desc' },
-      select: { caseNo: true }
+      orderBy: { caseNo: "desc" },
+      select: { caseNo: true },
     });
     const nextCaseNo = (lastProcess?.caseNo || 0) + 1;
 
     const allSelectedProducts = [
       ...saleData.selectedFilters,
       ...saleData.selectedFans,
-      ...saleData.selectedDucts
-    ].filter(id => id);
+      ...saleData.selectedDucts,
+    ].filter((id) => id);
 
     await prisma.$transaction(async (prisma) => {
       const process = await prisma.process.create({
         data: {
           title: saleData.title,
           caseNo: nextCaseNo,
-          status: 'ongoing',
-          currentStep: 2
-        }
+          status: "ongoing",
+          currentStep: 2,
+        },
       });
 
       const sale = await prisma.sale.create({
@@ -256,27 +287,33 @@ async function seedSales(prisma) {
           volumeFlow: saleData.volumeFlow,
           processId: process.id,
           customerId: saleData.customerId,
-          salesManagerId: saleData.salesManagerId
-        }
+          salesManagerId: saleData.salesManagerId,
+        },
       });
 
       if (allSelectedProducts.length > 0) {
-        const saleProductData = allSelectedProducts.map(productId => ({
+        const saleProductData = allSelectedProducts.map((productId) => ({
           saleId: sale.id,
           productId: productId,
-          quantity: 1
+          quantity: 1,
         }));
 
         await prisma.saleProduct.createMany({
-          data: saleProductData
+          data: saleProductData,
+          skipDuplicates: true,
         });
       }
 
-      console.log(`Created sale and process: ${saleData.title} (Case #${nextCaseNo})`);
+      console.log(
+        `Created sale and process: ${saleData.title} (Case #${nextCaseNo})`
+      );
+      createdCount++;
     });
   }
-  
-  console.log(`Seeded ${salesData.length} sales with auto-created processes`);
+
+  console.log(
+    `Seeded ${createdCount} sales with auto-created processes (skipped ${skippedCount} duplicates)`
+  );
 }
 
 module.exports = { seedSales };
