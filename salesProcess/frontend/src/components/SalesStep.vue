@@ -1,20 +1,24 @@
 <template>
   <div class="sale-form">
     <h2>Sale Information</h2>
-    
-    <form @submit.prevent="submitForm" @click="closeCountryDropdown" class="form-grid">
+
+    <form
+      @submit.prevent="submitForm"
+      @click="closeCountryDropdown"
+      class="form-grid"
+    >
       <div class="form-section">
         <h3>Basic Information</h3>
-          <div class="form-group">
-            <label for="title">Process Title *</label>
-              <input
-                id="title"
-                v-model="formData.title"
-                type="text"
-                placeholder="Enter a descriptive title for this process"
-                required
-              />
-          </div>
+        <div class="form-group">
+          <label for="title">Process Title *</label>
+          <input
+            id="title"
+            v-model="formData.title"
+            type="text"
+            placeholder="Enter a descriptive title for this process"
+            required
+          />
+        </div>
         <div class="form-group">
           <label for="customerId">Plant Manufacturer *</label>
           <select
@@ -58,6 +62,16 @@
         </div>
 
         <div class="form-group">
+          <label for="phoneNumber">Phone Number</label>
+          <input
+            id="phoneNumber"
+            v-model="formData.phoneNumber"
+            type="tel"
+            placeholder="e.g., +45 12 34 56 78"
+          />
+        </div>
+
+        <div class="form-group">
           <label for="country">Country *</label>
           <div class="country-dropdown-container" @click.stop>
             <input
@@ -66,10 +80,16 @@
               type="text"
               placeholder="Search and select a country..."
               @focus="handleCountryInputFocus"
-              @input="countryQuery = formData.country; showCountryDropdown = true"
+              @input="
+                countryQuery = formData.country;
+                showCountryDropdown = true;
+              "
               required
             />
-            <div v-if="showCountryDropdown && filteredCountries.length > 0" class="country-dropdown">
+            <div
+              v-if="showCountryDropdown && filteredCountries.length > 0"
+              class="country-dropdown"
+            >
               <div
                 v-for="country in filteredCountries"
                 :key="country.code"
@@ -79,7 +99,10 @@
                 {{ country.name }}
               </div>
             </div>
-            <div v-if="showCountryDropdown && filteredCountries.length === 0" class="country-dropdown">
+            <div
+              v-if="showCountryDropdown && filteredCountries.length === 0"
+              class="country-dropdown"
+            >
               <div class="no-results">No countries found</div>
             </div>
           </div>
@@ -87,11 +110,7 @@
 
         <div class="form-group">
           <label for="industry">Industry *</label>
-          <select
-            id="industry"
-            v-model="formData.industry"
-            required
-          >
+          <select id="industry" v-model="formData.industry" required>
             <option value="">Select Industry</option>
             <option value="woodworking">Woodworking</option>
             <option value="agroAndMilling">Agro- and Milling</option>
@@ -117,7 +136,7 @@
       <!-- Product Selection -->
       <div class="form-section">
         <h3>Product Selection</h3>
-        
+
         <div class="form-group">
           <label for="filtersAndSeparators">Filters & Separators</label>
           <select
@@ -134,7 +153,9 @@
               {{ product.title }}
             </option>
           </select>
-          <small class="help-text">Hold Ctrl/Cmd to select multiple items</small>
+          <small class="help-text"
+            >Hold Ctrl/Cmd to select multiple items</small
+          >
         </div>
 
         <div class="form-group">
@@ -153,7 +174,9 @@
               {{ product.title }}
             </option>
           </select>
-          <small class="help-text">Hold Ctrl/Cmd to select multiple items</small>
+          <small class="help-text"
+            >Hold Ctrl/Cmd to select multiple items</small
+          >
         </div>
 
         <div class="form-group">
@@ -172,14 +195,16 @@
               {{ product.title }}
             </option>
           </select>
-          <small class="help-text">Hold Ctrl/Cmd to select multiple items</small>
+          <small class="help-text"
+            >Hold Ctrl/Cmd to select multiple items</small
+          >
         </div>
       </div>
 
       <!-- Technical Specifications -->
       <div class="form-section">
         <h3>Technical Specifications</h3>
-        
+
         <div class="form-group">
           <label for="plantType">Plant Type *</label>
           <input
@@ -236,7 +261,9 @@
         </div>
 
         <div class="form-group">
-          <label for="totalExtractionVolume">Total Extraction Volume (m³) *</label>
+          <label for="totalExtractionVolume"
+            >Total Extraction Volume (m³) *</label
+          >
           <input
             id="totalExtractionVolume"
             v-model.number="formData.totalExtractionVolume"
@@ -267,7 +294,9 @@
           Reset
         </button>
         <button type="submit" class="btn-primary" :disabled="isSubmitting">
-          {{ isSubmitting ? 'Saving...' : (isEdit ? 'Update Sale' : 'Create Sale') }}
+          {{
+            isSubmitting ? "Saving..." : isEdit ? "Update Sale" : "Create Sale"
+          }}
         </button>
       </div>
     </form>
@@ -283,235 +312,252 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed } from 'vue'
-import { countries } from 'countries-list'
+import { ref, reactive, onMounted, computed } from "vue";
+import { countries } from "countries-list";
+import { useAuth } from "@/composables/useAuth";
 
 const props = defineProps({
   sale: {
     type: Object,
-    default: null
+    default: null,
   },
   processId: {
     type: Number,
-    required: true
+    required: true,
   },
   currentUserId: {
     type: Number,
-    required: true
-  }
-})
+    required: true,
+  },
+});
 
-const emit = defineEmits(['sale-created', 'sale-updated', 'cancel'])
+const emit = defineEmits(["sale-created", "sale-updated", "cancel"]);
+
+const { getAuthHeader } = useAuth();
 
 const formData = reactive({
-  title: '',
-  endUser: '',
-  country: '',
-  industry: '',
-  customIndustry: '',
+  title: "",
+  endUser: "",
+  phoneNumber: "",
+  country: "",
+  industry: "",
+  customIndustry: "",
   selectedFilters: [],
   selectedFans: [],
   selectedDucts: [],
-  plantType: '',
-  filterType: '',
-  fanType: '',
-  dustType: '',
-  ductSystem: '',
+  plantType: "",
+  filterType: "",
+  fanType: "",
+  dustType: "",
+  ductSystem: "",
   totalExtractionVolume: 0,
   volumeFlow: 0,
-  customerId: ''
-})
+  customerId: "",
+});
 
-const customers = ref([])
-const products = ref([])
-const isSubmitting = ref(false)
-const errorMessage = ref('')
-const successMessage = ref('')
-const countryQuery = ref('')
-const showCountryDropdown = ref(false)
+const customers = ref([]);
+const products = ref([]);
+const isSubmitting = ref(false);
+const errorMessage = ref("");
+const successMessage = ref("");
+const countryQuery = ref("");
+const showCountryDropdown = ref(false);
 
-const isEdit = computed(() => props.sale !== null)
+const isEdit = computed(() => props.sale !== null);
 
 const allCountries = computed(() => {
   const countryList = Object.entries(countries).map(([code, data]) => {
     // Handle both string values and object values
-    const name = typeof data === 'string' ? data : data.name || data
-    return { code, name: String(name).trim() }
-  })
-  return countryList.sort((a, b) => a.name.localeCompare(b.name))
-})
+    const name = typeof data === "string" ? data : data.name || data;
+    return { code, name: String(name).trim() };
+  });
+  return countryList.sort((a, b) => a.name.localeCompare(b.name));
+});
 
 const filteredCountries = computed(() => {
   if (!countryQuery.value.trim()) {
-    return allCountries.value
+    return allCountries.value;
   }
-  
-  const query = countryQuery.value.toLowerCase()
-  return allCountries.value.filter(country =>
+
+  const query = countryQuery.value.toLowerCase();
+  return allCountries.value.filter((country) =>
     country.name.toLowerCase().includes(query)
-  )
-})
+  );
+});
 
 const selectedCustomerWebsite = computed(() => {
-  const selectedCustomer = customers.value.find(c => c.id === formData.customerId)
-  return selectedCustomer?.website || 'No website available'
-})
+  const selectedCustomer = customers.value.find(
+    (c) => c.id === formData.customerId
+  );
+  return selectedCustomer?.website || "No website available";
+});
 
 const filterProducts = computed(() => {
-  return products.value.filter(p => p.category === 'filtersAndSeparators')
-})
+  return products.value.filter((p) => p.category === "filtersAndSeparators");
+});
 
 const fanProducts = computed(() => {
-  return products.value.filter(p => p.category === 'fanSystems')
-})
+  return products.value.filter((p) => p.category === "fanSystems");
+});
 
 const ductProducts = computed(() => {
-  return products.value.filter(p => p.category === 'ductSystems')
-})
+  return products.value.filter((p) => p.category === "ductSystems");
+});
 
 // Methods
 const resetForm = () => {
   Object.assign(formData, {
-    endUser: '',
-    country: '',
-    industry: '',
-    customIndustry: '',
+    endUser: "",
+    phoneNumber: "",
+    country: "",
+    industry: "",
+    customIndustry: "",
     selectedFilters: [],
     selectedFans: [],
     selectedDucts: [],
-    plantType: '',
-    filterType: '',
-    fanType: '',
-    dustType: '',
-    ductSystem: '',
+    plantType: "",
+    filterType: "",
+    fanType: "",
+    dustType: "",
+    ductSystem: "",
     totalExtractionVolume: 0,
     volumeFlow: 0,
-    customerId: ''
-  })
-  errorMessage.value = ''
-  successMessage.value = ''
-}
+    customerId: "",
+  });
+  errorMessage.value = "";
+  successMessage.value = "";
+};
 
 const loadFormData = () => {
   if (props.sale) {
     Object.assign(formData, {
-      endUser: props.sale.endUser || '',
-      country: props.sale.country || '',
-      industry: props.sale.industry || '',
-      customIndustry: props.sale.customIndustry || '',
-      plantType: props.sale.plantType || '',
-      filterType: props.sale.filterType || '',
-      fanType: props.sale.fanType || '',
-      dustType: props.sale.dustType || '',
-      ductSystem: props.sale.ductSystem || '',
+      endUser: props.sale.endUser || "",
+      phoneNumber: props.sale.phoneNumber || "",
+      country: props.sale.country || "",
+      industry: props.sale.industry || "",
+      customIndustry: props.sale.customIndustry || "",
+      plantType: props.sale.plantType || "",
+      filterType: props.sale.filterType || "",
+      fanType: props.sale.fanType || "",
+      dustType: props.sale.dustType || "",
+      ductSystem: props.sale.ductSystem || "",
       totalExtractionVolume: props.sale.totalExtractionVolume || 0,
       volumeFlow: props.sale.volumeFlow || 0,
-      customerId: props.sale.customerId || ''
-    })
+      customerId: props.sale.customerId || "",
+    });
   }
-}
+};
 
 const loadCustomers = async () => {
   try {
-    const response = await fetch('/api/customers')
+    const response = await fetch("/api/customers", {
+      headers: {
+        ...getAuthHeader(),
+      },
+    });
     if (response.ok) {
-      customers.value = await response.json()
+      customers.value = await response.json();
     }
   } catch (error) {
-    console.error('Error loading customers:', error)
+    console.error("Error loading customers:", error);
   }
-}
+};
 
 const loadProducts = async () => {
   try {
-    const response = await fetch('/api/products')
+    const response = await fetch("/api/products", {
+      headers: {
+        ...getAuthHeader(),
+      },
+    });
     if (response.ok) {
-      products.value = await response.json()
+      products.value = await response.json();
     }
   } catch (error) {
-    console.error('Error loading products:', error)
+    console.error("Error loading products:", error);
   }
-}
+};
 
 const onCustomerChange = () => {
-  if (formData.industry !== 'other') {
-    formData.customIndustry = ''
+  if (formData.industry !== "other") {
+    formData.customIndustry = "";
   }
-}
+};
 
 const selectCountry = (countryName) => {
-  formData.country = countryName
-  showCountryDropdown.value = false
-}
+  formData.country = countryName;
+  showCountryDropdown.value = false;
+};
 
 const handleCountryInputFocus = () => {
-  showCountryDropdown.value = true
-}
+  showCountryDropdown.value = true;
+};
 
 const closeCountryDropdown = (event) => {
   // Only close if clicking outside the country container
-  const countryContainer = event.target.closest('.country-dropdown-container')
+  const countryContainer = event.target.closest(".country-dropdown-container");
   if (!countryContainer) {
-    showCountryDropdown.value = false
+    showCountryDropdown.value = false;
   }
-}
+};
 
 const submitForm = async () => {
-  isSubmitting.value = true
-  errorMessage.value = ''
-  successMessage.value = ''
+  isSubmitting.value = true;
+  errorMessage.value = "";
+  successMessage.value = "";
 
   try {
     const saleData = {
       ...formData,
       processId: props.processId,
-      salesManagerId: props.currentUserId
+      salesManagerId: props.currentUserId,
+    };
+
+    if (saleData.industry !== "other") {
+      saleData.customIndustry = null;
     }
 
-    if (saleData.industry !== 'other') {
-      saleData.customIndustry = null
-    }
-
-    const url = isEdit.value ? `/api/sales/${props.sale.id}` : '/api/sales'
-    const method = isEdit.value ? 'PUT' : 'POST'
+    const url = isEdit.value ? `/api/sales/${props.sale.id}` : "/api/sales";
+    const method = isEdit.value ? "PUT" : "POST";
 
     const response = await fetch(url, {
       method,
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(saleData)
-    })
+      body: JSON.stringify(saleData),
+    });
 
     if (response.ok) {
-      const savedSale = await response.json()
-      successMessage.value = isEdit.value 
-        ? 'Sale updated successfully!' 
-        : 'Sale created successfully!'
-      
-      emit(isEdit.value ? 'sale-updated' : 'sale-created', savedSale)
-      
+      const savedSale = await response.json();
+      successMessage.value = isEdit.value
+        ? "Sale updated successfully!"
+        : "Sale created successfully!";
+
+      emit(isEdit.value ? "sale-updated" : "sale-created", savedSale);
+
       if (!isEdit.value) {
-        resetForm()
+        resetForm();
       }
     } else {
-      const errorData = await response.json()
-      errorMessage.value = errorData.message || 'An error occurred while saving the sale.'
+      const errorData = await response.json();
+      errorMessage.value =
+        errorData.message || "An error occurred while saving the sale.";
     }
   } catch (error) {
-    console.error('Error submitting form:', error)
-    errorMessage.value = 'Network error. Please try again.'
+    console.error("Error submitting form:", error);
+    errorMessage.value = "Network error. Please try again.";
   } finally {
-    isSubmitting.value = false
+    isSubmitting.value = false;
   }
-}
+};
 
 // Lifecycle
 onMounted(() => {
-  loadCustomers()
-  loadProducts()
-  loadFormData()
-})
+  loadCustomers();
+  loadProducts();
+  loadFormData();
+});
 </script>
 
 <style scoped>
@@ -714,11 +760,11 @@ onMounted(() => {
     margin: 1rem;
     padding: 1rem;
   }
-  
+
   .form-actions {
     flex-direction: column;
   }
-  
+
   .form-actions button {
     width: 100%;
   }

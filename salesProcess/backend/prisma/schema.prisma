@@ -76,6 +76,7 @@ model Sale {
   ductSystem             String   @map("duct_system")
   totalExtractionVolume  Int      @map("total_extraction_volume")
   volumeFlow             Int      @map("volume_flow")
+  phoneNumber            String?  @map("phone_number")
 
   // FK
   processId      Int @unique @map("process_id")

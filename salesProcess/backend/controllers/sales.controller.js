@@ -10,19 +10,19 @@ async function getAllSales(req, res) {
           select: {
             id: true,
             name: true,
-            email: true
-          }
+            email: true,
+          },
         },
         saleProducts: {
           include: {
-            product: true
-          }
-        }
-      }
+            product: true,
+          },
+        },
+      },
     });
     res.json(sales);
   } catch (error) {
-    console.error('Error fetching sales:', error);
+    console.error("Error fetching sales:", error);
     res.status(500).json({ error: error.message });
   }
 }
@@ -38,24 +38,24 @@ async function getSaleById(req, res) {
           select: {
             id: true,
             name: true,
-            email: true
-          }
+            email: true,
+          },
         },
         saleProducts: {
           include: {
-            product: true
-          }
-        }
-      }
+            product: true,
+          },
+        },
+      },
     });
-    
+
     if (!sale) {
       return res.status(404).json({ error: "Sale not found" });
     }
-    
+
     res.json(sale);
   } catch (error) {
-    console.error('Error fetching sale:', error);
+    console.error("Error fetching sale:", error);
     res.status(500).json({ error: error.message });
   }
 }
@@ -66,6 +66,7 @@ async function createSale(req, res) {
       // Basic Information
       title,
       endUser,
+      phoneNumber,
       country,
       industry,
       customIndustry,
@@ -82,18 +83,26 @@ async function createSale(req, res) {
       dustType,
       ductSystem,
       totalExtractionVolume,
-      volumeFlow
+      volumeFlow,
     } = req.body;
 
-    if (!title || !endUser || !country || !industry || !customerId || !salesManagerId) {
-      return res.status(400).json({ 
-        error: "Required fields: title, endUser, country, industry, customerId, salesManagerId" 
+    if (
+      !title ||
+      !endUser ||
+      !country ||
+      !industry ||
+      !customerId ||
+      !salesManagerId
+    ) {
+      return res.status(400).json({
+        error:
+          "Required fields: title, endUser, country, industry, customerId, salesManagerId",
       });
     }
 
     const customer = await prisma.customer.findUnique({
       where: { id: customerId },
-      select: { name: true }
+      select: { name: true },
     });
 
     if (!customer) {
@@ -101,34 +110,35 @@ async function createSale(req, res) {
     }
 
     const lastProcess = await prisma.process.findFirst({
-      orderBy: { caseNo: 'desc' },
-      select: { caseNo: true }
+      orderBy: { caseNo: "desc" },
+      select: { caseNo: true },
     });
     const nextCaseNo = (lastProcess?.caseNo || 0) + 1;
 
     const allSelectedProducts = [
       ...selectedFilters,
       ...selectedFans,
-      ...selectedDucts
-    ].filter(id => id);
+      ...selectedDucts,
+    ].filter((id) => id);
 
     const result = await prisma.$transaction(async (prisma) => {
       const process = await prisma.process.create({
         data: {
           title: title,
           caseNo: nextCaseNo,
-          status: 'ongoing',
-          currentStep: 2
-        }
+          status: "ongoing",
+          currentStep: 2,
+        },
       });
 
       const sale = await prisma.sale.create({
         data: {
           title: title,
           endUser,
+          phoneNumber: phoneNumber || null,
           country,
           industry,
-          customIndustry: industry === 'other' ? customIndustry : null,
+          customIndustry: industry === "other" ? customIndustry : null,
           plantType,
           filterType,
           fanType,
@@ -138,19 +148,19 @@ async function createSale(req, res) {
           volumeFlow: parseInt(volumeFlow),
           processId: process.id,
           customerId,
-          salesManagerId
-        }
+          salesManagerId,
+        },
       });
 
       if (allSelectedProducts.length > 0) {
-        const saleProductData = allSelectedProducts.map(productId => ({
+        const saleProductData = allSelectedProducts.map((productId) => ({
           saleId: sale.id,
           productId: parseInt(productId),
-          quantity: 1
+          quantity: 1,
         }));
 
         await prisma.saleProduct.createMany({
-          data: saleProductData
+          data: saleProductData,
         });
       }
 
@@ -163,23 +173,22 @@ async function createSale(req, res) {
             select: {
               id: true,
               name: true,
-              email: true
-            }
+              email: true,
+            },
           },
           saleProducts: {
             include: {
-              product: true
-            }
-          }
-        }
+              product: true,
+            },
+          },
+        },
       });
     });
 
     console.log(`Created sale and process: ${title} (Case #${nextCaseNo})`);
     res.status(201).json(result);
-
   } catch (error) {
-    console.error('Error creating sale:', error);
+    console.error("Error creating sale:", error);
     res.status(500).json({ error: error.message });
   }
 }
@@ -199,20 +208,20 @@ async function updateSale(req, res) {
           select: {
             id: true,
             name: true,
-            email: true
-          }
+            email: true,
+          },
         },
         saleProducts: {
           include: {
-            product: true
-          }
-        }
-      }
+            product: true,
+          },
+        },
+      },
     });
 
     res.json(sale);
   } catch (error) {
-    console.error('Error updating sale:', error);
+    console.error("Error updating sale:", error);
     res.status(500).json({ error: error.message });
   }
 }
@@ -223,17 +232,17 @@ async function deleteSale(req, res) {
 
     await prisma.$transaction(async (prisma) => {
       await prisma.saleProduct.deleteMany({
-        where: { saleId: parseInt(id) }
+        where: { saleId: parseInt(id) },
       });
 
       await prisma.sale.delete({
-        where: { id: parseInt(id) }
+        where: { id: parseInt(id) },
       });
     });
 
     res.status(204).send();
   } catch (error) {
-    console.error('Error deleting sale:', error);
+    console.error("Error deleting sale:", error);
     res.status(500).json({ error: error.message });
   }
 }

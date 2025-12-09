@@ -4,6 +4,7 @@ const salesData = [
   {
     title: "Advanced Dust Collection System - Cabinet Manufacturing",
     endUser: "Premier Cabinet Works",
+    phoneNumber: "+49 30 12345678",
     country: "Germany",
     industry: "woodworking",
     customIndustry: null,
@@ -23,6 +24,7 @@ const salesData = [
   {
     title: "High-Volume Wood Chip Extraction - Furniture Factory",
     endUser: "Scandinavian Furniture Co",
+    phoneNumber: "+46 8 98765432",
     country: "Sweden",
     industry: "woodworking",
     customIndustry: null,
@@ -42,6 +44,7 @@ const salesData = [
   {
     title: "Custom Cyclone Separator - Sawmill Operations",
     endUser: "Alpine Sawmill Group",
+    phoneNumber: "+43 1 23456789",
     country: "Austria",
     industry: "woodworking",
     customIndustry: null,
@@ -61,6 +64,7 @@ const salesData = [
   {
     title: "Multi-Stage Filtration System - Plywood Manufacturing",
     endUser: "Baltic Plywood Industries",
+    phoneNumber: "+358 9 12345678",
     country: "Finland",
     industry: "woodworking",
     customIndustry: null,
@@ -80,6 +84,7 @@ const salesData = [
   {
     title: "Pneumatic Conveying System - MDF Production",
     endUser: "European MDF Solutions",
+    phoneNumber: "+48 22 98765432",
     country: "Poland",
     industry: "woodworking",
     customIndustry: null,
@@ -118,6 +123,7 @@ async function seedSales(prisma) {
     {
       title: "Advanced Dust Collection System - Cabinet Manufacturing",
       endUser: "Premier Cabinet Works",
+      phoneNumber: "+49 30 12345678",
       country: "Germany",
       industry: "woodworking",
       customIndustry: null,
@@ -139,6 +145,7 @@ async function seedSales(prisma) {
     {
       title: "High-Volume Wood Chip Extraction - Furniture Factory",
       endUser: "Scandinavian Furniture Co",
+      phoneNumber: "+46 8 98765432",
       country: "Sweden",
       industry: "woodworking",
       customIndustry: null,
@@ -160,6 +167,7 @@ async function seedSales(prisma) {
     {
       title: "Custom Cyclone Separator - Sawmill Operations",
       endUser: "Alpine Sawmill Group",
+      phoneNumber: "+43 1 23456789",
       country: "Austria",
       industry: "woodworking",
       customIndustry: null,
@@ -181,6 +189,7 @@ async function seedSales(prisma) {
     {
       title: "Multi-Stage Filtration System - Plywood Manufacturing",
       endUser: "Baltic Plywood Industries",
+      phoneNumber: "+358 9 12345678",
       country: "Finland",
       industry: "woodworking",
       customIndustry: null,
@@ -204,6 +213,7 @@ async function seedSales(prisma) {
     {
       title: "Pneumatic Conveying System - MDF Production",
       endUser: "European MDF Solutions",
+      phoneNumber: "+48 22 98765432",
       country: "Poland",
       industry: "woodworking",
       customIndustry: null,
@@ -275,6 +285,7 @@ async function seedSales(prisma) {
         data: {
           title: saleData.title,
           endUser: saleData.endUser,
+          phoneNumber: saleData.phoneNumber,
           country: saleData.country,
           industry: saleData.industry,
           customIndustry: saleData.customIndustry,
