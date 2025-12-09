@@ -11,125 +11,176 @@
         <h3>Basic Information</h3>
         <div class="form-group">
           <label for="title">Process Title *</label>
-          <input
-            id="title"
-            v-model="formData.title"
-            type="text"
-            placeholder="Enter a descriptive title for this process"
-            required
-          />
+          <div class="input-with-checkbox">
+            <input
+              id="title"
+              v-model="formData.title"
+              type="text"
+              placeholder="Enter a descriptive title for this process"
+              required
+            />
+            <label class="privacy-checkbox">
+              <input type="checkbox" v-model="privacyFlags.title" />
+              <span>Private</span>
+            </label>
+          </div>
         </div>
         <div class="form-group">
           <label for="customerId">Plant Manufacturer *</label>
-          <select
-            id="customerId"
-            v-model="formData.customerId"
-            required
-            @change="onCustomerChange"
-          >
-            <option value="">Select Plant Manufacturer</option>
-            <option
-              v-for="customer in customers"
-              :key="customer.id"
-              :value="customer.id"
+          <div class="input-with-checkbox">
+            <select
+              id="customerId"
+              v-model="formData.customerId"
+              required
+              @change="onCustomerChange"
             >
-              {{ customer.name }}
-            </option>
-          </select>
+              <option value="">Select Plant Manufacturer</option>
+              <option
+                v-for="customer in customers"
+                :key="customer.id"
+                :value="customer.id"
+              >
+                {{ customer.name }}
+              </option>
+            </select>
+            <label class="privacy-checkbox">
+              <input type="checkbox" v-model="privacyFlags.customerId" />
+              <span>Private</span>
+            </label>
+          </div>
         </div>
 
         <div class="form-group">
           <label for="manufacturerWebsite">Manufacturer Website</label>
-          <input
-            id="manufacturerWebsite"
-            :value="selectedCustomerWebsite"
-            type="url"
-            placeholder="Auto-filled from selected manufacturer"
-            disabled
-            class="disabled-field"
-          />
+          <div class="input-with-checkbox">
+            <input
+              id="manufacturerWebsite"
+              :value="selectedCustomerWebsite"
+              type="url"
+              placeholder="Auto-filled from selected manufacturer"
+              disabled
+              class="disabled-field"
+            />
+            <label class="privacy-checkbox">
+              <input
+                type="checkbox"
+                v-model="privacyFlags.manufacturerWebsite"
+              />
+              <span>Private</span>
+            </label>
+          </div>
         </div>
 
         <div class="form-group">
           <label for="endUser">End User *</label>
-          <input
-            id="endUser"
-            v-model="formData.endUser"
-            type="text"
-            placeholder="Name of the end user company"
-            required
-          />
+          <div class="input-with-checkbox">
+            <input
+              id="endUser"
+              v-model="formData.endUser"
+              type="text"
+              placeholder="Name of the end user company"
+              required
+            />
+            <label class="privacy-checkbox">
+              <input type="checkbox" v-model="privacyFlags.endUser" />
+              <span>Private</span>
+            </label>
+          </div>
         </div>
 
         <div class="form-group">
           <label for="phoneNumber">Phone Number</label>
-          <input
-            id="phoneNumber"
-            v-model="formData.phoneNumber"
-            type="tel"
-            placeholder="e.g., +45 12 34 56 78"
-          />
+          <div class="input-with-checkbox">
+            <input
+              id="phoneNumber"
+              v-model="formData.phoneNumber"
+              type="tel"
+              placeholder="e.g., +45 12 34 56 78"
+            />
+            <label class="privacy-checkbox">
+              <input type="checkbox" v-model="privacyFlags.phoneNumber" />
+              <span>Private</span>
+            </label>
+          </div>
         </div>
 
         <div class="form-group">
           <label for="country">Country *</label>
-          <div class="country-dropdown-container" @click.stop>
-            <input
-              id="country"
-              v-model="formData.country"
-              type="text"
-              placeholder="Search and select a country..."
-              @focus="handleCountryInputFocus"
-              @input="
-                countryQuery = formData.country;
-                showCountryDropdown = true;
-              "
-              required
-            />
-            <div
-              v-if="showCountryDropdown && filteredCountries.length > 0"
-              class="country-dropdown"
-            >
+          <div class="input-with-checkbox">
+            <div class="country-dropdown-container" @click.stop>
+              <input
+                id="country"
+                v-model="formData.country"
+                type="text"
+                placeholder="Search and select a country..."
+                @focus="handleCountryInputFocus"
+                @input="
+                  countryQuery = formData.country;
+                  showCountryDropdown = true;
+                "
+                required
+              />
               <div
-                v-for="country in filteredCountries"
-                :key="country.code"
-                class="country-option"
-                @mousedown.prevent="selectCountry(country.name)"
+                v-if="showCountryDropdown && filteredCountries.length > 0"
+                class="country-dropdown"
               >
-                {{ country.name }}
+                <div
+                  v-for="country in filteredCountries"
+                  :key="country.code"
+                  class="country-option"
+                  @mousedown.prevent="selectCountry(country.name)"
+                >
+                  {{ country.name }}
+                </div>
+              </div>
+              <div
+                v-if="showCountryDropdown && filteredCountries.length === 0"
+                class="country-dropdown"
+              >
+                <div class="no-results">No countries found</div>
               </div>
             </div>
-            <div
-              v-if="showCountryDropdown && filteredCountries.length === 0"
-              class="country-dropdown"
-            >
-              <div class="no-results">No countries found</div>
-            </div>
+            <label class="privacy-checkbox">
+              <input type="checkbox" v-model="privacyFlags.country" />
+              <span>Private</span>
+            </label>
           </div>
         </div>
 
         <div class="form-group">
           <label for="industry">Industry *</label>
-          <select id="industry" v-model="formData.industry" required>
-            <option value="">Select Industry</option>
-            <option value="woodworking">Woodworking</option>
-            <option value="agroAndMilling">Agro- and Milling</option>
-            <option value="recycling">Recycling</option>
-            <option value="metalworking">Metalworking</option>
-            <option value="paper">Paper</option>
-            <option value="other">Other</option>
-          </select>
+          <div class="input-with-checkbox">
+            <select id="industry" v-model="formData.industry" required>
+              <option value="">Select Industry</option>
+              <option value="woodworking">Woodworking</option>
+              <option value="agroAndMilling">Agro- and Milling</option>
+              <option value="recycling">Recycling</option>
+              <option value="metalworking">Metalworking</option>
+              <option value="paper">Paper</option>
+              <option value="other">Other</option>
+            </select>
+            <label class="privacy-checkbox">
+              <input type="checkbox" v-model="privacyFlags.industry" />
+              <span>Private</span>
+            </label>
+          </div>
         </div>
 
         <div v-if="formData.industry === 'other'" class="form-group">
           <label for="customIndustry">Specify Industry *</label>
-          <input
-            id="customIndustry"
-            v-model="formData.customIndustry"
-            type="text"
-            placeholder="Enter custom industry"
-            required
-          />
+          <div class="input-with-checkbox">
+            <input
+              id="customIndustry"
+              v-model="formData.customIndustry"
+              type="text"
+              placeholder="Enter custom industry"
+              required
+            />
+            <label class="privacy-checkbox">
+              <input type="checkbox" v-model="privacyFlags.customIndustry" />
+              <span>Private</span>
+            </label>
+          </div>
         </div>
       </div>
 
@@ -139,65 +190,89 @@
 
         <div class="form-group">
           <label for="filtersAndSeparators">Filters & Separators</label>
-          <select
-            id="filtersAndSeparators"
-            v-model="formData.selectedFilters"
-            multiple
-            class="multi-select"
-          >
-            <option
-              v-for="product in filterProducts"
-              :key="product.id"
-              :value="product.id"
-            >
-              {{ product.title }}
-            </option>
-          </select>
-          <small class="help-text"
-            >Hold Ctrl/Cmd to select multiple items</small
-          >
+          <div class="input-with-checkbox">
+            <div style="flex: 1">
+              <select
+                id="filtersAndSeparators"
+                v-model="formData.selectedFilters"
+                multiple
+                class="multi-select"
+              >
+                <option
+                  v-for="product in filterProducts"
+                  :key="product.id"
+                  :value="product.id"
+                >
+                  {{ product.title }}
+                </option>
+              </select>
+              <small class="help-text"
+                >Hold Ctrl/Cmd to select multiple items</small
+              >
+            </div>
+            <label class="privacy-checkbox">
+              <input type="checkbox" v-model="privacyFlags.selectedFilters" />
+              <span>Private</span>
+            </label>
+          </div>
         </div>
 
         <div class="form-group">
           <label for="fanSystems">Fan Systems</label>
-          <select
-            id="fanSystems"
-            v-model="formData.selectedFans"
-            multiple
-            class="multi-select"
-          >
-            <option
-              v-for="product in fanProducts"
-              :key="product.id"
-              :value="product.id"
-            >
-              {{ product.title }}
-            </option>
-          </select>
-          <small class="help-text"
-            >Hold Ctrl/Cmd to select multiple items</small
-          >
+          <div class="input-with-checkbox">
+            <div style="flex: 1">
+              <select
+                id="fanSystems"
+                v-model="formData.selectedFans"
+                multiple
+                class="multi-select"
+              >
+                <option
+                  v-for="product in fanProducts"
+                  :key="product.id"
+                  :value="product.id"
+                >
+                  {{ product.title }}
+                </option>
+              </select>
+              <small class="help-text"
+                >Hold Ctrl/Cmd to select multiple items</small
+              >
+            </div>
+            <label class="privacy-checkbox">
+              <input type="checkbox" v-model="privacyFlags.selectedFans" />
+              <span>Private</span>
+            </label>
+          </div>
         </div>
 
         <div class="form-group">
           <label for="ductSystems">Duct Systems</label>
-          <select
-            id="ductSystems"
-            v-model="formData.selectedDucts"
-            multiple
-            class="multi-select"
-          >
-            <option
-              v-for="product in ductProducts"
-              :key="product.id"
-              :value="product.id"
-            >
-              {{ product.title }}
-            </option>
-          </select>
-          <small class="help-text"
-            >Hold Ctrl/Cmd to select multiple items</small
-          >
+          <div class="input-with-checkbox">
+            <div style="flex: 1">
+              <select
+                id="ductSystems"
+                v-model="formData.selectedDucts"
+                multiple
+                class="multi-select"
+              >
+                <option
+                  v-for="product in ductProducts"
+                  :key="product.id"
+                  :value="product.id"
+                >
+                  {{ product.title }}
+                </option>
+              </select>
+              <small class="help-text"
+                >Hold Ctrl/Cmd to select multiple items</small
+              >
+            </div>
+            <label class="privacy-checkbox">
+              <input type="checkbox" v-model="privacyFlags.selectedDucts" />
+              <span>Private</span>
+            </label>
+          </div>
         </div>
       </div>
 
@@ -207,85 +282,130 @@
 
         <div class="form-group">
           <label for="plantType">Plant Type *</label>
-          <input
-            id="plantType"
-            v-model="formData.plantType"
-            type="text"
-            placeholder="e.g., Production, Assembly, Packaging..."
-            required
-          />
+          <div class="input-with-checkbox">
+            <input
+              id="plantType"
+              v-model="formData.plantType"
+              type="text"
+              placeholder="e.g., Production, Assembly, Packaging..."
+              required
+            />
+            <label class="privacy-checkbox">
+              <input type="checkbox" v-model="privacyFlags.plantType" />
+              <span>Private</span>
+            </label>
+          </div>
         </div>
 
         <div class="form-group">
           <label for="filterType">Filter Type *</label>
-          <input
-            id="filterType"
-            v-model="formData.filterType"
-            type="text"
-            placeholder="e.g., Baghouse, Cartridge, Cyclone..."
-            required
-          />
+          <div class="input-with-checkbox">
+            <input
+              id="filterType"
+              v-model="formData.filterType"
+              type="text"
+              placeholder="e.g., Baghouse, Cartridge, Cyclone..."
+              required
+            />
+            <label class="privacy-checkbox">
+              <input type="checkbox" v-model="privacyFlags.filterType" />
+              <span>Private</span>
+            </label>
+          </div>
         </div>
 
         <div class="form-group">
           <label for="fanType">Fan Type *</label>
-          <input
-            id="fanType"
-            v-model="formData.fanType"
-            type="text"
-            placeholder="e.g., Centrifugal, Axial, Mixed Flow..."
-            required
-          />
+          <div class="input-with-checkbox">
+            <input
+              id="fanType"
+              v-model="formData.fanType"
+              type="text"
+              placeholder="e.g., Centrifugal, Axial, Mixed Flow..."
+              required
+            />
+            <label class="privacy-checkbox">
+              <input type="checkbox" v-model="privacyFlags.fanType" />
+              <span>Private</span>
+            </label>
+          </div>
         </div>
 
         <div class="form-group">
           <label for="dustType">Dust Type *</label>
-          <input
-            id="dustType"
-            v-model="formData.dustType"
-            type="text"
-            placeholder="e.g., Wood dust, Metal particles..."
-            required
-          />
+          <div class="input-with-checkbox">
+            <input
+              id="dustType"
+              v-model="formData.dustType"
+              type="text"
+              placeholder="e.g., Wood dust, Metal particles..."
+              required
+            />
+            <label class="privacy-checkbox">
+              <input type="checkbox" v-model="privacyFlags.dustType" />
+              <span>Private</span>
+            </label>
+          </div>
         </div>
 
         <div class="form-group">
           <label for="ductSystem">Duct System *</label>
-          <input
-            id="ductSystem"
-            v-model="formData.ductSystem"
-            type="text"
-            placeholder="e.g., Round, Rectangular, Flexible..."
-            required
-          />
+          <div class="input-with-checkbox">
+            <input
+              id="ductSystem"
+              v-model="formData.ductSystem"
+              type="text"
+              placeholder="e.g., Round, Rectangular, Flexible..."
+              required
+            />
+            <label class="privacy-checkbox">
+              <input type="checkbox" v-model="privacyFlags.ductSystem" />
+              <span>Private</span>
+            </label>
+          </div>
         </div>
 
         <div class="form-group">
           <label for="totalExtractionVolume"
             >Total Extraction Volume (m³) *</label
           >
-          <input
-            id="totalExtractionVolume"
-            v-model.number="formData.totalExtractionVolume"
-            type="number"
-            min="0"
-            step="0.1"
-            placeholder="0"
-            required
-          />
+          <div class="input-with-checkbox">
+            <input
+              id="totalExtractionVolume"
+              v-model.number="formData.totalExtractionVolume"
+              type="number"
+              min="0"
+              step="0.1"
+              placeholder="0"
+              required
+            />
+            <label class="privacy-checkbox">
+              <input
+                type="checkbox"
+                v-model="privacyFlags.totalExtractionVolume"
+              />
+              <span>Private</span>
+            </label>
+          </div>
         </div>
 
         <div class="form-group">
           <label for="volumeFlow">Volume Flow (m³/h) *</label>
-          <input
-            id="volumeFlow"
-            v-model.number="formData.volumeFlow"
-            type="number"
-            min="0"
-            step="0.1"
-            placeholder="0"
-            required
-          />
+          <div class="input-with-checkbox">
+            <input
+              id="volumeFlow"
+              v-model.number="formData.volumeFlow"
+              type="number"
+              min="0"
+              step="0.1"
+              placeholder="0"
+              required
+            />
+            <label class="privacy-checkbox">
+              <input type="checkbox" v-model="privacyFlags.volumeFlow" />
+              <span>Private</span>
+            </label>
+          </div>
         </div>
       </div>
 
@@ -353,6 +473,27 @@ const formData = reactive({
   totalExtractionVolume: 0,
   volumeFlow: 0,
   customerId: "",
+});
+
+const privacyFlags = reactive({
+  title: false,
+  endUser: false,
+  phoneNumber: false,
+  country: false,
+  industry: false,
+  customIndustry: false,
+  selectedFilters: false,
+  selectedFans: false,
+  selectedDucts: false,
+  plantType: false,
+  filterType: false,
+  fanType: false,
+  dustType: false,
+  ductSystem: false,
+  totalExtractionVolume: false,
+  volumeFlow: false,
+  customerId: false,
+  manufacturerWebsite: false,
 });
 
 const customers = ref([]);
@@ -608,6 +749,7 @@ onMounted(() => {
   border-radius: 4px;
   font-size: 1rem;
   transition: border-color 0.2s;
+  box-sizing: border-box;
 }
 
 .form-group input:focus,
@@ -700,21 +842,11 @@ onMounted(() => {
 
 .country-dropdown-container {
   position: relative;
+  width: 100%;
 }
 
 .country-dropdown-container input {
   width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 4px;
-  font-size: 1rem;
-  transition: border-color 0.2s;
-}
-
-.country-dropdown-container input:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .country-dropdown {
@@ -753,6 +885,40 @@ onMounted(() => {
   margin-top: 0.5rem;
   font-size: 0.875rem;
   color: #059669;
+}
+
+/* Privacy checkbox styles */
+.input-with-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.input-with-checkbox input,
+.input-with-checkbox select,
+.input-with-checkbox .country-dropdown-container {
+  flex: 1;
+}
+
+.privacy-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.privacy-checkbox input[type="checkbox"] {
+  cursor: pointer;
+  width: auto;
+  margin: 0;
+}
+
+.privacy-checkbox span {
+  font-weight: 500;
 }
 
 @media (max-width: 768px) {
