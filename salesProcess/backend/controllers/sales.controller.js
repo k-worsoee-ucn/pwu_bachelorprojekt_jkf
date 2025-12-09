@@ -117,7 +117,8 @@ async function createSale(req, res) {
         data: {
           title: title,
           caseNo: nextCaseNo,
-          status: 'ongoing'
+          status: 'ongoing',
+          currentStep: 2
         }
       });
 

@@ -1,10 +1,25 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import ProcessCard from '@/components/ProcessCard.vue';
-import { processes as mockProcesses } from '@/js/mockProcesses.js';
+import { useAuth } from '@/composables/useAuth';
 
+const { getAuthHeader } = useAuth();
 const searchQuery = ref('');
-const allProcesses = ref(mockProcesses);
+const allProcesses = ref([]);
+
+onMounted(async () => {
+    try {
+        const response = await fetch('/api/processes', {
+            headers: {
+                ...getAuthHeader()
+            }
+        });
+        const data = await response.json();
+        allProcesses.value = data;
+    } catch (error) {
+        console.error('Error fetching processes:', error);
+    }
+});
 
 const filteredProcesses = computed(() => {
     if (!searchQuery.value.trim()) {
@@ -13,19 +28,18 @@ const filteredProcesses = computed(() => {
 
     const query = searchQuery.value.toLowerCase();
     return allProcesses.value.filter(process => 
-        process.name.toLowerCase().includes(query) ||
-        process.caseNumber.toLowerCase().includes(query) ||
-        process.startDate.includes(query) ||
-        process.expectedEndDate.includes(query)
+        process.title.toLowerCase().includes(query) ||
+        process.caseNo.toString().includes(query) ||
+        process.status.toLowerCase().includes(query)
     );
 });
 
 const ongoingProcesses = computed(() => {
-    return filteredProcesses.value.filter(process => process.step < 6);
+    return filteredProcesses.value.filter(process => process.currentStep < 6);
 });
 
 const completedProcesses = computed(() => {
-    return filteredProcesses.value.filter(process => process.step === 6);
+    return filteredProcesses.value.filter(process => process.currentStep === 6);
 });
 </script>
 
@@ -44,43 +58,43 @@ const completedProcesses = computed(() => {
 
         <!-- Ongoing Section -->
         <div class="section">
-            <h2>Ongoing</h2>
-            <div class="cards-grid">
-                <ProcessCard
-                    v-for="process in ongoingProcesses"
-                    :key="process.id"
-                    :id="process.id"
-                    :name="process.name"
-                    :caseNumber="process.caseNumber"
-                    :startDate="process.startDate"
-                    :expectedEndDate="process.expectedEndDate"
-                    :step="process.step"
-                />
-                <div v-if="ongoingProcesses.length === 0" class="no-results">
-                    <p>No ongoing processes found.</p>
+                <h2>Ongoing</h2>
+                <div class="cards-grid">
+                    <ProcessCard
+                        v-for="process in ongoingProcesses"
+                        :key="process.id"
+                        :id="process.id"
+                        :name="process.title"
+                        :caseNumber="process.caseNo"
+                        :startDate="process.startDate"
+                        :expectedEndDate="process.expectedEndDate"
+                        :step="process.currentStep"
+                    />
+                    <div v-if="ongoingProcesses.length === 0" class="no-results">
+                        <p>No ongoing processes found.</p>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Completed Section -->
-        <div class="section">
-            <h2>Completed</h2>
-            <div class="cards-grid">
-                <ProcessCard
-                    v-for="process in completedProcesses"
-                    :key="process.id"
-                    :id="process.id"
-                    :name="process.name"
-                    :caseNumber="process.caseNumber"
-                    :startDate="process.startDate"
-                    :expectedEndDate="process.expectedEndDate"
-                    :step="process.step"
-                />
-                <div v-if="completedProcesses.length === 0" class="no-results">
-                    <p>No completed processes found.</p>
+            <!-- Completed Section -->
+            <div class="section">
+                <h2>Completed</h2>
+                <div class="cards-grid">
+                    <ProcessCard
+                        v-for="process in completedProcesses"
+                        :key="process.id"
+                        :id="process.id"
+                        :name="process.title"
+                        :caseNumber="process.caseNo"
+                        :startDate="process.startDate"
+                        :expectedEndDate="process.expectedEndDate"
+                        :step="process.currentStep"
+                    />
+                    <div v-if="completedProcesses.length === 0" class="no-results">
+                        <p>No completed processes found.</p>
+                    </div>
                 </div>
             </div>
-        </div>
     </div>
 </template>
 

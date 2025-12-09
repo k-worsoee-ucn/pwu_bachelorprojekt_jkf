@@ -235,7 +235,8 @@ async function seedSales(prisma) {
         data: {
           title: saleData.title,
           caseNo: nextCaseNo,
-          status: 'ongoing'
+          status: 'ongoing',
+          currentStep: 2
         }
       });
 

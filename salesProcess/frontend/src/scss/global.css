@@ -1,16 +1,15 @@
 .btn {
   padding: 10px 20px;
-  background-color: $primary-jkf-blue;
+  background-color: #204485;
   color: white;
   border: none;
   border-radius: 5px;
   text-decoration: none;
   cursor: pointer;
   transition: background-color 0.3s;
-  
-  &:hover {
-    background-color: $jkf-hover-blue;
-  }
+}
+.btn:hover {
+  background-color: #0B5ED7;
 }
 
 .logout-btn {
@@ -22,8 +21,7 @@
   cursor: pointer;
   font-size: 0.9rem;
   transition: background-color 0.3s;
-
-  &:hover {
-    background-color: #c82333;
-  }
 }
+.logout-btn:hover {
+  background-color: #c82333;
+}/*# sourceMappingURL=global.css.map */

@@ -13,10 +13,6 @@ export function useAuth() {
   const isMarketingManager = computed(() => user.value?.role === 'marketingManager')
   const isViewer = computed(() => user.value?.role === 'viewer')
 
-  const canCreateSales = computed(() => isSalesManager.value)
-
-  const canViewAllProcesses = computed(() => isMarketingManager.value)
-
   const login = async (email, password) => {
     const response = await fetch('/api/users/login', {
       method: 'POST',
@@ -72,8 +68,6 @@ export function useAuth() {
     isSalesManager,
     isMarketingManager, 
     isViewer,
-    canCreateSales,
-    canViewAllProcesses,
 
     login,
     logout,
