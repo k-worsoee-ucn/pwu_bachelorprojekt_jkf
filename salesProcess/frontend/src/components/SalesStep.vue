@@ -570,8 +570,11 @@ const resetForm = () => {
 };
 
 const loadFormData = () => {
+  console.log("loadFormData called, props.sale:", props.sale);
   if (props.sale) {
+    console.log("props.sale.saleProducts:", props.sale.saleProducts);
     Object.assign(formData, {
+      title: props.sale.title || "",
       endUser: props.sale.endUser || "",
       phoneNumber: props.sale.phoneNumber || "",
       country: props.sale.country || "",
@@ -585,7 +588,20 @@ const loadFormData = () => {
       totalExtractionVolume: props.sale.totalExtractionVolume || 0,
       volumeFlow: props.sale.volumeFlow || 0,
       customerId: props.sale.customerId || "",
+      selectedFilters:
+        props.sale.saleProducts
+          ?.filter((sp) => sp.product.category === "filtersAndSeparators")
+          .map((sp) => sp.productId) || [],
+      selectedFans:
+        props.sale.saleProducts
+          ?.filter((sp) => sp.product.category === "fanSystems")
+          .map((sp) => sp.productId) || [],
+      selectedDucts:
+        props.sale.saleProducts
+          ?.filter((sp) => sp.product.category === "ductSystems")
+          .map((sp) => sp.productId) || [],
     });
+    console.log("formData after loading:", formData);
   }
 };
 
@@ -665,6 +681,7 @@ const submitForm = async () => {
       method,
       headers: {
         "Content-Type": "application/json",
+        ...getAuthHeader(),
       },
       body: JSON.stringify(saleData),
     });
