@@ -83,7 +83,9 @@ async function createSale(req, res) {
       dustType,
       ductSystem,
       totalExtractionVolume,
+      pressure,
       volumeFlow,
+      description,
     } = req.body;
 
     if (
@@ -134,6 +136,7 @@ async function createSale(req, res) {
       const sale = await prisma.sale.create({
         data: {
           title: title,
+          description: description || null,
           endUser,
           phoneNumber: phoneNumber || null,
           country,
@@ -145,6 +148,7 @@ async function createSale(req, res) {
           dustType,
           ductSystem,
           totalExtractionVolume: parseInt(totalExtractionVolume),
+          pressure: parseInt(pressure),
           volumeFlow: parseInt(volumeFlow),
           processId: process.id,
           customerId,
