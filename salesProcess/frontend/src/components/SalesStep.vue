@@ -613,7 +613,9 @@ const resetForm = () => {
 };
 
 const loadFormData = () => {
+  console.log("loadFormData called, props.sale:", props.sale);
   if (props.sale) {
+    console.log("props.sale.saleProducts:", props.sale.saleProducts);
     Object.assign(formData, {
       title: props.sale.title || "",
       description: props.sale.description || "",
@@ -644,6 +646,7 @@ const loadFormData = () => {
           ?.filter((sp) => sp.product.category === "ductSystems")
           .map((sp) => sp.productId) || [],
     });
+    console.log("formData after loading:", formData);
   }
 };
 
@@ -723,6 +726,7 @@ const submitForm = async () => {
       method,
       headers: {
         "Content-Type": "application/json",
+        ...getAuthHeader(),
       },
       body: JSON.stringify(saleData),
     });

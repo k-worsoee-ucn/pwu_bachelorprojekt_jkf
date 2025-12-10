@@ -1,18 +1,19 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useAuth } from "@/composables/useAuth";
 import SalesStep from "@/components/SalesStep.vue";
 
 const route = useRoute();
 const router = useRouter();
-const { getAuthHeader } = useAuth();
-const processId = route.params.id;
+const { getAuthHeader, user } = useAuth();
+const processId = computed(() => route.params.id);
 
 const process = ref(null);
-const isNewSale = processId === "new";
+const isNewSale = computed(() => processId.value === "new");
 const activeStep = ref(null);
 const shippingDate = ref(null); // Mock shipping date for production step
+const currentUserId = ref(null);
 
 const steps = [
   { id: 1, title: "Salg - Sag oprettelse", component: "SalesStep" },
@@ -40,7 +41,7 @@ const steps = [
 ];
 
 const getCurrentStep = () => {
-  if (isNewSale) return 1;
+  if (isNewSale.value) return 1;
   return process.value?.currentStep || 1;
 };
 
@@ -77,25 +78,48 @@ const toggleStep = (stepId) => {
 };
 
 onMounted(async () => {
-  if (!isNewSale) {
+  // Get current user ID
+  if (user.value?.id) {
+    currentUserId.value = user.value.id;
+  }
+
+  console.log("Route params:", route.params);
+  console.log("processId:", processId.value);
+  console.log("isNewSale:", isNewSale.value);
+
+  if (!isNewSale.value && processId.value) {
     try {
-      const response = await fetch(`/api/processes/${processId}`, {
+      console.log("Fetching process:", processId.value);
+      const response = await fetch(`/api/processes/${processId.value}`, {
         headers: {
           ...getAuthHeader(),
         },
       });
+      console.log("Response status:", response.status);
       const data = await response.json();
+      console.log("Process data:", data);
       process.value = data;
+      console.log("process.value after assignment:", process.value);
     } catch (error) {
       console.error("Error fetching process:", error);
     }
   }
+  console.log("Final process.value:", process.value);
+  console.log("Final isNewSale.value:", isNewSale.value);
   // Open first step by default
   activeStep.value = 1;
 });
 
 const goBack = () => {
   router.back();
+};
+
+const handleSaleCreated = (savedSale) => {
+  console.log("Sale created:", savedSale);
+  // Navigate to the created process
+  if (savedSale.process?.id) {
+    router.push(`/processes/${savedSale.process.id}`);
+  }
 };
 </script>
 
@@ -169,8 +193,10 @@ const goBack = () => {
         >
           <SalesStep
             v-if="step.component === 'SalesStep'"
-            :process="null"
-            :isNew="true"
+            :process-id="0"
+            :current-user-id="currentUserId || 0"
+            :sale="null"
+            @sale-created="handleSaleCreated"
           />
           <div v-else class="placeholder">
             {{ step.component }} - Content coming soon
@@ -252,7 +278,12 @@ const goBack = () => {
           "
           class="accordion-content"
         >
-          <SalesStep v-if="step.component === 'SalesStep'" :process="process" />
+          <SalesStep
+            v-if="step.component === 'SalesStep'"
+            :process-id="process.id"
+            :current-user-id="currentUserId || process.userId || 0"
+            :sale="process.sale || null"
+          />
           <div v-else class="placeholder">
             {{ step.component }} - Content coming soon
           </div>

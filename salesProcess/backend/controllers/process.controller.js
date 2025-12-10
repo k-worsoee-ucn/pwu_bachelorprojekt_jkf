@@ -15,7 +15,26 @@ async function getProcessById(req, res) {
   try {
     const process = await prisma.process.findUnique({
       where: { id: parseInt(req.params.id) },
-      include: { sale: true },
+      include: {
+        sale: {
+          include: {
+            saleProducts: {
+              include: {
+                product: true,
+              },
+            },
+            customer: true,
+            salesManager: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!process) return res.status(404).json({ error: "Process not found" });
