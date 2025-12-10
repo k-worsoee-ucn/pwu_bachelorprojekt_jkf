@@ -25,6 +25,23 @@
             </label>
           </div>
         </div>
+
+        <div class="form-group">
+          <label for="description">Description</label>
+          <div class="input-with-checkbox">
+            <textarea
+              id="description"
+              v-model="formData.description"
+              placeholder="Enter a detailed description of the project"
+              rows="3"
+            ></textarea>
+            <label class="privacy-checkbox">
+              <input type="checkbox" v-model="privacyFlags.description" />
+              <span>Private</span>
+            </label>
+          </div>
+        </div>
+
         <div class="form-group">
           <label for="customerId">Plant Manufacturer *</label>
           <div class="input-with-checkbox">
@@ -390,6 +407,25 @@
         </div>
 
         <div class="form-group">
+          <label for="pressure">Pressure (Pa) *</label>
+          <div class="input-with-checkbox">
+            <input
+              id="pressure"
+              v-model.number="formData.pressure"
+              type="number"
+              min="0"
+              step="1"
+              placeholder="0"
+              required
+            />
+            <label class="privacy-checkbox">
+              <input type="checkbox" v-model="privacyFlags.pressure" />
+              <span>Private</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
           <label for="volumeFlow">Volume Flow (m³/h) *</label>
           <div class="input-with-checkbox">
             <input
@@ -457,6 +493,7 @@ const { getAuthHeader } = useAuth();
 
 const formData = reactive({
   title: "",
+  description: "",
   endUser: "",
   phoneNumber: "",
   country: "",
@@ -471,12 +508,14 @@ const formData = reactive({
   dustType: "",
   ductSystem: "",
   totalExtractionVolume: 0,
+  pressure: 0,
   volumeFlow: 0,
   customerId: "",
 });
 
 const privacyFlags = reactive({
   title: false,
+  description: false,
   endUser: false,
   phoneNumber: false,
   country: false,
@@ -491,6 +530,7 @@ const privacyFlags = reactive({
   dustType: false,
   ductSystem: false,
   totalExtractionVolume: false,
+  pressure: false,
   volumeFlow: false,
   customerId: false,
   manufacturerWebsite: false,
@@ -548,6 +588,8 @@ const ductProducts = computed(() => {
 // Methods
 const resetForm = () => {
   Object.assign(formData, {
+    title: "",
+    description: "",
     endUser: "",
     phoneNumber: "",
     country: "",
@@ -562,6 +604,7 @@ const resetForm = () => {
     dustType: "",
     ductSystem: "",
     totalExtractionVolume: 0,
+    pressure: 0,
     volumeFlow: 0,
     customerId: "",
   });
@@ -572,6 +615,8 @@ const resetForm = () => {
 const loadFormData = () => {
   if (props.sale) {
     Object.assign(formData, {
+      title: props.sale.title || "",
+      description: props.sale.description || "",
       endUser: props.sale.endUser || "",
       phoneNumber: props.sale.phoneNumber || "",
       country: props.sale.country || "",
@@ -583,8 +628,21 @@ const loadFormData = () => {
       dustType: props.sale.dustType || "",
       ductSystem: props.sale.ductSystem || "",
       totalExtractionVolume: props.sale.totalExtractionVolume || 0,
+      pressure: props.sale.pressure || 0,
       volumeFlow: props.sale.volumeFlow || 0,
       customerId: props.sale.customerId || "",
+      selectedFilters:
+        props.sale.saleProducts
+          ?.filter((sp) => sp.product.category === "filtersAndSeparators")
+          .map((sp) => sp.productId) || [],
+      selectedFans:
+        props.sale.saleProducts
+          ?.filter((sp) => sp.product.category === "fanSystems")
+          .map((sp) => sp.productId) || [],
+      selectedDucts:
+        props.sale.saleProducts
+          ?.filter((sp) => sp.product.category === "ductSystems")
+          .map((sp) => sp.productId) || [],
     });
   }
 };

@@ -65,6 +65,7 @@ model Process {
 model Sale {
   id                     Int      @id @default(autoincrement())
   title                  String
+  description            String?
   endUser                String   @map("end_user")
   country                String
   industry               Industry
@@ -75,6 +76,7 @@ model Sale {
   dustType               String   @map("dust_type")
   ductSystem             String   @map("duct_system")
   totalExtractionVolume  Int      @map("total_extraction_volume")
+  pressure               Int    
   volumeFlow             Int      @map("volume_flow")
   phoneNumber            String?  @map("phone_number")
 
