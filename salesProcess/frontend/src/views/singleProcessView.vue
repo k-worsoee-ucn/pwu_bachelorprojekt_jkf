@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useAuth } from "@/composables/useAuth";
 import SalesStep from "@/components/SalesStep.vue";
@@ -77,17 +77,8 @@ const toggleStep = (stepId) => {
   }
 };
 
-onMounted(async () => {
-  // Get current user ID
-  if (user.value?.id) {
-    currentUserId.value = user.value.id;
-  }
-
-  console.log("Route params:", route.params);
-  console.log("processId:", processId.value);
-  console.log("isNewSale:", isNewSale.value);
-
-  if (!isNewSale.value && processId.value) {
+const fetchProcess = async () => {
+  if (!isNewSale.value && processId.value && processId.value !== "new") {
     try {
       console.log("Fetching process:", processId.value);
       const response = await fetch(`/api/processes/${processId.value}`, {
@@ -103,7 +94,35 @@ onMounted(async () => {
     } catch (error) {
       console.error("Error fetching process:", error);
     }
+  } else {
+    // Reset process when navigating to new sale
+    process.value = null;
   }
+};
+
+// Watch for route changes
+watch(
+  () => route.params.id,
+  async (newId, oldId) => {
+    console.log("Route ID changed from", oldId, "to", newId);
+    await fetchProcess();
+    // Open first step when route changes
+    activeStep.value = 1;
+  }
+);
+
+onMounted(async () => {
+  // Get current user ID
+  if (user.value?.id) {
+    currentUserId.value = user.value.id;
+  }
+
+  console.log("Route params:", route.params);
+  console.log("processId:", processId.value);
+  console.log("isNewSale:", isNewSale.value);
+
+  await fetchProcess();
+
   console.log("Final process.value:", process.value);
   console.log("Final isNewSale.value:", isNewSale.value);
   // Open first step by default
