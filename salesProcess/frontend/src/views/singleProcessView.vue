@@ -64,6 +64,9 @@ const canToggleStep = (stepId) => {
 };
 
 const toggleStep = (stepId) => {
+  // Production step (step 2) should not have accordion functionality
+  if (stepId === 2) return;
+
   if (!canToggleStep(stepId)) return;
 
   if (activeStep.value === stepId) {
@@ -119,8 +122,11 @@ const goBack = () => {
       >
         <div
           class="accordion-header"
-          @click="toggleStep(step.id)"
-          :class="{ 'not-allowed': !canToggleStep(step.id) }"
+          @click="step.id !== 2 ? toggleStep(step.id) : null"
+          :class="{
+            'not-allowed': !canToggleStep(step.id),
+            'no-expand': step.id === 2,
+          }"
         >
           <div class="step-info">
             <i class="fa-solid step-icon" :class="getStepIcon(step.id)"></i>
@@ -148,7 +154,7 @@ const goBack = () => {
             </div>
           </div>
           <i
-            v-if="canToggleStep(step.id)"
+            v-if="canToggleStep(step.id) && step.id !== 2"
             class="fa-solid chevron-icon"
             :class="
               activeStep === step.id ? 'fa-chevron-up' : 'fa-chevron-down'
@@ -156,7 +162,9 @@ const goBack = () => {
           ></i>
         </div>
         <div
-          v-if="activeStep === step.id && canToggleStep(step.id)"
+          v-if="
+            activeStep === step.id && canToggleStep(step.id) && step.id !== 2
+          "
           class="accordion-content"
         >
           <SalesStep
@@ -199,8 +207,11 @@ const goBack = () => {
       >
         <div
           class="accordion-header"
-          @click="toggleStep(step.id)"
-          :class="{ 'not-allowed': !canToggleStep(step.id) }"
+          @click="step.id !== 2 ? toggleStep(step.id) : null"
+          :class="{
+            'not-allowed': !canToggleStep(step.id),
+            'no-expand': step.id === 2,
+          }"
         >
           <div class="step-info">
             <i class="fa-solid step-icon" :class="getStepIcon(step.id)"></i>
@@ -228,7 +239,7 @@ const goBack = () => {
             </div>
           </div>
           <i
-            v-if="canToggleStep(step.id)"
+            v-if="canToggleStep(step.id) && step.id !== 2"
             class="fa-solid chevron-icon"
             :class="
               activeStep === step.id ? 'fa-chevron-up' : 'fa-chevron-down'
@@ -236,7 +247,9 @@ const goBack = () => {
           ></i>
         </div>
         <div
-          v-if="activeStep === step.id && canToggleStep(step.id)"
+          v-if="
+            activeStep === step.id && canToggleStep(step.id) && step.id !== 2
+          "
           class="accordion-content"
         >
           <SalesStep v-if="step.component === 'SalesStep'" :process="process" />
@@ -394,6 +407,10 @@ const goBack = () => {
 
         &.not-allowed {
           cursor: not-allowed;
+        }
+
+        &.no-expand {
+          cursor: default;
         }
 
         .step-info {
