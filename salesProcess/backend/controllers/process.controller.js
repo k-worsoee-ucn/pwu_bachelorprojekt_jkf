@@ -47,11 +47,39 @@ async function getProcessById(req, res) {
 
 async function updateProcess(req, res) {
   try {
-    const { title, caseNo, status } = req.body;
+    const { title, caseNo, status, consent, currentStep } = req.body;
+
+    // Build update data object, only including fields that are provided
+    const updateData = {};
+    if (title !== undefined) updateData.title = title;
+    if (caseNo !== undefined) updateData.caseNo = caseNo;
+    if (status !== undefined) updateData.status = status;
+    if (consent !== undefined) updateData.consent = consent;
+    if (currentStep !== undefined) updateData.currentStep = currentStep;
+
     const process = await prisma.process.update({
       where: { id: parseInt(req.params.id) },
-      data: { title, caseNo, status },
-      include: { sale: true },
+      data: updateData,
+      include: {
+        sale: {
+          include: {
+            saleProducts: {
+              include: {
+                product: true,
+              },
+            },
+            customer: true,
+            salesManager: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+              },
+            },
+          },
+        },
+      },
     });
     res.json(process);
   } catch (error) {

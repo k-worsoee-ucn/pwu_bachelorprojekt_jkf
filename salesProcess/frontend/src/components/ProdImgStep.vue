@@ -183,6 +183,7 @@ const uploadImages = async () => {
     selectedFiles.value.forEach((file) => {
       formData.append("images", file);
     });
+    formData.append("type", "production");
 
     const response = await fetch(
       `http://localhost:3000/api/processes/${props.processId}/images`,
@@ -225,7 +226,7 @@ const uploadImages = async () => {
 const fetchUploadedImages = async () => {
   try {
     const response = await fetch(
-      `http://localhost:3000/api/processes/${props.processId}/images`
+      `http://localhost:3000/api/processes/${props.processId}/images?type=production`
     );
 
     if (!response.ok) {

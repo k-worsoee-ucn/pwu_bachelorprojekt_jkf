@@ -5,6 +5,7 @@ const uploadImages = async (req, res) => {
   try {
     const { processId } = req.params;
     const files = req.files;
+    const { type } = req.body;
 
     if (!files || files.length === 0) {
       return res.status(400).json({ error: "No files uploaded" });
@@ -27,6 +28,7 @@ const uploadImages = async (req, res) => {
             url: `/uploads/${file.filename}`,
             filename: file.filename,
             processId: parseInt(processId),
+            type: type || "production",
           },
         })
       )
@@ -46,9 +48,18 @@ const uploadImages = async (req, res) => {
 const getProcessImages = async (req, res) => {
   try {
     const { processId } = req.params;
+    const { type } = req.query;
+
+    const where = {
+      processId: parseInt(processId),
+    };
+
+    if (type) {
+      where.type = type;
+    }
 
     const images = await prisma.image.findMany({
-      where: { processId: parseInt(processId) },
+      where,
       orderBy: { createdAt: "desc" },
     });
 

@@ -44,6 +44,7 @@ model Process {
   caseNo      Int           @unique
   status      ProcessStatus @default(ongoing)
   currentStep Int           @default(1)
+  consent     Boolean       @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -212,9 +213,10 @@ model Case {
 }
 
 model Image {
-  id        Int    @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   url       String
   filename  String
+  type      String   @default("production") // "production" or "installation"
 
   createdAt DateTime @default(now())
 

@@ -4,6 +4,7 @@ import { useRoute, useRouter } from "vue-router";
 import { useAuth } from "@/composables/useAuth";
 import SalesStep from "@/components/SalesStep.vue";
 import ProdImgStep from "@/components/ProdImgStep.vue";
+import InstallImgStep from "@/components/InstallImgStep.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -41,6 +42,14 @@ const steps = [
     component: "CaseUploadStep",
   },
 ];
+
+const visibleSteps = computed(() => {
+  // If no process or consent is false, filter out step 6
+  if (!process.value?.consent) {
+    return steps.filter((step) => step.id !== 6);
+  }
+  return steps;
+});
 
 const getCurrentStep = () => {
   if (isNewSale.value) return 1;
@@ -223,7 +232,7 @@ const handleStepCompleted = async () => {
 
     <div class="steps-container">
       <div
-        v-for="step in steps"
+        v-for="step in visibleSteps"
         :key="step.id"
         class="step-accordion"
         :class="[
@@ -289,6 +298,12 @@ const handleStepCompleted = async () => {
             v-else-if="step.component === 'ProdImgStep'"
             :process-id="processId"
           />
+          <InstallImgStep
+            v-else-if="step.component === 'InstallImgStep'"
+            :process-id="processId"
+            :sale="null"
+            :process="null"
+          />
           <div v-else class="placeholder">
             {{ step.component }} - Content coming soon
           </div>
@@ -314,7 +329,7 @@ const handleStepCompleted = async () => {
 
     <div class="steps-container">
       <div
-        v-for="step in steps"
+        v-for="step in visibleSteps"
         :key="step.id"
         class="step-accordion"
         :class="[
@@ -378,6 +393,13 @@ const handleStepCompleted = async () => {
           <ProdImgStep
             v-else-if="step.component === 'ProdImgStep'"
             :process-id="process.id"
+          />
+          <InstallImgStep
+            v-else-if="step.component === 'InstallImgStep'"
+            :process-id="process.id"
+            :sale="process.sale || null"
+            :process="process"
+            @consent-updated="fetchProcess"
           />
           <div v-else class="placeholder">
             {{ step.component }} - Content coming soon
