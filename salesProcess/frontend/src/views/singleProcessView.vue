@@ -3,6 +3,7 @@ import { ref, computed, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useAuth } from "@/composables/useAuth";
 import SalesStep from "@/components/SalesStep.vue";
+import ProdImgStep from "@/components/ProdImgStep.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -151,9 +152,10 @@ const advanceToNextStep = async () => {
 
     if (response.ok) {
       const updatedProcess = await response.json();
+      const previousStep = process.value.currentStep;
       process.value = updatedProcess;
       console.log(
-        `Process advanced from step ${nextStep - 1} to step ${nextStep}`
+        `Process advanced from step ${previousStep} to step ${nextStep}`
       );
     }
   } catch (error) {
@@ -283,6 +285,10 @@ const handleStepCompleted = async () => {
             :sale="null"
             @sale-created="handleSaleCreated"
           />
+          <ProdImgStep
+            v-else-if="step.component === 'ProdImgStep'"
+            :process-id="processId"
+          />
           <div v-else class="placeholder">
             {{ step.component }} - Content coming soon
           </div>
@@ -369,23 +375,28 @@ const handleStepCompleted = async () => {
             :current-user-id="currentUserId || process.userId || 0"
             :sale="process.sale || null"
           />
+          <ProdImgStep
+            v-else-if="step.component === 'ProdImgStep'"
+            :process-id="process.id"
+          />
           <div v-else class="placeholder">
             {{ step.component }} - Content coming soon
-            <button
-              @click="handleStepCompleted"
-              style="
-                margin-top: 1rem;
-                padding: 0.5rem 1rem;
-                background: #204485;
-                color: white;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-              "
-            >
-              Complete Step
-            </button>
           </div>
+          <button
+            v-if="step.component !== 'SalesStep'"
+            @click="handleStepCompleted"
+            style="
+              margin-top: 1rem;
+              padding: 0.5rem 1rem;
+              background: #204485;
+              color: white;
+              border: none;
+              border-radius: 4px;
+              cursor: pointer;
+            "
+          >
+            Complete Step
+          </button>
         </div>
       </div>
     </div>

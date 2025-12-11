@@ -58,6 +58,7 @@ model Process {
   references Reference[]
   products   Product[]
   cases      Case[]
+  images     Image[]
 
   @@map("processes")
 }
@@ -208,4 +209,18 @@ model Case {
   products  Product[]
 
   @@map("cases")
+}
+
+model Image {
+  id        Int    @id @default(autoincrement())
+  url       String
+  filename  String
+
+  createdAt DateTime @default(now())
+
+  // Relationships
+  process   Process  @relation(fields: [processId], references: [id])
+  processId Int
+
+  @@map("images")
 }
