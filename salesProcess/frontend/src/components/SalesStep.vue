@@ -468,7 +468,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, computed } from "vue";
+import { ref, reactive, onMounted, computed, watch } from "vue";
 import { countries } from "countries-list";
 import { useAuth } from "@/composables/useAuth";
 
@@ -646,6 +646,12 @@ const loadFormData = () => {
           ?.filter((sp) => sp.product.category === "ductSystems")
           .map((sp) => sp.productId) || [],
     });
+
+    // Load privacy settings
+    if (props.sale.privacySettings) {
+      Object.assign(privacyFlags, props.sale.privacySettings);
+    }
+
     console.log("formData after loading:", formData);
   }
 };
@@ -713,6 +719,7 @@ const submitForm = async () => {
       ...formData,
       processId: props.processId,
       salesManagerId: props.currentUserId,
+      privacySettings: privacyFlags,
     };
 
     if (saleData.industry !== "other") {
@@ -761,6 +768,26 @@ onMounted(() => {
   loadProducts();
   loadFormData();
 });
+
+// Watch for sale prop changes to reload privacy flags
+watch(
+  () => props.sale,
+  (newSale) => {
+    if (newSale?.privacySettings) {
+      // Reset all to false first
+      Object.keys(privacyFlags).forEach((key) => {
+        privacyFlags[key] = false;
+      });
+      // Then apply saved settings
+      Object.keys(newSale.privacySettings).forEach((key) => {
+        if (key in privacyFlags) {
+          privacyFlags[key] = newSale.privacySettings[key];
+        }
+      });
+    }
+  },
+  { immediate: true, deep: true }
+);
 </script>
 
 <style scoped>

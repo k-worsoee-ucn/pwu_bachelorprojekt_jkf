@@ -5,6 +5,7 @@ import { useAuth } from "@/composables/useAuth";
 import SalesStep from "@/components/SalesStep.vue";
 import ProdImgStep from "@/components/ProdImgStep.vue";
 import InstallImgStep from "@/components/InstallImgStep.vue";
+import CaseRefStep from "@/components/CaseRefStep.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -304,6 +305,12 @@ const handleStepCompleted = async () => {
             :sale="null"
             :process="null"
           />
+          <CaseRefStep
+            v-else-if="step.component === 'CaseRefStep'"
+            :process-id="processId"
+            :sale="null"
+            :process="null"
+          />
           <div v-else class="placeholder">
             {{ step.component }} - Content coming soon
           </div>
@@ -389,6 +396,7 @@ const handleStepCompleted = async () => {
             :process-id="process.id"
             :current-user-id="currentUserId || process.userId || 0"
             :sale="process.sale || null"
+            @sale-updated="fetchProcess"
           />
           <ProdImgStep
             v-else-if="step.component === 'ProdImgStep'"
@@ -400,6 +408,12 @@ const handleStepCompleted = async () => {
             :sale="process.sale || null"
             :process="process"
             @consent-updated="fetchProcess"
+          />
+          <CaseRefStep
+            v-else-if="step.component === 'CaseRefStep'"
+            :process-id="process.id"
+            :sale="process.sale || null"
+            :process="process"
           />
           <div v-else class="placeholder">
             {{ step.component }} - Content coming soon

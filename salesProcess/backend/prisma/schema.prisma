@@ -81,6 +81,7 @@ model Sale {
   pressure               Int    
   volumeFlow             Int      @map("volume_flow")
   phoneNumber            String?  @map("phone_number")
+  privacySettings        Json?    @map("privacy_settings")
 
   // FK
   processId      Int @unique @map("process_id")
