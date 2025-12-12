@@ -44,6 +44,7 @@ model Process {
   caseNo      Int           @unique
   status      ProcessStatus @default(ongoing)
   currentStep Int           @default(1)
+  consent     Boolean       @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -58,6 +59,7 @@ model Process {
   references Reference[]
   products   Product[]
   cases      Case[]
+  images     Image[]
 
   @@map("processes")
 }
@@ -79,6 +81,7 @@ model Sale {
   pressure               Int    
   volumeFlow             Int      @map("volume_flow")
   phoneNumber            String?  @map("phone_number")
+  privacySettings        Json?    @map("privacy_settings")
 
   // FK
   processId      Int @unique @map("process_id")
@@ -208,4 +211,19 @@ model Case {
   products  Product[]
 
   @@map("cases")
+}
+
+model Image {
+  id        Int      @id @default(autoincrement())
+  url       String
+  filename  String
+  type      String   @default("production") // "production" or "installation"
+
+  createdAt DateTime @default(now())
+
+  // Relationships
+  process   Process  @relation(fields: [processId], references: [id])
+  processId Int
+
+  @@map("images")
 }

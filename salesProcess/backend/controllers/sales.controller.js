@@ -86,6 +86,7 @@ async function createSale(req, res) {
       pressure,
       volumeFlow,
       description,
+      privacySettings,
     } = req.body;
 
     if (
@@ -150,6 +151,7 @@ async function createSale(req, res) {
           totalExtractionVolume: parseInt(totalExtractionVolume),
           pressure: parseInt(pressure),
           volumeFlow: parseInt(volumeFlow),
+          privacySettings: privacySettings || null,
           processId: process.id,
           customerId,
           salesManagerId,
@@ -200,27 +202,69 @@ async function createSale(req, res) {
 async function updateSale(req, res) {
   try {
     const { id } = req.params;
-    const updateData = req.body;
+    const {
+      // Remove UI-only fields that aren't in the database
+      selectedFilters,
+      selectedFans,
+      selectedDucts,
+      processId,
+      salesManagerId,
+      ...updateData
+    } = req.body;
 
-    const sale = await prisma.sale.update({
-      where: { id: parseInt(id) },
-      data: updateData,
-      include: {
-        process: true,
-        customer: true,
-        salesManager: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
+    // Handle product updates
+    const allSelectedProducts = [
+      ...(selectedFilters || []),
+      ...(selectedFans || []),
+      ...(selectedDucts || []),
+    ];
+
+    // Update sale and products in a transaction
+    const sale = await prisma.$transaction(async (prisma) => {
+      // Update the sale
+      const updatedSale = await prisma.sale.update({
+        where: { id: parseInt(id) },
+        data: updateData,
+      });
+
+      // Delete existing sale products
+      await prisma.saleProduct.deleteMany({
+        where: { saleId: parseInt(id) },
+      });
+
+      // Create new sale products if any are selected
+      if (allSelectedProducts.length > 0) {
+        const saleProductData = allSelectedProducts.map((productId) => ({
+          saleId: parseInt(id),
+          productId: parseInt(productId),
+          quantity: 1,
+        }));
+
+        await prisma.saleProduct.createMany({
+          data: saleProductData,
+        });
+      }
+
+      // Return the updated sale with all relations
+      return await prisma.sale.findUnique({
+        where: { id: parseInt(id) },
+        include: {
+          process: true,
+          customer: true,
+          salesManager: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+            },
+          },
+          saleProducts: {
+            include: {
+              product: true,
+            },
           },
         },
-        saleProducts: {
-          include: {
-            product: true,
-          },
-        },
-      },
+      });
     });
 
     res.json(sale);

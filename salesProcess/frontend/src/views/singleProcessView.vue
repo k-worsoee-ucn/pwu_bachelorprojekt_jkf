@@ -3,6 +3,9 @@ import { ref, computed, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useAuth } from "@/composables/useAuth";
 import SalesStep from "@/components/SalesStep.vue";
+import ProdImgStep from "@/components/ProdImgStep.vue";
+import InstallImgStep from "@/components/InstallImgStep.vue";
+import CaseRefStep from "@/components/CaseRefStep.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -14,6 +17,7 @@ const isNewSale = computed(() => processId.value === "new");
 const activeStep = ref(null);
 const shippingDate = ref(null); // Mock shipping date for production step
 const currentUserId = ref(null);
+let shippingDateTimer = null;
 
 const steps = [
   { id: 1, title: "Salg - Sag oprettelse", component: "SalesStep" },
@@ -40,16 +44,27 @@ const steps = [
   },
 ];
 
+const visibleSteps = computed(() => {
+  // If no process or consent is false, filter out step 6
+  if (!process.value?.consent) {
+    return steps.filter((step) => step.id !== 6);
+  }
+  return steps;
+});
+
 const getCurrentStep = () => {
   if (isNewSale.value) return 1;
   return process.value?.currentStep || 1;
 };
 
 const getStepState = (stepId) => {
-  const currentStep = getCurrentStep();
-  if (stepId < currentStep) return "completed";
-  if (stepId === currentStep) return "active";
-  return "locked";
+  // TEMPORARY: Allow all steps for development
+  return "active";
+
+  // const currentStep = getCurrentStep();
+  // if (stepId < currentStep) return "completed";
+  // if (stepId === currentStep) return "active";
+  // return "locked";
 };
 
 const getStepIcon = (stepId) => {
@@ -60,12 +75,14 @@ const getStepIcon = (stepId) => {
 };
 
 const canToggleStep = (stepId) => {
-  const state = getStepState(stepId);
-  return state !== "locked";
+  // TEMPORARY: Allow all steps for development
+  return true;
+
+  // const state = getStepState(stepId);
+  // return state !== "locked";
 };
 
 const toggleStep = (stepId) => {
-  // Production step (step 2) should not have accordion functionality
   if (stepId === 2) return;
 
   if (!canToggleStep(stepId)) return;
@@ -91,28 +108,86 @@ const fetchProcess = async () => {
       console.log("Process data:", data);
       process.value = data;
       console.log("process.value after assignment:", process.value);
+
+      if (data.currentStep === 2 && !shippingDate.value) {
+        startShippingDateTimer();
+      }
     } catch (error) {
       console.error("Error fetching process:", error);
     }
   } else {
-    // Reset process when navigating to new sale
     process.value = null;
   }
 };
 
-// Watch for route changes
+const startShippingDateTimer = () => {
+  if (shippingDateTimer) {
+    clearTimeout(shippingDateTimer);
+  }
+
+  shippingDateTimer = setTimeout(async () => {
+    // Generate a mock shipping date (7 days from now)
+    const futureDate = new Date();
+    futureDate.setDate(futureDate.getDate() + 7);
+    shippingDate.value = futureDate.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+    console.log("Mock shipping date set:", shippingDate.value);
+
+    // Production step is now complete, advance to next step
+    await advanceToNextStep();
+  }, 15000); // 15 seconds
+};
+
+const advanceToNextStep = async () => {
+  if (!process.value) return;
+
+  const nextStep = process.value.currentStep + 1;
+  if (nextStep > 6) {
+    console.log("Process already at final step");
+    return;
+  }
+
+  try {
+    const response = await fetch(`/api/processes/${process.value.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        ...getAuthHeader(),
+      },
+      body: JSON.stringify({ currentStep: nextStep }),
+    });
+
+    if (response.ok) {
+      const updatedProcess = await response.json();
+      const previousStep = process.value.currentStep;
+      process.value = updatedProcess;
+      console.log(
+        `Process advanced from step ${previousStep} to step ${nextStep}`
+      );
+    }
+  } catch (error) {
+    console.error("Error advancing process step:", error);
+  }
+};
+
 watch(
   () => route.params.id,
   async (newId, oldId) => {
     console.log("Route ID changed from", oldId, "to", newId);
+    // Clear timer when route changes
+    if (shippingDateTimer) {
+      clearTimeout(shippingDateTimer);
+      shippingDateTimer = null;
+    }
     await fetchProcess();
-    // Open first step when route changes
     activeStep.value = 1;
   }
 );
 
 onMounted(async () => {
-  // Get current user ID
   if (user.value?.id) {
     currentUserId.value = user.value.id;
   }
@@ -125,7 +200,6 @@ onMounted(async () => {
 
   console.log("Final process.value:", process.value);
   console.log("Final isNewSale.value:", isNewSale.value);
-  // Open first step by default
   activeStep.value = 1;
 });
 
@@ -135,10 +209,14 @@ const goBack = () => {
 
 const handleSaleCreated = (savedSale) => {
   console.log("Sale created:", savedSale);
-  // Navigate to the created process
   if (savedSale.process?.id) {
     router.push(`/processes/${savedSale.process.id}`);
   }
+};
+
+const handleStepCompleted = async () => {
+  console.log("Step completed, advancing to next step");
+  await advanceToNextStep();
 };
 </script>
 
@@ -155,7 +233,7 @@ const handleSaleCreated = (savedSale) => {
 
     <div class="steps-container">
       <div
-        v-for="step in steps"
+        v-for="step in visibleSteps"
         :key="step.id"
         class="step-accordion"
         :class="[
@@ -183,16 +261,16 @@ const handleSaleCreated = (savedSale) => {
                 "
                 class="step-status"
               >
-                Forventet dato: xx/xx
+                Shipping Date: Pending
               </p>
               <p v-if="step.id === 2 && shippingDate" class="step-status">
-                Sidst ændret: {{ shippingDate }}
+                Shipping Date: {{ shippingDate }}
               </p>
               <p
                 v-if="getStepState(step.id) === 'completed' && step.id !== 2"
                 class="step-status"
               >
-                Sidst ændret: {{ new Date().toLocaleDateString("da-DK") }}
+                Last changed: {{ new Date().toLocaleDateString("en-US") }}
               </p>
             </div>
           </div>
@@ -216,6 +294,22 @@ const handleSaleCreated = (savedSale) => {
             :current-user-id="currentUserId || 0"
             :sale="null"
             @sale-created="handleSaleCreated"
+          />
+          <ProdImgStep
+            v-else-if="step.component === 'ProdImgStep'"
+            :process-id="processId"
+          />
+          <InstallImgStep
+            v-else-if="step.component === 'InstallImgStep'"
+            :process-id="processId"
+            :sale="null"
+            :process="null"
+          />
+          <CaseRefStep
+            v-else-if="step.component === 'CaseRefStep'"
+            :process-id="processId"
+            :sale="null"
+            :process="null"
           />
           <div v-else class="placeholder">
             {{ step.component }} - Content coming soon
@@ -242,7 +336,7 @@ const handleSaleCreated = (savedSale) => {
 
     <div class="steps-container">
       <div
-        v-for="step in steps"
+        v-for="step in visibleSteps"
         :key="step.id"
         class="step-accordion"
         :class="[
@@ -270,16 +364,16 @@ const handleSaleCreated = (savedSale) => {
                 "
                 class="step-status"
               >
-                Forventet dato: xx/xx
+                Shipping Date: Pending...
               </p>
               <p v-if="step.id === 2 && shippingDate" class="step-status">
-                Sidst ændret: {{ shippingDate }}
+                Shipping Date: {{ shippingDate }}
               </p>
               <p
                 v-if="getStepState(step.id) === 'completed' && step.id !== 2"
                 class="step-status"
               >
-                Sidst ændret: {{ new Date().toLocaleDateString("da-DK") }}
+                Last changed: {{ new Date().toLocaleDateString("en-US") }}
               </p>
             </div>
           </div>
@@ -302,10 +396,43 @@ const handleSaleCreated = (savedSale) => {
             :process-id="process.id"
             :current-user-id="currentUserId || process.userId || 0"
             :sale="process.sale || null"
+            @sale-updated="fetchProcess"
+          />
+          <ProdImgStep
+            v-else-if="step.component === 'ProdImgStep'"
+            :process-id="process.id"
+          />
+          <InstallImgStep
+            v-else-if="step.component === 'InstallImgStep'"
+            :process-id="process.id"
+            :sale="process.sale || null"
+            :process="process"
+            @consent-updated="fetchProcess"
+          />
+          <CaseRefStep
+            v-else-if="step.component === 'CaseRefStep'"
+            :process-id="process.id"
+            :sale="process.sale || null"
+            :process="process"
           />
           <div v-else class="placeholder">
             {{ step.component }} - Content coming soon
           </div>
+          <button
+            v-if="step.component !== 'SalesStep'"
+            @click="handleStepCompleted"
+            style="
+              margin-top: 1rem;
+              padding: 0.5rem 1rem;
+              background: #204485;
+              color: white;
+              border: none;
+              border-radius: 4px;
+              cursor: pointer;
+            "
+          >
+            Complete Step
+          </button>
         </div>
       </div>
     </div>
