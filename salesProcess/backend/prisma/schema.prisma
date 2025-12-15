@@ -10,15 +10,15 @@ datasource db {
 // PREDEFINED VALUES (ENUMERATIONS)
 
 enum ProcessStatus {
-  done
-  ongoing
-  locked
+  completed @map("Completed")
+  ongoing @map("Ongoing")
+  locked   @map("Locked")
 }
 
 enum UserRole {
-  salesManager
-  marketingManager
-  viewer
+  salesManager      @map("Sales Manager")
+  marketingManager  @map("Marketing Manager")
+  viewer            @map("Viewer")
 }
 
 enum Industry {
@@ -226,4 +226,3 @@ model Image {
   processId Int
 
   @@map("images")
-}
