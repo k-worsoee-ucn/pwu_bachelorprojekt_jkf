@@ -214,15 +214,13 @@ model Case {
 }
 
 model Image {
-id        Int      @id @default(autoincrement())
-url       String
-filename  String
-type      String   @default("production") // "production" or "installation"
+  id        Int      @id @default(autoincrement())
+  url       String
+  filename  String
+  type      String   @default("production") // "production" or "installation"
+  createdAt DateTime @default(now())
+  process   Process  @relation(fields: [processId], references: [id])
+  processId Int
 
-createdAt DateTime @default(now())
-
-// Relationships
-process   Process  @relation(fields: [processId], references: [id])
-processId Int
-
-@@map("images")
+  @@map("images")
+}
