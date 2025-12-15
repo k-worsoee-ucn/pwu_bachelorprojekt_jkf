@@ -58,13 +58,10 @@ const getCurrentStep = () => {
 };
 
 const getStepState = (stepId) => {
-  // TEMPORARY: Allow all steps for development
-  return "active";
-
-  // const currentStep = getCurrentStep();
-  // if (stepId < currentStep) return "completed";
-  // if (stepId === currentStep) return "active";
-  // return "locked";
+  const currentStep = getCurrentStep();
+  if (stepId < currentStep) return "completed";
+  if (stepId === currentStep) return "active";
+  return "locked";
 };
 
 const getStepIcon = (stepId) => {
@@ -75,11 +72,8 @@ const getStepIcon = (stepId) => {
 };
 
 const canToggleStep = (stepId) => {
-  // TEMPORARY: Allow all steps for development
-  return true;
-
-  // const state = getStepState(stepId);
-  // return state !== "locked";
+  const state = getStepState(stepId);
+  return state !== "locked";
 };
 
 const toggleStep = (stepId) => {
@@ -320,18 +314,29 @@ const handleStepCompleted = async () => {
   </div>
 
   <div v-else-if="process" class="single-process-container">
-    <button class="back-button" @click="goBack">
-      <i class="fa-solid fa-chevron-left"></i> Back
-    </button>
-    <h1>{{ process.title }}</h1>
-    <p><strong>Case Number:</strong> {{ process.caseNo }}</p>
-    <p><strong>Status:</strong> {{ process.status }}</p>
-    <p><strong>Current Step:</strong> {{ process.currentStep }} / 6</p>
-    <div class="progress-bar">
-      <div
-        class="progress-fill"
-        :style="{ width: (process.currentStep / 6) * 100 + '%' }"
-      ></div>
+    <div class="process-header">
+      <div class="header-left">
+        <button class="back-button" @click="goBack">
+          <i class="fa-solid fa-chevron-left"></i> Back
+        </button>
+        <h1>{{ process.title }}</h1>
+        <p><strong>Status:</strong> {{ process.status }}</p>
+        <div class="progress-bar">
+          <div
+            class="progress-fill"
+            :style="{ width: (process.currentStep / 6) * 100 + '%' }"
+          ></div>
+        </div>
+      </div>
+      <div class="header-right" v-if="process.sale?.salesManager">
+        <div class="sales-manager-info">
+          <i class="fa-solid fa-user"></i>
+          <div>
+            <p class="manager-name">{{ process.sale.salesManager.name }}</p>
+            <p class="manager-role">{{ process.sale.salesManager.role }}</p>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="steps-container">
@@ -442,6 +447,51 @@ const handleStepCompleted = async () => {
 <style scoped lang="scss">
 .single-process-container {
   padding: 2rem;
+
+  .process-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+
+    .header-left {
+      flex: 1;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+
+      .sales-manager-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1rem 1.5rem;
+        background-color: #f5f5f5;
+        border-radius: 8px;
+        border-left: 4px solid #204485;
+
+        i {
+          font-size: 2rem;
+          color: #204485;
+        }
+
+        .manager-name {
+          margin: 0;
+          font-size: 1rem;
+          font-weight: 600;
+          color: #333;
+        }
+
+        .manager-role {
+          margin: 0;
+          font-size: 0.875rem;
+          color: #666;
+        }
+      }
+    }
+  }
 
   .back-button {
     display: inline-flex;
