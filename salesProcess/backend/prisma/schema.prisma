@@ -11,29 +11,29 @@ datasource db {
 
 enum ProcessStatus {
   completed @map("Completed")
-  ongoing @map("Ongoing")
-  locked   @map("Locked")
+  ongoing   @map("Ongoing")
+  locked    @map("Locked")
 }
 
 enum UserRole {
-  salesManager      @map("Sales Manager")
-  marketingManager  @map("Marketing Manager")
-  viewer            @map("Viewer")
+  salesManager     @map("Sales Manager")
+  marketingManager @map("Marketing Manager")
+  viewer           @map("Viewer")
 }
 
 enum Industry {
-  woodworking @map("Woodworking")
+  woodworking    @map("Woodworking")
   agroAndMilling @map("Agro- and Milling")
-  recycling @map("Recycling")
-  metalworking @map("Metalworking")
-  paper @map("Paper")
-  other @map("Other")
+  recycling      @map("Recycling")
+  metalworking   @map("Metalworking")
+  paper          @map("Paper")
+  other          @map("Other")
 }
 
 enum ProductCategory {
   filtersAndSeparators @map("Filters & Separators")
-  fanSystems @map("Fan Systems")
-  ductSystems @map("Duct Systems")
+  fanSystems           @map("Fan Systems")
+  ductSystems          @map("Duct Systems")
 }
 
 // MODELS
@@ -65,23 +65,23 @@ model Process {
 }
 
 model Sale {
-  id                     Int      @id @default(autoincrement())
-  title                  String
-  description            String?
-  endUser                String   @map("end_user")
-  country                String
-  industry               Industry
-  customIndustry         String?  @map("custom_industry")
-  plantType              String   @map("plant_type")
-  filterType             String   @map("filter_type")
-  fanType                String   @map("fan_type")
-  dustType               String   @map("dust_type")
-  ductSystem             String   @map("duct_system")
-  totalExtractionVolume  Int      @map("total_extraction_volume")
-  pressure               Int    
-  volumeFlow             Int      @map("volume_flow")
-  phoneNumber            String?  @map("phone_number")
-  privacySettings        Json?    @map("privacy_settings")
+  id                    Int      @id @default(autoincrement())
+  title                 String
+  description           String?
+  endUser               String   @map("end_user")
+  country               String
+  industry              Industry
+  customIndustry        String?  @map("custom_industry")
+  plantType             String   @map("plant_type")
+  filterType            String   @map("filter_type")
+  fanType               String   @map("fan_type")
+  dustType              String   @map("dust_type")
+  ductSystem            String   @map("duct_system")
+  totalExtractionVolume Int      @map("total_extraction_volume")
+  pressure              Int
+  volumeFlow            Int      @map("volume_flow")
+  phoneNumber           String?  @map("phone_number")
+  privacySettings       Json?    @map("privacy_settings")
 
   // FK
   processId      Int @unique @map("process_id")
@@ -136,9 +136,9 @@ model ProcessUser {
 }
 
 model Customer {
-  id       Int    @id @default(autoincrement())
-  name     String @unique
-  website  String?
+  id      Int     @id @default(autoincrement())
+  name    String  @unique
+  website String?
 
   // Each customer has exactly ONE sales manager
   salesManagerId Int @map("sales_manager_id")
@@ -161,9 +161,9 @@ model Product {
   caseId      Int?            @map("case_id")
 
   // Relationships
-  process      Process?   @relation(fields: [processId], references: [id])
-  reference    Reference? @relation(fields: [referenceId], references: [id])
-  case         Case?      @relation(fields: [caseId], references: [id])
+  process      Process?      @relation(fields: [processId], references: [id])
+  reference    Reference?    @relation(fields: [referenceId], references: [id])
+  case         Case?         @relation(fields: [caseId], references: [id])
   saleProducts SaleProduct[]
 
   @@map("products")
@@ -184,13 +184,13 @@ model SaleProduct {
 }
 
 model Reference {
-  id        Int @id @default(autoincrement())
+  id        Int  @id @default(autoincrement())
   processId Int? @map("process_id")
 
   createdAt DateTime @default(now())
 
   // Relationships
-  process  Process? @relation(fields: [processId], references: [id])
+  process  Process?  @relation(fields: [processId], references: [id])
   products Product[]
   cases    Case[]
 
@@ -214,15 +214,15 @@ model Case {
 }
 
 model Image {
-  id        Int      @id @default(autoincrement())
-  url       String
-  filename  String
-  type      String   @default("production") // "production" or "installation"
+id        Int      @id @default(autoincrement())
+url       String
+filename  String
+type      String   @default("production") // "production" or "installation"
 
-  createdAt DateTime @default(now())
+createdAt DateTime @default(now())
 
-  // Relationships
-  process   Process  @relation(fields: [processId], references: [id])
-  processId Int
+// Relationships
+process   Process  @relation(fields: [processId], references: [id])
+processId Int
 
-  @@map("images")
+@@map("images")
