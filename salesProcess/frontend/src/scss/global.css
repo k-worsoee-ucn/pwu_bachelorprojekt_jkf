@@ -108,4 +108,12 @@
   border-radius: 4px;
   margin-bottom: 1rem;
   border: 1px solid #fcc;
+}
+.form-container .success-message {
+  background-color: #efe;
+  color: #363;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  border: 1px solid #cfc;
 }/*# sourceMappingURL=global.css.map */
