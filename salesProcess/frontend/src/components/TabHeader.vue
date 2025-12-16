@@ -53,6 +53,7 @@ const switchTab = (tab) => {
 
   .tab-buttons {
     display: flex;
+    justify-content: space-evenly;
     gap: 1rem;
   }
 
@@ -67,6 +68,7 @@ const switchTab = (tab) => {
     font-weight: 500;
     border-bottom: 3px solid transparent;
     position: relative;
+    width: 100%;
 
     &:hover {
       color: $primary-jkf-blue;
