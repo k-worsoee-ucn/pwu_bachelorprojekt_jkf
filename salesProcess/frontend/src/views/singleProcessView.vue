@@ -348,11 +348,6 @@ const handleStepCompleted = async () => {
 <template>
   <div v-if="isNewSale" class="single-process-container">
     <h1>Create New Sale</h1>
-    <p><strong>Current Step:</strong> 1 / 6</p>
-    <div class="progress-bar">
-      <div class="progress-fill" :style="{ width: (1 / 6) * 100 + '%' }"></div>
-    </div>
-
     <div class="steps-container">
       <div
         v-for="step in visibleSteps"
@@ -443,24 +438,24 @@ const handleStepCompleted = async () => {
 
   <div v-else-if="process" class="single-process-container">
     <div class="process-header">
-      <div class="header-left">
-        <h1>{{ process.title }}</h1>
+      <h1>{{ process.title }}</h1>
+      <div class="status-row">
         <p><strong>Status:</strong> {{ getStatusMessage }}</p>
-        <div class="progress-bar">
-          <div
-            class="progress-fill"
-            :style="{ width: (process.currentStep / 6) * 100 + '%' }"
-          ></div>
+        <div class="sales-manager-info" v-if="process.sale?.salesManager">
+          <p class="manager-name">{{ process.sale.salesManager.name }}</p>
+          <p class="manager-role">
+            {{
+              roleLabels[process.sale.salesManager.role] ||
+              process.sale.salesManager.role
+            }}
+          </p>
         </div>
       </div>
-      <div class="header-right" v-if="process.sale?.salesManager">
-        <div class="sales-manager-info">
-          <i class="fa-solid fa-user"></i>
-          <div>
-            <p class="manager-name">{{ process.sale.salesManager.name }}</p>
-            <p class="manager-role">{{ roleLabels[process.sale.salesManager.role] || process.sale.salesManager.role }}</p>
-          </div>
-        </div>
+      <div class="progress-bar">
+        <div
+          class="progress-fill"
+          :style="{ width: (process.currentStep / 6) * 100 + '%' }"
+        ></div>
       </div>
     </div>
 
@@ -579,33 +574,26 @@ const handleStepCompleted = async () => {
   padding: 2rem;
 
   .process-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 2rem;
     margin-bottom: 2rem;
 
-    .header-left {
-      flex: 1;
+    h1 {
+      margin-bottom: 1rem;
     }
 
-    .header-right {
+    .status-row {
       display: flex;
-      align-items: center;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 1rem;
+
+      p {
+        margin: 0;
+      }
 
       .sales-manager-info {
         display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        padding: 1rem 1.5rem;
-        background-color: #f5f5f5;
-        border-radius: 8px;
-        border-left: 4px solid #204485;
-
-        i {
-          font-size: 2rem;
-          color: #204485;
-        }
+        flex-direction: column;
+        align-items: flex-end;
 
         .manager-name {
           margin: 0;
@@ -621,15 +609,6 @@ const handleStepCompleted = async () => {
         }
       }
     }
-  }
-
-  h1 {
-    margin-bottom: 1.5rem;
-  }
-
-  p {
-    margin-bottom: 1rem;
-    font-size: 1rem;
   }
 
   .progress-bar {
