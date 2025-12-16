@@ -6,6 +6,7 @@ import SalesStep from "@/components/SalesStep.vue";
 import ProdImgStep from "@/components/ProdImgStep.vue";
 import InstallImgStep from "@/components/InstallImgStep.vue";
 import CaseRefStep from "@/components/CaseRefStep.vue";
+import CaseUploadStep from "@/components/CaseUploadStep.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -71,6 +72,15 @@ const getCurrentStep = () => {
 
 const getStepState = (stepId) => {
   const currentStep = getCurrentStep();
+  const isDone = process.value?.status === "done";
+
+  // If process is done and we're on step 6, mark it as completed
+  if (isDone && currentStep === 6 && stepId === 6) return "completed";
+
+  // If process is done on step 5 without consent, mark step 5 as completed
+  if (isDone && currentStep === 5 && !process.value?.consent && stepId === 5)
+    return "completed";
+
   if (stepId < currentStep) return "completed";
   if (stepId === currentStep) return "active";
   return "locked";
@@ -115,6 +125,11 @@ const fetchProcess = async () => {
       process.value = data;
       console.log("process.value after assignment:", process.value);
 
+      // Load shipping date if it exists
+      if (data.shippingDate) {
+        shippingDate.value = data.shippingDate;
+      }
+
       if (data.currentStep === 2 && !shippingDate.value) {
         startShippingDateTimer();
       }
@@ -142,6 +157,28 @@ const startShippingDateTimer = () => {
     });
     console.log("Mock shipping date set:", shippingDate.value);
 
+    // Save shipping date to database
+    try {
+      const response = await fetch(`/api/processes/${process.value.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeader(),
+        },
+        body: JSON.stringify({
+          shippingDate: shippingDate.value,
+        }),
+      });
+
+      if (response.ok) {
+        const updatedProcess = await response.json();
+        process.value = updatedProcess;
+        console.log("Shipping date saved to database");
+      }
+    } catch (error) {
+      console.error("Error saving shipping date:", error);
+    }
+
     // Production step is now complete, advance to next step
     await advanceToNextStep();
   }, 15000); // 15 seconds
@@ -150,7 +187,66 @@ const startShippingDateTimer = () => {
 const advanceToNextStep = async () => {
   if (!process.value) return;
 
-  const nextStep = process.value.currentStep + 1;
+  const currentStep = process.value.currentStep;
+  const nextStep = currentStep + 1;
+
+  // If on step 6, mark process as complete
+  if (currentStep === 6) {
+    console.log("Completing process...");
+    try {
+      const response = await fetch(`/api/processes/${process.value.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeader(),
+        },
+        body: JSON.stringify({
+          currentStep: 6,
+          status: "done",
+        }),
+      });
+
+      if (response.ok) {
+        const updatedProcess = await response.json();
+        process.value = updatedProcess;
+        activeStep.value = null; // Close the accordion
+        console.log("Process marked as complete");
+      }
+    } catch (error) {
+      console.error("Error completing process:", error);
+    }
+    return;
+  }
+
+  // If on step 5 and consent is false (no step 6), mark process as complete
+  if (currentStep === 5 && !process.value.consent) {
+    console.log("Completing process (no consent, skipping step 6)...");
+    try {
+      const response = await fetch(`/api/processes/${process.value.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeader(),
+        },
+        body: JSON.stringify({
+          currentStep: 5,
+          status: "done",
+        }),
+      });
+
+      if (response.ok) {
+        const updatedProcess = await response.json();
+        process.value = updatedProcess;
+        activeStep.value = null; // Close the accordion
+        console.log("Process marked as complete");
+      }
+    } catch (error) {
+      console.error("Error completing process:", error);
+    }
+    return;
+  }
+
+  // Otherwise, advance to next step
   if (nextStep > 6) {
     console.log("Process already at final step");
     return;
@@ -209,10 +305,6 @@ onMounted(async () => {
   activeStep.value = 1;
 });
 
-const goBack = () => {
-  router.back();
-};
-
 const handleSaleCreated = (savedSale) => {
   console.log("Sale created:", savedSale);
   if (savedSale.process?.id) {
@@ -228,9 +320,6 @@ const handleStepCompleted = async () => {
 
 <template>
   <div v-if="isNewSale" class="single-process-container">
-    <button class="back-button" @click="goBack">
-      <i class="fa-solid fa-chevron-left"></i> Back
-    </button>
     <h1>Create New Sale</h1>
     <p><strong>Current Step:</strong> 1 / 6</p>
     <div class="progress-bar">
@@ -328,9 +417,6 @@ const handleStepCompleted = async () => {
   <div v-else-if="process" class="single-process-container">
     <div class="process-header">
       <div class="header-left">
-        <button class="back-button" @click="goBack">
-          <i class="fa-solid fa-chevron-left"></i> Back
-        </button>
         <h1>{{ process.title }}</h1>
         <p><strong>Status:</strong> {{ statusLabels[process.status] || process.status }}</p>
         <div class="progress-bar">
@@ -432,6 +518,11 @@ const handleStepCompleted = async () => {
             :sale="process.sale || null"
             :process="process"
           />
+          <CaseUploadStep
+            v-else-if="step.component === 'CaseUploadStep'"
+            :process-id="process.id"
+            :process="process"
+          />
           <div v-else class="placeholder">
             {{ step.component }} - Content coming soon
           </div>
@@ -502,29 +593,6 @@ const handleStepCompleted = async () => {
           color: #666;
         }
       }
-    }
-  }
-
-  .back-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    margin-bottom: 1.5rem;
-    background-color: #204485;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-
-    &:hover {
-      background-color: #0b5ed7;
-    }
-
-    i {
-      font-size: 1.2rem;
     }
   }
 
