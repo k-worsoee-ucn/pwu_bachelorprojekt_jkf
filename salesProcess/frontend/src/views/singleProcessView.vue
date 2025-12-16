@@ -72,7 +72,8 @@ const getCurrentStep = () => {
 
 const getStepState = (stepId) => {
   const currentStep = getCurrentStep();
-  const isDone = process.value?.status === "done";
+  const isDone =
+    process.value?.status === "done" || process.value?.status === "completed";
 
   // If process is done and we're on step 6, mark it as completed
   if (isDone && currentStep === 6 && stepId === 6) return "completed";
@@ -113,7 +114,7 @@ const toggleStep = (stepId) => {
 const getStatusMessage = computed(() => {
   if (!process.value) return "";
 
-  if (process.value.status === "done") {
+  if (process.value.status === "completed" || process.value.status === "done") {
     return "Completed";
   }
 
@@ -237,7 +238,12 @@ const advanceToNextStep = async () => {
         const updatedProcess = await response.json();
         process.value = updatedProcess;
         activeStep.value = null; // Close the accordion
-        console.log("Process marked as complete");
+        console.log("Process marked as complete", updatedProcess);
+        // Force a refresh to ensure all computed properties update
+        await fetchProcess();
+      } else {
+        const error = await response.json();
+        console.error("Failed to complete process:", response.status, error);
       }
     } catch (error) {
       console.error("Error completing process:", error);
@@ -265,7 +271,9 @@ const advanceToNextStep = async () => {
         const updatedProcess = await response.json();
         process.value = updatedProcess;
         activeStep.value = null; // Close the accordion
-        console.log("Process marked as complete");
+        console.log("Process marked as complete", updatedProcess);
+        // Force a refresh to ensure all computed properties update
+        await fetchProcess();
       }
     } catch (error) {
       console.error("Error completing process:", error);

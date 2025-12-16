@@ -96,6 +96,9 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
+import { useAuth } from "../composables/useAuth";
+
+const { getAuthHeader } = useAuth();
 
 const props = defineProps({
   processId: {
@@ -189,6 +192,9 @@ const uploadImages = async () => {
       `http://localhost:3000/api/processes/${props.processId}/images`,
       {
         method: "POST",
+        headers: {
+          ...getAuthHeader(),
+        },
         body: formData,
       }
     );
@@ -226,7 +232,12 @@ const uploadImages = async () => {
 const fetchUploadedImages = async () => {
   try {
     const response = await fetch(
-      `http://localhost:3000/api/processes/${props.processId}/images?type=production`
+      `http://localhost:3000/api/processes/${props.processId}/images?type=production`,
+      {
+        headers: {
+          ...getAuthHeader(),
+        },
+      }
     );
 
     if (!response.ok) {
@@ -249,6 +260,9 @@ const deleteImage = async (imageId) => {
       `http://localhost:3000/api/images/${imageId}`,
       {
         method: "DELETE",
+        headers: {
+          ...getAuthHeader(),
+        },
       }
     );
 

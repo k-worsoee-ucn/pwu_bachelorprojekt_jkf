@@ -66,6 +66,7 @@ async function getProcessById(req, res) {
 
 async function updateProcess(req, res) {
   try {
+    const processId = parseInt(req.params.id);
     const { title, caseNo, status, consent, currentStep, shippingDate } =
       req.body;
 
@@ -79,7 +80,7 @@ async function updateProcess(req, res) {
     if (shippingDate !== undefined) updateData.shippingDate = shippingDate;
 
     const process = await prisma.process.update({
-      where: { id: parseInt(req.params.id) },
+      where: { id: processId },
       data: updateData,
       include: {
         sale: {

@@ -39,6 +39,9 @@
 import { ref } from "vue";
 import { jsPDF } from "jspdf";
 import JSZip from "jszip";
+import { useAuth } from "../composables/useAuth";
+
+const { getAuthHeader } = useAuth();
 
 const props = defineProps({
   processId: {
@@ -66,7 +69,12 @@ const successMessage = ref("");
 const fetchImages = async (type) => {
   try {
     const response = await fetch(
-      `http://localhost:3000/api/processes/${props.processId}/images?type=${type}`
+      `http://localhost:3000/api/processes/${props.processId}/images?type=${type}`,
+      {
+        headers: {
+          ...getAuthHeader(),
+        },
+      }
     );
 
     if (!response.ok) {
@@ -331,7 +339,12 @@ const downloadImages = async () => {
       for (let i = 0; i < productionImages.length; i++) {
         try {
           const response = await fetch(
-            `http://localhost:3000${productionImages[i].url}`
+            `http://localhost:3000${productionImages[i].url}`,
+            {
+              headers: {
+                ...getAuthHeader(),
+              },
+            }
           );
           const blob = await response.blob();
           productionFolder.file(`production-${i + 1}.jpg`, blob);
@@ -347,7 +360,12 @@ const downloadImages = async () => {
       for (let i = 0; i < installationImages.length; i++) {
         try {
           const response = await fetch(
-            `http://localhost:3000${installationImages[i].url}`
+            `http://localhost:3000${installationImages[i].url}`,
+            {
+              headers: {
+                ...getAuthHeader(),
+              },
+            }
           );
           const blob = await response.blob();
           installationFolder.file(`installation-${i + 1}.jpg`, blob);
