@@ -1,11 +1,21 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import ProcessCard from '@/components/ProcessCard.vue';
 import { useAuth } from '@/composables/useAuth';
 
 const { getAuthHeader } = useAuth();
+const route = useRoute();
 const searchQuery = ref('');
 const allProcesses = ref([]);
+const activeTab = ref('ongoing');
+
+// Watch route query for tab changes
+watch(() => route.query.tab, (newTab) => {
+  if (newTab) {
+    activeTab.value = newTab;
+  }
+}, { immediate: true });
 
 onMounted(async () => {
     try {
@@ -41,6 +51,14 @@ const ongoingProcesses = computed(() => {
 const completedProcesses = computed(() => {
     return filteredProcesses.value.filter(process => process.currentStep === 6);
 });
+
+const displayedProcesses = computed(() => {
+    return activeTab.value === 'ongoing' ? ongoingProcesses.value : completedProcesses.value;
+});
+
+const tabLabel = computed(() => {
+    return activeTab.value === 'ongoing' ? 'Ongoing' : 'Completed';
+});
 </script>
 
 <template>
@@ -56,45 +74,25 @@ const completedProcesses = computed(() => {
             <i class="fa-solid fa-magnifying-glass search-icon"></i>
         </div>
 
-        <!-- Ongoing Section -->
+        <!-- Tab Content -->
         <div class="section">
-                <h2>Ongoing</h2>
-                <div class="cards-grid">
-                    <ProcessCard
-                        v-for="process in ongoingProcesses"
-                        :key="process.id"
-                        :id="process.id"
-                        :name="process.title"
-                        :caseNumber="process.caseNo"
-                        :startDate="process.startDate"
-                        :expectedEndDate="process.expectedEndDate"
-                        :step="process.currentStep"
-                    />
-                    <div v-if="ongoingProcesses.length === 0" class="no-results">
-                        <p>No ongoing processes found.</p>
-                    </div>
+            <h2>{{ tabLabel }}</h2>
+            <div class="cards-grid">
+                <ProcessCard
+                    v-for="process in displayedProcesses"
+                    :key="process.id"
+                    :id="process.id"
+                    :name="process.title"
+                    :caseNumber="process.caseNo"
+                    :startDate="process.startDate"
+                    :expectedEndDate="process.expectedEndDate"
+                    :step="process.currentStep"
+                />
+                <div v-if="displayedProcesses.length === 0" class="no-results">
+                    <p>No {{ tabLabel.toLowerCase() }} processes found.</p>
                 </div>
             </div>
-
-            <!-- Completed Section -->
-            <div class="section">
-                <h2>Completed</h2>
-                <div class="cards-grid">
-                    <ProcessCard
-                        v-for="process in completedProcesses"
-                        :key="process.id"
-                        :id="process.id"
-                        :name="process.title"
-                        :caseNumber="process.caseNo"
-                        :startDate="process.startDate"
-                        :expectedEndDate="process.expectedEndDate"
-                        :step="process.currentStep"
-                    />
-                    <div v-if="completedProcesses.length === 0" class="no-results">
-                        <p>No completed processes found.</p>
-                    </div>
-                </div>
-            </div>
+        </div>
     </div>
 </template>
 

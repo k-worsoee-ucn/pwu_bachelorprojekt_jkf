@@ -62,7 +62,7 @@ const handleSubmit = async () => {
 </script>
 
 <template>
-  <div class="signUp-container">
+  <div class="form-container">
     <h1>Sign Up</h1>
     <form @submit.prevent="handleSubmit">
       <!-- Access Code Field -->
@@ -135,112 +135,9 @@ const handleSubmit = async () => {
       </div>
 
       <!-- Submit Button -->
-      <button type="submit" :disabled="isLoading">
+      <button type="submit" :disabled="isLoading" class="btn">
         {{ isLoading ? 'Registering...' : 'Sign Up' }}
       </button>
     </form>
   </div>
 </template>
-
-<style scoped lang="scss">
-.signUp-container {
-  max-width: 30%;
-  margin: 2rem auto;
-  padding: 2rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-
-  h1 {
-    text-align: center;
-    margin-bottom: 1.5rem;
-    color: #333;
-  }
-
-  .form-group {
-    margin-bottom: 1rem;
-
-    label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-      color: #555;
-    }
-
-    input {
-      width: 100%;
-      padding: 0.75rem;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      font-size: 1rem;
-      box-sizing: border-box;
-
-      &:focus {
-        outline: none;
-        border-color: $primary-jkf-blue;
-        box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
-      }
-    }
-
-    select {
-      width: 100%;
-      padding: 0.75rem;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      font-size: 1rem;
-      box-sizing: border-box;
-      background-color: white;
-
-      &:focus {
-        outline: none;
-        border-color: $primary-jkf-blue;
-        box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
-      }
-    }
-  }
-
-  .error-message {
-    background-color: #fee;
-    color: #c33;
-    padding: 0.75rem;
-    border-radius: 4px;
-    margin-bottom: 1rem;
-    border: 1px solid #fcc;
-  }
-
-  .success-message {
-    background-color: #efe;
-    color: #363;
-    padding: 0.75rem;
-    border-radius: 4px;
-    margin-bottom: 1rem;
-    border: 1px solid #cfc;
-  }
-
-  button {
-    width: 100%;
-    padding: 0.75rem;
-    background-color: $primary-jkf-blue;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-size: 1rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.3s;
-
-    &:hover:not(:disabled) {
-      background-color: $jkf-hover-blue;
-    }
-
-    &:active:not(:disabled) {
-      background-color: $jkf-hover-blue;
-    }
-
-    &:disabled {
-      background-color: #ccc;
-      cursor: not-allowed;
-    }
-  }
-}
-</style>

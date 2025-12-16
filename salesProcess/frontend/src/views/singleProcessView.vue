@@ -202,7 +202,7 @@ const advanceToNextStep = async () => {
         },
         body: JSON.stringify({
           currentStep: 6,
-          status: "done",
+          status: "completed",
         }),
       });
 
@@ -230,7 +230,7 @@ const advanceToNextStep = async () => {
         },
         body: JSON.stringify({
           currentStep: 5,
-          status: "done",
+          status: "completed",
         }),
       });
 
