@@ -4,10 +4,30 @@ const caseController = require("../controllers/case.controller");
 const { verifyToken, requireRole } = require("../middleware/auth");
 
 router.get("/", verifyToken, caseController.getAllCases);
+router.get(
+  "/process/:processId",
+  verifyToken,
+  caseController.getCasesByProcessId
+);
 router.get("/:id", verifyToken, caseController.getCaseById);
 
-router.post("/", verifyToken, requireRole(['salesManager', 'marketingManager']), caseController.createCase);
-router.put("/:id", verifyToken, requireRole(['salesManager', 'marketingManager']), caseController.updateCase);
-router.delete("/:id", verifyToken, requireRole(['salesManager', 'marketingManager']), caseController.deleteCase);
+router.post(
+  "/",
+  verifyToken,
+  requireRole(["salesManager", "marketingManager"]),
+  caseController.createCase
+);
+router.put(
+  "/:id",
+  verifyToken,
+  requireRole(["salesManager", "marketingManager"]),
+  caseController.updateCase
+);
+router.delete(
+  "/:id",
+  verifyToken,
+  requireRole(["salesManager", "marketingManager"]),
+  caseController.deleteCase
+);
 
 module.exports = router;
