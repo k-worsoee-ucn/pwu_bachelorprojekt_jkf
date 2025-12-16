@@ -39,7 +39,7 @@ const switchTab = (tab) => {
         @click="switchTab('ongoing')"
       >
         <span class="material-symbols-outlined">clock_loader_10</span> Ongoing
-        <span class="badge" v-if="ongoingCount > 0">{{ ongoingCount }}</span>
+        <span class="badge" v-if="ongoingCount > 0 && route.path.includes('my-processes')">{{ ongoingCount }}</span>
       </button>
       <button 
         :class="['tab-btn', { active: activeTab === 'completed' }]"

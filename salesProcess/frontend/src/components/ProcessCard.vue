@@ -13,13 +13,14 @@ const props = defineProps({
         required: true,
     },
     caseNumber: {
-        type: String,
+        type: [String, Number],
         required: false,
         default: '',
     },
     startDate: {
         type: String,
-        required: true,
+        required: false,
+        default: 'N/A',
     },
     expectedEndDate: {
         type: String,
