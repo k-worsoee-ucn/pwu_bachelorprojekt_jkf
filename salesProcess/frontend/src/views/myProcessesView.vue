@@ -4,7 +4,7 @@ import { useRoute } from 'vue-router';
 import ProcessCard from '@/components/ProcessCard.vue';
 import { useAuth } from '@/composables/useAuth';
 
-const { getAuthHeader } = useAuth();
+const { getAuthHeader, user } = useAuth();
 const route = useRoute();
 const searchQuery = ref('');
 const allProcesses = ref([]);
@@ -32,13 +32,20 @@ onMounted(async () => {
     }
 });
 
+const userProcesses = computed(() => {
+    if (!user.value?.id) return [];
+    return allProcesses.value.filter(process => 
+        process.sale?.salesManager?.id === user.value.id
+    );
+});
+
 const filteredProcesses = computed(() => {
     if (!searchQuery.value.trim()) {
-        return allProcesses.value;
+        return userProcesses.value;
     }
 
     const query = searchQuery.value.toLowerCase();
-    return allProcesses.value.filter(process => 
+    return userProcesses.value.filter(process => 
         process.title.toLowerCase().includes(query) ||
         process.caseNo.toString().includes(query) ||
         process.status.toLowerCase().includes(query)
