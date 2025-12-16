@@ -45,6 +45,18 @@ const steps = [
   },
 ];
 
+const statusLabels = {
+  completed: "Completed",
+  ongoing: "Ongoing",
+  locked: "Locked",
+};
+
+const roleLabels = {
+  salesManager: "Sales Manager",
+  marketingManager: "Marketing Manager",
+  viewer: "Viewer",
+};
+
 const visibleSteps = computed(() => {
   // If no process or consent is false, filter out step 6
   if (!process.value?.consent) {
@@ -446,7 +458,7 @@ const handleStepCompleted = async () => {
           <i class="fa-solid fa-user"></i>
           <div>
             <p class="manager-name">{{ process.sale.salesManager.name }}</p>
-            <p class="manager-role">{{ process.sale.salesManager.role }}</p>
+            <p class="manager-role">{{ roleLabels[process.sale.salesManager.role] || process.sale.salesManager.role }}</p>
           </div>
         </div>
       </div>
