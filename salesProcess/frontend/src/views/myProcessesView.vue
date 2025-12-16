@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, watch, inject } from 'vue';
 import { useRoute } from 'vue-router';
 import ProcessCard from '@/components/ProcessCard.vue';
 import { useAuth } from '@/composables/useAuth';
@@ -9,6 +9,7 @@ const route = useRoute();
 const searchQuery = ref('');
 const allProcesses = ref([]);
 const activeTab = ref('ongoing');
+const ongoingCount = inject('ongoingCount');
 
 // Watch route query for tab changes
 watch(() => route.query.tab, (newTab) => {
@@ -51,6 +52,13 @@ const ongoingProcesses = computed(() => {
 const completedProcesses = computed(() => {
     return filteredProcesses.value.filter(process => process.currentStep === 6);
 });
+
+// Update the injected count whenever ongoing processes change
+watch(ongoingProcesses, (newOngoing) => {
+  if (ongoingCount) {
+    ongoingCount.value = newOngoing.length;
+  }
+}, { immediate: true });
 
 const displayedProcesses = computed(() => {
     return activeTab.value === 'ongoing' ? ongoingProcesses.value : completedProcesses.value;

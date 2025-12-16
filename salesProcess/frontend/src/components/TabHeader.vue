@@ -8,6 +8,13 @@ const route = useRoute();
 const router = useRouter();
 const activeTab = ref('ongoing');
 
+defineProps({
+  ongoingCount: {
+    type: Number,
+    default: 0
+  }
+});
+
 // Watch route changes to update active tab
 watch(() => route.query.tab, (newTab) => {
   if (newTab) {
@@ -31,13 +38,14 @@ const switchTab = (tab) => {
         :class="['tab-btn', { active: activeTab === 'ongoing' }]"
         @click="switchTab('ongoing')"
       >
-        ⏳ Ongoing
+        <span class="material-symbols-outlined">clock_loader_10</span> Ongoing
+        <span class="badge" v-if="ongoingCount > 0">{{ ongoingCount }}</span>
       </button>
       <button 
         :class="['tab-btn', { active: activeTab === 'completed' }]"
         @click="switchTab('completed')"
       >
-        ✓ Completed
+        <span class="material-symbols-outlined">folder_check</span> Completed
       </button>
     </div>
   </div>
@@ -47,14 +55,11 @@ const switchTab = (tab) => {
 @import '@/scss/variables';
 
 .tab-header {
-  padding: 1rem 2rem;
-  background-color: #f8f9fa;
-  border-bottom: 1px solid #e0e0e0;
+  padding: 0 2rem;
 
   .tab-buttons {
     display: flex;
     justify-content: space-evenly;
-    gap: 1rem;
   }
 
   .tab-btn {
@@ -64,20 +69,42 @@ const switchTab = (tab) => {
     color: #666;
     cursor: pointer;
     font-size: 0.95rem;
-    transition: all 0.3s ease;
     font-weight: 500;
-    border-bottom: 3px solid transparent;
+    border-bottom: 1px solid $primary-jkf-blue;
     position: relative;
     width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
 
     &:hover {
       color: $primary-jkf-blue;
+      border-bottom: 3px solid $primary-jkf-blue;
     }
 
     &.active {
       color: $primary-jkf-blue;
-      border-bottom-color: $primary-jkf-blue;
+      border-bottom: 3px solid $primary-jkf-blue;
     }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 24px;
+      height: 24px;
+      padding: .3rem;
+      background-color: $warning-500-main;
+      color: black;
+      border-radius: 50%;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-left: 0.5rem;
+    }
+
+    .material-symbols-outlined {
+      margin: 0;
   }
-}
+}}
 </style>

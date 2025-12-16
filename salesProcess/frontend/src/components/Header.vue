@@ -7,6 +7,13 @@ const {
   isSalesManager, 
   logout 
 } = useAuth()
+
+defineProps({
+  ongoingCount: {
+    type: Number,
+    default: 0
+  }
+})
 </script>
 
 <template>
@@ -17,8 +24,9 @@ const {
         <RouterLink v-if="isSalesManager" to="/processes/new" class="nav-btn btn-no-fill">
           Opret sag
         </RouterLink>
-        <RouterLink to="/my-processes" class="nav-btn btn-no-fill">
+        <RouterLink to="/my-processes" class="nav-btn btn-no-fill nav-btn-badge">
           Mine sager
+          <span class="badge" v-if="ongoingCount > 0">{{ ongoingCount }}</span>
         </RouterLink>
         <RouterLink to="/all-processes" class="nav-btn btn-no-fill">
           Alle sager
@@ -67,6 +75,28 @@ header {
       display: flex;
       gap: 1rem;
       align-items: center;
+    }
+
+    .nav-btn-badge {
+      position: relative;
+
+      .badge {
+        position: absolute;
+        bottom: -18px;
+        right: -18px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 24px;
+        height: 24px;
+        padding: 0.2rem;
+        background-color: $warning-500-main;
+        color: black;
+        border-radius: 50%;
+        font-size: 0.8rem;
+        font-weight: 600;        
+        border: 3px solid white;      
+      }
     }
 
 
