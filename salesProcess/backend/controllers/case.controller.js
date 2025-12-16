@@ -38,23 +38,57 @@ async function getCaseById(req, res) {
   }
 }
 
+async function getCasesByProcessId(req, res) {
+  try {
+    const { processId } = req.params;
+
+    const cases = await prisma.case.findMany({
+      where: { processId: parseInt(processId) },
+      include: {
+        process: true,
+        reference: true,
+        products: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    res.json(cases);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
 async function createCase(req, res) {
   try {
+    console.log("Creating case with body:", req.body);
     const { content, processId, referenceId } = req.body;
 
     if (!content) return res.status(400).json({ error: "content is required" });
 
+    const dataToCreate = {
+      content,
+    };
+
+    if (processId) {
+      dataToCreate.processId = parseInt(processId);
+    }
+
+    if (referenceId) {
+      dataToCreate.referenceId = parseInt(referenceId);
+    }
+
+    console.log("Data to create:", dataToCreate);
+
     const caseItem = await prisma.case.create({
-      data: {
-        content,
-        ...(processId && { processId }),
-        ...(referenceId && { referenceId }),
-      },
+      data: dataToCreate,
       include: { process: true, reference: true },
     });
 
     res.status(201).json(caseItem);
   } catch (error) {
+    console.error("Error creating case:", error);
     res.status(500).json({ error: error.message });
   }
 }
@@ -67,14 +101,17 @@ async function updateCase(req, res) {
       where: { id: parseInt(req.params.id) },
       data: {
         ...(content && { content }),
-        ...(processId !== undefined && { processId }),
-        ...(referenceId !== undefined && { referenceId }),
+        ...(processId !== undefined && { processId: parseInt(processId) }),
+        ...(referenceId !== undefined && {
+          referenceId: parseInt(referenceId),
+        }),
       },
       include: { process: true, reference: true },
     });
 
     res.json(caseItem);
   } catch (error) {
+    console.error("Error updating case:", error);
     res.status(500).json({ error: error.message });
   }
 }
@@ -91,6 +128,7 @@ async function deleteCase(req, res) {
 module.exports = {
   getAllCases,
   getCaseById,
+  getCasesByProcessId,
   createCase,
   updateCase,
   deleteCase,

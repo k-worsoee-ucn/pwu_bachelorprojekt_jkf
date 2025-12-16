@@ -39,12 +39,13 @@ enum ProductCategory {
 // MODELS
 
 model Process {
-  id          Int           @id @default(autoincrement())
-  title       String
-  caseNo      Int           @unique
-  status      ProcessStatus @default(ongoing)
-  currentStep Int           @default(1)
-  consent     Boolean       @default(false)
+  id           Int           @id @default(autoincrement())
+  title        String
+  caseNo       Int           @unique
+  status       ProcessStatus @default(ongoing)
+  currentStep  Int           @default(1)
+  consent      Boolean       @default(false)
+  shippingDate String?       @map("shipping_date")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
