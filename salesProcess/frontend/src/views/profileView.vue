@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 
 const { user, getAuthHeader } = useAuth()
-const form = ref({ email: '', password: '', name: '', role: '' })
+const form = ref({ email: '', password: '', name: '', role: '', accessCode: '' })
 const message = ref('')
 
 onMounted(() => {
@@ -19,9 +19,9 @@ const updateProfile = async () => {
     const payload = {
       email: form.value.email,
       name: form.value.name,
-      ...(form.value.password ? { password: form.value.password } : {}),
+      ...(form.value.password ? { password: form.value.password, accessCode: form.value.accessCode } : {}),
     }
-    const res = await fetch(`/api/users/${user.value.id}`, {
+    const res = await fetch(`/api/users/me`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -29,10 +29,11 @@ const updateProfile = async () => {
       },
       body: JSON.stringify(payload),
     })
+    const data = await res.json();
     if (res.ok) {
-      message.value = 'Profile updated!'
+      message.value = 'Profile updated!';
     } else {
-      message.value = 'Update failed.'
+      message.value = data.error || 'Update failed.';
     }
   } catch (err) {
     message.value = 'Error updating profile.'
@@ -41,29 +42,32 @@ const updateProfile = async () => {
 </script>
 
 <template>
-  <div class="profile-container">
-    <h2>Update Profile</h2>
+  <div class="form-container">
+    <h1>Update Profile</h1>
     <form @submit.prevent="updateProfile">
-      <label>Email:</label>
-      <input v-model="form.email" type="email" required />
-
-      <!-- <label>Password:</label>
-      <input v-model="form.password" type="password" placeholder="New password" /> -->
-
-      <label>Name:</label>
-      <input v-model="form.name" type="text" required />
-
-      <!-- If you want users to change their role (usually admin only) -->
-      <!--
-      <label>Role:</label>
-      <select v-model="form.role">
-        <option value="salesManager">Sales Manager</option>
-        <option value="marketingManager">Marketing Manager</option>
-        <option value="viewer">Viewer</option>
-      </select>
-      -->
-
-      <button type="submit">Save Changes</button>
+        <div class="form-group">
+            <label>Name:</label>
+            <input v-model="form.name" type="text" required />
+        </div>
+        <div class="form-group">
+            <label>Email:</label>
+            <input v-model="form.email" type="email" required />
+        </div>
+        <div class="form-group">
+          <label>Password:</label>
+          <input v-model="form.password" type="password" placeholder="New password" />
+        </div>
+        <div class="form-group" v-if="form.password">
+          <label for="accessCode">Access Code:</label>
+          <input 
+            type="text" 
+            id="accessCode" 
+            v-model="form.accessCode"
+            placeholder="Enter access code" 
+            required
+          />
+        </div>
+      <button type="submit" class="btn">Save Changes</button>
     </form>
     <p v-if="message">{{ message }}</p>
   </div>

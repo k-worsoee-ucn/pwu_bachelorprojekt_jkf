@@ -52,17 +52,27 @@ async function getUserById(req, res) {
 
 async function updateCurrentUser(req, res) {
   try {
-    const { email, name, role } = req.body;
-    const userId = req.user.id; // Get current user's ID from token
-    
+    const { email, name, role, password, accessCode } = req.body;
+    const userId = req.user.id;
+
+    let updateData = {};
+    if (email) updateData.email = email;
+    if (name) updateData.name = name;
+    if (role) updateData.role = role;
+
+    if (password) {
+      if (!accessCode || accessCode !== process.env.REGISTRATION_ACCESS_CODE) {
+        console.log('Access code missing or invalid for password update');
+        return res.status(403).json({ error: 'Valid access code required to change password' });
+      }
+      const bcrypt = require('bcrypt');
+      updateData.password = await bcrypt.hash(password, 10);
+      console.log('Password will be updated for user:', userId);
+    }
+
     const user = await prisma.user.update({
       where: { id: userId },
-      data: {
-        ...(email && { email }),
-        ...(name && { name }),
-        // Note: Role updates could be restricted or removed entirely
-        ...(role && { role }),
-      },
+      data: updateData,
       select: {
         id: true,
         email: true,
@@ -74,6 +84,7 @@ async function updateCurrentUser(req, res) {
 
     res.json(user);
   } catch (error) {
+    console.error('Error in updateCurrentUser:', error);
     res.status(500).json({ error: error.message });
   }
 }
