@@ -4,6 +4,7 @@ import LoginView from "../views/loginView.vue";
 import MyProcessesView from "../views/myProcessesView.vue";
 import AllProcessesView from "../views/allProcessesView.vue";
 import SingleProcessView from "../views/singleProcessView.vue";
+import ProfileView from "../views/profileView.vue";
 
 const routes = [
   {
@@ -45,7 +46,6 @@ const routes = [
       allowedRoles: ["salesManager"],
     },
     beforeEnter: (to, from, next) => {
-      // Set the id param to "new" for this route
       to.params.id = "new";
       next();
     },
@@ -56,6 +56,12 @@ const routes = [
     component: SingleProcessView,
     meta: { requiresAuth: true },
   },
+  {
+    path: "/profile",
+    name: "Profile",
+    component: ProfileView,
+    meta: { requiresAuth: true },
+  }
 ];
 
 const router = createRouter({
