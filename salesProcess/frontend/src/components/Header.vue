@@ -27,9 +27,9 @@ const {
 
       <!-- Right side: User actions -->
       <div class="user-actions">
-        <button class="edit-user-btn  btn-no-fill">
+        <RouterLink to="/profile" class="edit-user-btn  btn-no-fill">
           Edit user
-        </button>
+        </RouterLink>
         <button @click="logout" class="logout-btn">
           Logout
         </button>
