@@ -304,7 +304,7 @@
               id="plantType"
               v-model="formData.plantType"
               type="text"
-              placeholder="e.g., Production, Assembly, Packaging..."
+              placeholder="e.g., Wooden furniture manufacturer..."
               required
             />
             <label class="privacy-checkbox">
@@ -314,14 +314,14 @@
           </div>
         </div>
 
-        <div class="form-group">
+        <!-- <div class="form-group">
           <label for="filterType">Filter Type *</label>
           <div class="input-with-checkbox">
             <input
               id="filterType"
               v-model="formData.filterType"
               type="text"
-              placeholder="e.g., Baghouse, Cartridge, Cyclone..."
+              placeholder="e.g., SBF220S 4,0 Super Blower Filter..."
               required
             />
             <label class="privacy-checkbox">
@@ -329,16 +329,16 @@
               <span>Private</span>
             </label>
           </div>
-        </div>
+        </div> -->
 
-        <div class="form-group">
+        <!-- <div class="form-group">
           <label for="fanType">Fan Type *</label>
           <div class="input-with-checkbox">
             <input
               id="fanType"
               v-model="formData.fanType"
               type="text"
-              placeholder="e.g., Centrifugal, Axial, Mixed Flow..."
+              placeholder="e.g., JK-100MT clean air fan x 1 unit - JK-30D transport fan x 1 unit..."
               required
             />
             <label class="privacy-checkbox">
@@ -346,7 +346,7 @@
               <span>Private</span>
             </label>
           </div>
-        </div>
+        </div> -->
 
         <div class="form-group">
           <label for="dustType">Dust Type *</label>
@@ -355,7 +355,7 @@
               id="dustType"
               v-model="formData.dustType"
               type="text"
-              placeholder="e.g., Wood dust, Metal particles..."
+              placeholder="e.g., Mixed wood..."
               required
             />
             <label class="privacy-checkbox">
@@ -365,14 +365,14 @@
           </div>
         </div>
 
-        <div class="form-group">
+        <!-- <div class="form-group">
           <label for="ductSystem">Duct System *</label>
           <div class="input-with-checkbox">
             <input
               id="ductSystem"
               v-model="formData.ductSystem"
               type="text"
-              placeholder="e.g., Round, Rectangular, Flexible..."
+              placeholder="e.g., JKF standard - 40m Optiflow and galvanised duct system..."
               required
             />
             <label class="privacy-checkbox">
@@ -380,7 +380,7 @@
               <span>Private</span>
             </label>
           </div>
-        </div>
+        </div> -->
 
         <div class="form-group">
           <label for="totalExtractionVolume"
@@ -393,7 +393,7 @@
               type="number"
               min="0"
               step="0.1"
-              placeholder="0"
+              placeholder="e.g., 75.000 m3/hr"
               required
             />
             <label class="privacy-checkbox">
@@ -415,7 +415,7 @@
               type="number"
               min="0"
               step="1"
-              placeholder="0"
+              placeholder="e.g., +/- 5000 Pa"
               required
             />
             <label class="privacy-checkbox">
@@ -434,7 +434,7 @@
               type="number"
               min="0"
               step="0.1"
-              placeholder="0"
+              placeholder="e.g., 75.000 m3/hr"
               required
             />
             <label class="privacy-checkbox">
@@ -790,7 +790,7 @@ watch(
 );
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .sale-form {
   max-width: 800px;
   margin: 0 auto;
@@ -798,230 +798,233 @@ watch(
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
 
-.form-grid {
-  display: grid;
-  gap: 2rem;
-}
+  h2 {
+    margin: 0 0 1.5rem 0;
+    color: #374151;
+  }
 
-.form-section {
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  padding: 1.5rem;
-  background: #f9fafb;
-}
+  .form-grid {
+    display: grid;
+    gap: 2rem;
+  }
 
-.form-section h3 {
-  margin: 0 0 1rem 0;
-  color: #374151;
-  font-size: 1.1rem;
-  font-weight: 600;
-}
+  .form-section {
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 1.5rem;
+    background: #f9fafb;
 
-.form-group {
-  margin-bottom: 1rem;
-}
+    h3 {
+      margin: 0 0 1rem 0;
+      color: #374151;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+  }
 
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: #374151;
-  font-weight: 500;
-}
+  .form-group {
+    margin-bottom: 1rem;
 
-.form-group input,
-.form-group select {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 4px;
-  font-size: 1rem;
-  transition: border-color 0.2s;
-  box-sizing: border-box;
-}
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #374151;
+      font-weight: 500;
+    }
 
-.form-group input:focus,
-.form-group select:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+      box-sizing: border-box;
 
-.disabled-field {
-  background-color: #f9fafb !important;
-  color: #6b7280 !important;
-  cursor: not-allowed !important;
-}
+      &:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+    }
 
-.form-actions {
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-  margin-top: 2rem;
-  padding-top: 1rem;
-  border-top: 1px solid #e5e7eb;
-}
+    .disabled-field {
+      background-color: #f9fafb !important;
+      color: #6b7280 !important;
+      cursor: not-allowed !important;
+    }
+  }
 
-.btn-primary {
-  background: #3b82f6;
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: background-color 0.2s;
-}
+  .input-with-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 
-.btn-primary:hover:not(:disabled) {
-  background: #2563eb;
-}
+    input,
+    select,
+    textarea,
+    .country-dropdown-container {
+      flex: 1;
+    }
+  }
 
-.btn-primary:disabled {
-  background: #9ca3af;
-  cursor: not-allowed;
-}
+  .privacy-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    font-size: 0.875rem;
+    color: #6b7280;
 
-.btn-secondary {
-  background: transparent;
-  color: #6b7280;
-  border: 1px solid #d1d5db;
-  padding: 0.75rem 1.5rem;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s;
-}
+    input[type="checkbox"] {
+      cursor: pointer;
+      width: auto;
+      margin: 0;
+    }
 
-.btn-secondary:hover {
-  background: #f3f4f6;
-  border-color: #9ca3af;
-}
+    span {
+      font-weight: 500;
+    }
+  }
 
-.error-message {
-  background: #fef2f2;
-  color: #dc2626;
-  padding: 1rem;
-  border-radius: 4px;
-  border: 1px solid #fecaca;
-  margin-top: 1rem;
-}
+  .multi-select {
+    min-height: 80px !important;
+    padding: 0.5rem !important;
+  }
 
-.success-message {
-  background: #f0fdf4;
-  color: #16a34a;
-  padding: 1rem;
-  border-radius: 4px;
-  border: 1px solid #bbf7d0;
-  margin-top: 1rem;
-}
+  .help-text {
+    color: #6b7280;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    display: block;
+  }
 
-.multi-select {
-  min-height: 80px !important;
-  padding: 0.5rem !important;
-}
+  .country-dropdown-container {
+    position: relative;
+    width: 100%;
 
-.help-text {
-  color: #6b7280;
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
-  display: block;
-}
+    input {
+      width: 100%;
+    }
+  }
 
-.country-dropdown-container {
-  position: relative;
-  width: 100%;
-}
+  .country-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    max-height: 250px;
+    overflow-y: auto;
+    z-index: 10;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 
-.country-dropdown-container input {
-  width: 100%;
-}
+    .no-results {
+      padding: 0.75rem;
+      color: #6b7280;
+      text-align: center;
+    }
+  }
 
-.country-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background: white;
-  border: 1px solid #d1d5db;
-  border-top: none;
-  border-radius: 0 0 4px 4px;
-  max-height: 250px;
-  overflow-y: auto;
-  z-index: 10;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
+  .country-option {
+    padding: 0.75rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
 
-.country-option {
-  padding: 0.75rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
+    &:hover {
+      background-color: #e0e7ff;
+      color: #3b82f6;
+    }
+  }
 
-.country-option:hover {
-  background-color: #e0e7ff;
-  color: #3b82f6;
-}
-
-.country-dropdown .no-results {
-  padding: 0.75rem;
-  color: #6b7280;
-  text-align: center;
-}
-
-.selected-country {
-  margin-top: 0.5rem;
-  font-size: 0.875rem;
-  color: #059669;
-}
-
-/* Privacy checkbox styles */
-.input-with-checkbox {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.input-with-checkbox input,
-.input-with-checkbox select,
-.input-with-checkbox .country-dropdown-container {
-  flex: 1;
-}
-
-.privacy-checkbox {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  white-space: nowrap;
-  cursor: pointer;
-  user-select: none;
-  font-size: 0.875rem;
-  color: #6b7280;
-}
-
-.privacy-checkbox input[type="checkbox"] {
-  cursor: pointer;
-  width: auto;
-  margin: 0;
-}
-
-.privacy-checkbox span {
-  font-weight: 500;
-}
-
-@media (max-width: 768px) {
-  .sale-form {
-    margin: 1rem;
-    padding: 1rem;
+  .selected-country {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: #059669;
   }
 
   .form-actions {
-    flex-direction: column;
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e7eb;
   }
 
-  .form-actions button {
-    width: 100%;
+  .btn-primary {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+
+    &:hover:not(:disabled) {
+      background: #2563eb;
+    }
+
+    &:disabled {
+      background: #9ca3af;
+      cursor: not-allowed;
+    }
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: #6b7280;
+    border: 1px solid #d1d5db;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+
+    &:hover {
+      background: #f3f4f6;
+      border-color: #9ca3af;
+    }
+  }
+
+  .error-message {
+    background: #fef2f2;
+    color: #dc2626;
+    padding: 1rem;
+    border-radius: 4px;
+    border: 1px solid #fecaca;
+    margin-top: 1rem;
+  }
+
+  .success-message {
+    background: #f0fdf4;
+    color: #16a34a;
+    padding: 1rem;
+    border-radius: 4px;
+    border: 1px solid #bbf7d0;
+    margin-top: 1rem;
+  }
+
+  @media (max-width: 768px) {
+    margin: 1rem;
+    padding: 1rem;
+
+    .form-actions {
+      flex-direction: column;
+
+      button {
+        width: 100%;
+      }
+    }
   }
 }
 </style>

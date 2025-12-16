@@ -9,7 +9,7 @@ async function seedProducts(/* FKs */) {
       where: { id: 1 },
       update: {},
       create: {
-        title: 'Product 1',
+        title: 'SBF220S 4,0 Super Blower Filter',
         category: 'filtersAndSeparators',
       }
     }),
@@ -17,7 +17,7 @@ async function seedProducts(/* FKs */) {
       where: { id: 2 },
       update: {},
       create: {
-        title: 'Product 2',
+        title: '6 Blower- and Jetfilter',
         category: 'filtersAndSeparators',
       }
     }),
@@ -25,7 +25,7 @@ async function seedProducts(/* FKs */) {
       where: { id: 3 },
       update: {},
       create: {
-        title: 'Product 3',
+        title: 'DS-12 EC-S',
         category: 'filtersAndSeparators',
       }
     }),
@@ -33,7 +33,7 @@ async function seedProducts(/* FKs */) {
       where: { id: 4 },
       update: {},
       create: {
-        title: 'Product 4',
+        title: '	JK MTD 40',
         category: 'fanSystems',
       }
     }),
@@ -41,7 +41,7 @@ async function seedProducts(/* FKs */) {
       where: { id: 5 },
       update: {},
       create: {
-        title: 'Product 5',
+        title: 'JKF fan',
         category: 'fanSystems',
       }
     }),
@@ -49,7 +49,7 @@ async function seedProducts(/* FKs */) {
       where: { id: 6 },
       update: {},
       create: {
-        title: 'Product 6',
+        title: 'JK-100MT clean air fan x 1 unit - JK-30D transport fan x 1 unit',
         category: 'fanSystems',
       }
     }),
@@ -57,7 +57,7 @@ async function seedProducts(/* FKs */) {
       where: { id: 7 },
       update: {},
       create: {
-        title: 'Product 7',
+        title: 'JK-60 MTD',
         category: 'fanSystems',
       }
     }),
@@ -65,7 +65,7 @@ async function seedProducts(/* FKs */) {
       where: { id: 8 },
       update: {},
       create: {
-        title: 'Product 8',
+        title: 'JKF standard - galvanised',
         category: 'ductSystems',
       }
     }),
@@ -73,15 +73,7 @@ async function seedProducts(/* FKs */) {
       where: { id: 9 },
       update: {},
       create: {
-        title: 'Product 9',
-        category: 'ductSystems',
-      }
-    }),
-    prisma.product.upsert({
-      where: { id: 10 },
-      update: {},
-      create: {
-        title: 'Product 10',
+        title: 'JKF standard',
         category: 'ductSystems',
       }
     }),

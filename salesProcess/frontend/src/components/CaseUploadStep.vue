@@ -182,101 +182,101 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .case-upload-step {
   padding: 1.5rem;
-}
 
-h2 {
-  margin-bottom: 0.5rem;
-  color: #204485;
-}
+  h2 {
+    margin-bottom: 0.5rem;
+    color: #204485;
+  }
 
-.description {
-  color: #666;
-  margin-bottom: 1.5rem;
-}
+  .description {
+    color: #666;
+    margin-bottom: 1.5rem;
+  }
 
-.loading {
-  text-align: center;
-  padding: 2rem;
-  color: #666;
-  font-size: 1.1rem;
-}
+  .loading {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+    font-size: 1.1rem;
+  }
 
-.editor-container {
-  background: white;
-  border-radius: 8px;
-  padding: 1rem;
-}
+  .editor-container {
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;
+  }
 
-.editor-wrapper {
-  margin-bottom: 1.5rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-}
+  .editor-wrapper {
+    margin-bottom: 1.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
 
-.editor-wrapper :deep(.ql-container) {
-  min-height: 400px;
-  font-size: 16px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-    Ubuntu, Cantarell, sans-serif;
-}
+    :deep(.ql-container) {
+      min-height: 400px;
+      font-size: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+        Ubuntu, Cantarell, sans-serif;
+    }
 
-.editor-wrapper :deep(.ql-toolbar) {
-  background: #f8f9fa;
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
-}
+    :deep(.ql-toolbar) {
+      background: #f8f9fa;
+      border-top-left-radius: 4px;
+      border-top-right-radius: 4px;
+    }
+  }
 
-.action-buttons {
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-}
+  .action-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+  }
 
-.save-button {
-  padding: 0.75rem 1.5rem;
-  background: #204485;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: background 0.2s;
-}
+  .save-button {
+    padding: 0.75rem 1.5rem;
+    background: #204485;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: background 0.2s;
 
-.save-button:hover:not(:disabled) {
-  background: #163361;
-}
+    &:hover:not(:disabled) {
+      background: #163361;
+    }
 
-.save-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
+    &:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
 
-.save-message {
-  margin-top: 1rem;
-  padding: 0.75rem 1rem;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.95rem;
-}
+  .save-message {
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
 
-.save-message.success {
-  background: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
-}
+    &.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
 
-.save-message.error {
-  background: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
+    &.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+  }
 }
 </style>

@@ -110,6 +110,33 @@ const toggleStep = (stepId) => {
   }
 };
 
+const getStatusMessage = computed(() => {
+  if (!process.value) return "";
+
+  if (process.value.status === "done") {
+    return "Completed";
+  }
+
+  const step = process.value.currentStep;
+
+  switch (step) {
+    case 1:
+      return "Creating Sale";
+    case 2:
+      return "In Production";
+    case 3:
+      return "Awaiting Product Images";
+    case 4:
+      return "Awaiting Installation Images & Consent";
+    case 5:
+      return "Creating Case & Reference";
+    case 6:
+      return "Awaiting Case Upload";
+    default:
+      return process.value.status;
+  }
+});
+
 const fetchProcess = async () => {
   if (!isNewSale.value && processId.value && processId.value !== "new") {
     try {
@@ -285,7 +312,8 @@ watch(
       shippingDateTimer = null;
     }
     await fetchProcess();
-    activeStep.value = 1;
+    // Only open first step if it's a new sale
+    activeStep.value = newId === "new" ? 1 : null;
   }
 );
 
@@ -302,7 +330,8 @@ onMounted(async () => {
 
   console.log("Final process.value:", process.value);
   console.log("Final isNewSale.value:", isNewSale.value);
-  activeStep.value = 1;
+  // Only open first step if it's a new sale
+  activeStep.value = isNewSale.value ? 1 : null;
 });
 
 const handleSaleCreated = (savedSale) => {
@@ -315,17 +344,13 @@ const handleSaleCreated = (savedSale) => {
 const handleStepCompleted = async () => {
   console.log("Step completed, advancing to next step");
   await advanceToNextStep();
+  activeStep.value = null; // Close the accordion after completing the step
 };
 </script>
 
 <template>
   <div v-if="isNewSale" class="single-process-container">
     <h1>Create New Sale</h1>
-    <p><strong>Current Step:</strong> 1 / 6</p>
-    <div class="progress-bar">
-      <div class="progress-fill" :style="{ width: (1 / 6) * 100 + '%' }"></div>
-    </div>
-
     <div class="steps-container">
       <div
         v-for="step in visibleSteps"
@@ -416,24 +441,24 @@ const handleStepCompleted = async () => {
 
   <div v-else-if="process" class="single-process-container">
     <div class="process-header">
-      <div class="header-left">
-        <h1>{{ process.title }}</h1>
-        <p><strong>Status:</strong> {{ statusLabels[process.status] || process.status }}</p>
-        <div class="progress-bar">
-          <div
-            class="progress-fill"
-            :style="{ width: (process.currentStep / 6) * 100 + '%' }"
-          ></div>
+      <h1>{{ process.title }}</h1>
+      <div class="status-row">
+        <p><strong>Status:</strong> {{ getStatusMessage }}</p>
+        <div class="sales-manager-info" v-if="process.sale?.salesManager">
+          <p class="manager-name">{{ process.sale.salesManager.name }}</p>
+          <p class="manager-role">
+            {{
+              roleLabels[process.sale.salesManager.role] ||
+              process.sale.salesManager.role
+            }}
+          </p>
         </div>
       </div>
-      <div class="header-right" v-if="process.sale?.salesManager">
-        <div class="sales-manager-info">
-          <i class="fa-solid fa-user"></i>
-          <div>
-            <p class="manager-name">{{ process.sale.salesManager.name }}</p>
-            <p class="manager-role">{{ roleLabels[process.sale.salesManager.role] || process.sale.salesManager.role }}</p>
-          </div>
-        </div>
+      <div class="progress-bar">
+        <div
+          class="progress-fill"
+          :style="{ width: (process.currentStep / 6) * 100 + '%' }"
+        ></div>
       </div>
     </div>
 
@@ -453,25 +478,13 @@ const handleStepCompleted = async () => {
           :class="{
             'not-allowed': !canToggleStep(step.id),
             'no-expand': step.id === 2,
+            'production-step': step.id === 2,
           }"
         >
           <div class="step-info">
             <i class="fa-solid step-icon" :class="getStepIcon(step.id)"></i>
             <div class="step-text">
               <h3>{{ step.title }}</h3>
-              <p
-                v-if="
-                  step.id === 2 &&
-                  getStepState(step.id) === 'active' &&
-                  !shippingDate
-                "
-                class="step-status"
-              >
-                Shipping Date: Pending...
-              </p>
-              <p v-if="step.id === 2 && shippingDate" class="step-status">
-                Shipping Date: {{ shippingDate }}
-              </p>
               <p
                 v-if="getStepState(step.id) === 'completed' && step.id !== 2"
                 class="step-status"
@@ -480,6 +493,18 @@ const handleStepCompleted = async () => {
               </p>
             </div>
           </div>
+          <span
+            v-if="step.id === 2 && shippingDate"
+            class="shipping-date-badge"
+          >
+            Shipping Date: {{ shippingDate }}
+          </span>
+          <span
+            v-else-if="step.id === 2 && !shippingDate"
+            class="shipping-date-badge"
+          >
+            Shipping Date: Pending...
+          </span>
           <i
             v-if="canToggleStep(step.id) && step.id !== 2"
             class="fa-solid chevron-icon"
@@ -552,33 +577,26 @@ const handleStepCompleted = async () => {
   padding: 2rem;
 
   .process-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 2rem;
     margin-bottom: 2rem;
 
-    .header-left {
-      flex: 1;
+    h1 {
+      margin-bottom: 1rem;
     }
 
-    .header-right {
+    .status-row {
       display: flex;
-      align-items: center;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 1rem;
+
+      p {
+        margin: 0;
+      }
 
       .sales-manager-info {
         display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        padding: 1rem 1.5rem;
-        background-color: #f5f5f5;
-        border-radius: 8px;
-        border-left: 4px solid #204485;
-
-        i {
-          font-size: 2rem;
-          color: #204485;
-        }
+        flex-direction: column;
+        align-items: flex-end;
 
         .manager-name {
           margin: 0;
@@ -594,15 +612,6 @@ const handleStepCompleted = async () => {
         }
       }
     }
-  }
-
-  h1 {
-    margin-bottom: 1.5rem;
-  }
-
-  p {
-    margin-bottom: 1rem;
-    font-size: 1rem;
   }
 
   .progress-bar {
@@ -753,6 +762,21 @@ const handleStepCompleted = async () => {
           transition: transform 0.3s ease;
           flex-shrink: 0;
           margin-left: 1rem;
+        }
+
+        &.production-step {
+          justify-content: flex-end;
+          position: relative;
+
+          .step-info {
+            position: absolute;
+            left: 1.5rem;
+          }
+        }
+
+        .shipping-date-badge {
+          font-size: 1.15rem;
+          color: white;
         }
       }
 
