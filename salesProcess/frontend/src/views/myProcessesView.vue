@@ -84,7 +84,7 @@ const tabLabel = computed(() => {
 
         <!-- Tab Content -->
         <div class="section">
-            <h2>{{ tabLabel }}</h2>
+            
             <div class="cards-grid">
                 <ProcessCard
                     v-for="process in displayedProcesses"

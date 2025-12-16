@@ -66,6 +66,8 @@ const handleClick = () => {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     transition: box-shadow 0.3s ease;
     cursor: pointer;
+    display: flex;
+    flex-direction: column;
 
     &:hover {
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -77,6 +79,7 @@ const handleClick = () => {
         grid-template-columns: repeat(3, 1fr);
         gap: 2rem;
         align-items: center;
+        flex-grow: 1;
 
         .column {
             display: grid;
@@ -133,7 +136,6 @@ const handleClick = () => {
         height: 8px;
         background-color: #e0e0e0;
         position: relative;
-        margin-top: 1rem;
         border-radius: 4px;
         overflow: hidden;
 
