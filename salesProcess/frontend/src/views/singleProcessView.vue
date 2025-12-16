@@ -312,7 +312,8 @@ watch(
       shippingDateTimer = null;
     }
     await fetchProcess();
-    activeStep.value = 1;
+    // Only open first step if it's a new sale
+    activeStep.value = newId === "new" ? 1 : null;
   }
 );
 
@@ -329,7 +330,8 @@ onMounted(async () => {
 
   console.log("Final process.value:", process.value);
   console.log("Final isNewSale.value:", isNewSale.value);
-  activeStep.value = 1;
+  // Only open first step if it's a new sale
+  activeStep.value = isNewSale.value ? 1 : null;
 });
 
 const handleSaleCreated = (savedSale) => {
@@ -342,6 +344,7 @@ const handleSaleCreated = (savedSale) => {
 const handleStepCompleted = async () => {
   console.log("Step completed, advancing to next step");
   await advanceToNextStep();
+  activeStep.value = null; // Close the accordion after completing the step
 };
 </script>
 
@@ -475,25 +478,13 @@ const handleStepCompleted = async () => {
           :class="{
             'not-allowed': !canToggleStep(step.id),
             'no-expand': step.id === 2,
+            'production-step': step.id === 2,
           }"
         >
           <div class="step-info">
             <i class="fa-solid step-icon" :class="getStepIcon(step.id)"></i>
             <div class="step-text">
               <h3>{{ step.title }}</h3>
-              <p
-                v-if="
-                  step.id === 2 &&
-                  getStepState(step.id) === 'active' &&
-                  !shippingDate
-                "
-                class="step-status"
-              >
-                Shipping Date: Pending...
-              </p>
-              <p v-if="step.id === 2 && shippingDate" class="step-status">
-                Shipping Date: {{ shippingDate }}
-              </p>
               <p
                 v-if="getStepState(step.id) === 'completed' && step.id !== 2"
                 class="step-status"
@@ -502,6 +493,18 @@ const handleStepCompleted = async () => {
               </p>
             </div>
           </div>
+          <span
+            v-if="step.id === 2 && shippingDate"
+            class="shipping-date-badge"
+          >
+            Shipping Date: {{ shippingDate }}
+          </span>
+          <span
+            v-else-if="step.id === 2 && !shippingDate"
+            class="shipping-date-badge"
+          >
+            Shipping Date: Pending...
+          </span>
           <i
             v-if="canToggleStep(step.id) && step.id !== 2"
             class="fa-solid chevron-icon"
@@ -759,6 +762,21 @@ const handleStepCompleted = async () => {
           transition: transform 0.3s ease;
           flex-shrink: 0;
           margin-left: 1rem;
+        }
+
+        &.production-step {
+          justify-content: flex-end;
+          position: relative;
+
+          .step-info {
+            position: absolute;
+            left: 1.5rem;
+          }
+        }
+
+        .shipping-date-badge {
+          font-size: 1.15rem;
+          color: white;
         }
       }
 

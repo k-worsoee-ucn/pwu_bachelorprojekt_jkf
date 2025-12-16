@@ -304,7 +304,7 @@
               id="plantType"
               v-model="formData.plantType"
               type="text"
-              placeholder="e.g., Production, Assembly, Packaging..."
+              placeholder="e.g., Wooden furniture manufacturer..."
               required
             />
             <label class="privacy-checkbox">
@@ -314,14 +314,14 @@
           </div>
         </div>
 
-        <div class="form-group">
+        <!-- <div class="form-group">
           <label for="filterType">Filter Type *</label>
           <div class="input-with-checkbox">
             <input
               id="filterType"
               v-model="formData.filterType"
               type="text"
-              placeholder="e.g., Baghouse, Cartridge, Cyclone..."
+              placeholder="e.g., SBF220S 4,0 Super Blower Filter..."
               required
             />
             <label class="privacy-checkbox">
@@ -329,16 +329,16 @@
               <span>Private</span>
             </label>
           </div>
-        </div>
+        </div> -->
 
-        <div class="form-group">
+        <!-- <div class="form-group">
           <label for="fanType">Fan Type *</label>
           <div class="input-with-checkbox">
             <input
               id="fanType"
               v-model="formData.fanType"
               type="text"
-              placeholder="e.g., Centrifugal, Axial, Mixed Flow..."
+              placeholder="e.g., JK-100MT clean air fan x 1 unit - JK-30D transport fan x 1 unit..."
               required
             />
             <label class="privacy-checkbox">
@@ -346,7 +346,7 @@
               <span>Private</span>
             </label>
           </div>
-        </div>
+        </div> -->
 
         <div class="form-group">
           <label for="dustType">Dust Type *</label>
@@ -355,7 +355,7 @@
               id="dustType"
               v-model="formData.dustType"
               type="text"
-              placeholder="e.g., Wood dust, Metal particles..."
+              placeholder="e.g., Mixed wood..."
               required
             />
             <label class="privacy-checkbox">
@@ -365,14 +365,14 @@
           </div>
         </div>
 
-        <div class="form-group">
+        <!-- <div class="form-group">
           <label for="ductSystem">Duct System *</label>
           <div class="input-with-checkbox">
             <input
               id="ductSystem"
               v-model="formData.ductSystem"
               type="text"
-              placeholder="e.g., Round, Rectangular, Flexible..."
+              placeholder="e.g., JKF standard - 40m Optiflow and galvanised duct system..."
               required
             />
             <label class="privacy-checkbox">
@@ -380,7 +380,7 @@
               <span>Private</span>
             </label>
           </div>
-        </div>
+        </div> -->
 
         <div class="form-group">
           <label for="totalExtractionVolume"
@@ -393,7 +393,7 @@
               type="number"
               min="0"
               step="0.1"
-              placeholder="0"
+              placeholder="e.g., 75.000 m3/hr"
               required
             />
             <label class="privacy-checkbox">
@@ -415,7 +415,7 @@
               type="number"
               min="0"
               step="1"
-              placeholder="0"
+              placeholder="e.g., +/- 5000 Pa"
               required
             />
             <label class="privacy-checkbox">
@@ -434,7 +434,7 @@
               type="number"
               min="0"
               step="0.1"
-              placeholder="0"
+              placeholder="e.g., 75.000 m3/hr"
               required
             />
             <label class="privacy-checkbox">
