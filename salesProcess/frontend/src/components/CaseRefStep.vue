@@ -378,66 +378,66 @@ const downloadImages = async () => {
 };
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .case-ref-step {
   padding: 20px;
-}
 
-h3 {
-  margin-bottom: 10px;
-  color: #333;
-}
+  h3 {
+    margin-bottom: 10px;
+    color: #333;
+  }
 
-p {
-  color: #666;
-  margin-bottom: 20px;
-}
+  p {
+    color: #666;
+    margin-bottom: 20px;
+  }
 
-.download-section {
-  margin-bottom: 20px;
-  display: flex;
-  gap: 15px;
-  flex-wrap: wrap;
-}
+  .download-section {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
 
-.download-button {
-  padding: 12px 30px;
-  background-color: #204485;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
+  .download-button {
+    padding: 12px 30px;
+    background-color: #204485;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 
-.download-button:hover:not(:disabled) {
-  background-color: #0b5ed7;
-}
+    &:hover:not(:disabled) {
+      background-color: #0b5ed7;
+    }
 
-.download-button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
+    &:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+  }
 
-.error-message {
-  padding: 10px 15px;
-  background-color: #ffebee;
-  color: #c62828;
-  border-left: 4px solid #c62828;
-  border-radius: 4px;
-  margin: 15px 0;
-}
+  .error-message {
+    padding: 10px 15px;
+    background-color: #ffebee;
+    color: #c62828;
+    border-left: 4px solid #c62828;
+    border-radius: 4px;
+    margin: 15px 0;
+  }
 
-.success-message {
-  padding: 10px 15px;
-  background-color: #e8f5e9;
-  color: #2e7d32;
-  border-left: 4px solid #2e7d32;
-  border-radius: 4px;
-  margin: 15px 0;
+  .success-message {
+    padding: 10px 15px;
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border-left: 4px solid #2e7d32;
+    border-radius: 4px;
+    margin: 15px 0;
+  }
 }
 </style>

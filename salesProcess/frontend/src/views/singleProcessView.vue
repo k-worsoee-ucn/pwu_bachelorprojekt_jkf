@@ -98,6 +98,33 @@ const toggleStep = (stepId) => {
   }
 };
 
+const getStatusMessage = computed(() => {
+  if (!process.value) return "";
+
+  if (process.value.status === "done") {
+    return "Completed";
+  }
+
+  const step = process.value.currentStep;
+
+  switch (step) {
+    case 1:
+      return "Creating Sale";
+    case 2:
+      return "In Production";
+    case 3:
+      return "Awaiting Product Images";
+    case 4:
+      return "Awaiting Installation Images & Consent";
+    case 5:
+      return "Creating Case & Reference";
+    case 6:
+      return "Awaiting Case Upload";
+    default:
+      return process.value.status;
+  }
+});
+
 const fetchProcess = async () => {
   if (!isNewSale.value && processId.value && processId.value !== "new") {
     try {
@@ -406,7 +433,7 @@ const handleStepCompleted = async () => {
     <div class="process-header">
       <div class="header-left">
         <h1>{{ process.title }}</h1>
-        <p><strong>Status:</strong> {{ process.status }}</p>
+        <p><strong>Status:</strong> {{ getStatusMessage }}</p>
         <div class="progress-bar">
           <div
             class="progress-fill"
