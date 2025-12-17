@@ -23,7 +23,7 @@ defineProps({
         >
           Opret sag
         </RouterLink>
-        <RouterLink
+        <RouterLink v-if="isSalesManager"
           to="/my-processes"
           class="nav-btn btn-no-fill nav-btn-badge"
         >
