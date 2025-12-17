@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 
-const { user, getAuthHeader } = useAuth()
+const { user, getAuthHeader, setUser } = useAuth()
 const form = ref({ email: '', password: '', name: '', role: '', accessCode: '' })
 const message = ref('')
 
@@ -32,6 +32,9 @@ const updateProfile = async () => {
     const data = await res.json();
     if (res.ok) {
       message.value = 'Profile updated!';
+      if (data && typeof data === 'object') {
+        setUser({ ...user.value, ...data });
+      }
     } else {
       message.value = data.error || 'Update failed.';
     }
