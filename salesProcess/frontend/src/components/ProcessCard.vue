@@ -30,7 +30,24 @@ const props = defineProps({
     step: {
         type: Number,
         required: true,
-        validator: (value) => value >= 1 && value <= 6,
+    },
+    totalSteps: {
+        type: Number,
+        required: false,
+        default: 6,
+        validator: (value) => value >= 2,
+    },
+    stepTitles: {
+        type: Array,
+        required: false,
+        default: () => [
+            'Salg - Sag oprettelse',
+            'Under produktion',
+            'Produktbilleder',
+            'Installationsbilleder',
+            'Referencer',
+            'Afslutning/upload',
+        ],
     },
 });
 
@@ -54,7 +71,17 @@ const handleClick = () => {
             </div>
         </div>
         <div class="progress-bar">
-            <div class="progress-fill" :style="{ width: (step / 6) * 100 + '%' }"></div>
+            <div class="progress-fill" :style="{ width: ((step - 1) / (totalSteps + 1)) * 100 + '%' }"></div>
+            <div class="step-dots">
+                <span
+                    v-for="n in totalSteps"
+                    :key="n"
+                    class="dot"
+                    :class="{ active: n <= (step - 1) }"
+                    :style="{ left: ((n) / (totalSteps + 1)) * 100 + '%' }"
+                    :title="stepTitles[n - 1] || `Step ${n}`"
+                ></span>
+            </div>
         </div>
     </div>
 </template>
@@ -148,7 +175,35 @@ const handleClick = () => {
         }
 
         .step-dots {
-            display: none;
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 0;
+            pointer-events: auto;
+        }
+        .dot {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background-color: #ffffff;
+            border-radius: 50%;
+            z-index: 1;
+            transition: background 0.3s;
+            pointer-events: auto;
+
+            &:first-child {
+                transform: translate(0%, -50%);
+            }
+            &:last-child {
+                transform: translate(-100%, -50%);
+            }
+        }
+        .dot.active {
+            box-sizing: border-box;
+            background: #4caf50;
+            border: 2px solid #fff;
         }
     }
 }
