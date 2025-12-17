@@ -202,6 +202,7 @@ async function createSale(req, res) {
 async function updateSale(req, res) {
   try {
     const { id } = req.params;
+
     const {
       // Remove UI-only fields that aren't in the database
       selectedFilters,

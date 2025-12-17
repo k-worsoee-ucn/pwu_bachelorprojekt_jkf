@@ -1,19 +1,14 @@
 <script setup>
-import { useAuth } from '@/composables/useAuth'
+import { useAuth } from "@/composables/useAuth";
 
-const { 
-  user, 
-  isAuthenticated, 
-  isSalesManager, 
-  logout 
-} = useAuth()
+const { user, isAuthenticated, isSalesManager, logout } = useAuth();
 
 defineProps({
   ongoingCount: {
     type: Number,
-    default: 0
-  }
-})
+    default: 0,
+  },
+});
 </script>
 
 <template>
@@ -21,10 +16,17 @@ defineProps({
     <nav v-if="isAuthenticated" class="nav-bar">
       <!-- Left side: Navigation Links -->
       <div class="nav-links">
-        <RouterLink v-if="isSalesManager" to="/processes/new" class="nav-btn btn-no-fill">
+        <RouterLink
+          v-if="isSalesManager"
+          to="/processes/new"
+          class="nav-btn btn-no-fill"
+        >
           Opret sag
         </RouterLink>
-        <RouterLink to="/my-processes" class="nav-btn btn-no-fill nav-btn-badge">
+        <RouterLink
+          to="/my-processes"
+          class="nav-btn btn-no-fill nav-btn-badge"
+        >
           Mine sager
           <span class="badge" v-if="ongoingCount > 0">{{ ongoingCount }}</span>
         </RouterLink>
@@ -35,15 +37,17 @@ defineProps({
 
       <!-- Right side: User actions -->
       <div class="user-actions">
-        <RouterLink to="/profile" class="edit-user-btn  btn-no-fill">
+        <div v-if="user" class="user-info">
+          <span class="user-name">{{ user.name }}</span>
+          <span class="user-role">{{ user.role }}</span>
+        </div>
+        <RouterLink to="/profile" class="edit-user-btn btn-no-fill">
           Edit user
         </RouterLink>
-        <button @click="logout" class="logout-btn">
-          Logout
-        </button>
+        <button @click="logout" class="logout-btn">Logout</button>
       </div>
     </nav>
-    
+
     <!-- Login view header -->
     <nav v-else class="nav-bar login-nav">
       <div></div>
@@ -55,11 +59,9 @@ defineProps({
 </template>
 
 <style scoped lang="scss">
-@import '@/scss/variables';
+@import "@/scss/variables";
 
 header {
-
-
   .nav-bar {
     padding: 1rem 2rem;
     display: flex;
@@ -94,18 +96,36 @@ header {
         color: black;
         border-radius: 50%;
         font-size: 0.8rem;
-        font-weight: 600;        
-        border: 3px solid white;      
+        font-weight: 600;
+        border: 3px solid white;
       }
     }
-
-
 
     .user-actions {
       display: flex;
       gap: 1rem;
       align-items: center;
       margin-left: auto;
+    }
+
+    .user-info {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.2rem;
+      padding-right: 1rem;
+      border-right: 1px solid #ddd;
+    }
+
+    .user-name {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .user-role {
+      font-size: 0.8rem;
+      color: #666;
+      text-transform: capitalize;
     }
 
     .logout-btn {
@@ -123,8 +143,6 @@ header {
         background-color: #c82333;
       }
     }
-
-    
   }
 }
 </style>
