@@ -1,14 +1,15 @@
 <script setup>
-import { ref, computed, onMounted, watch } from "vue";
+import { ref, computed, onMounted, watch, inject } from "vue";
 import { useRoute } from "vue-router";
 import ProcessCard from "@/components/ProcessCard.vue";
 import { useAuth } from "@/composables/useAuth";
 
-const { getAuthHeader } = useAuth();
+const { getAuthHeader, isMarketingManager } = useAuth();
 const route = useRoute();
 const searchQuery = ref("");
 const allProcesses = ref([]);
 const activeTab = ref("ongoing");
+const marketingManagerCount = inject("marketingManagerCount");
 
 // Watch route query for tab changes
 watch(
@@ -54,6 +55,17 @@ const ongoingProcesses = computed(() => {
     (process) => process.status !== "completed" && process.status !== "done"
   );
 });
+
+// Update the injected count for marketing managers whenever ongoing processes change
+watch(
+  ongoingProcesses,
+  (newOngoing) => {
+    if (isMarketingManager && marketingManagerCount) {
+      marketingManagerCount.value = newOngoing.length;
+    }
+  },
+  { immediate: true }
+);
 
 const completedProcesses = computed(() => {
   return filteredProcesses.value.filter(
