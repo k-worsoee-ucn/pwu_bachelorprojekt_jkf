@@ -87,14 +87,7 @@ const canUpdateSale = async (req, res, next) => {
       });
     }
 
-    // Don't allow updates if process is beyond step 1
-    if (sale.process && sale.process.currentStep > 1) {
-      return res.status(403).json({
-        error:
-          "Cannot update sale information after the process has progressed beyond step 1.",
-      });
-    }
-
+    // Allow updates at any time - sales managers can re-edit their sales even after progression
     next();
   } catch (error) {
     return res.status(500).json({ error: error.message });
