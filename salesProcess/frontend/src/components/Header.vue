@@ -1,10 +1,15 @@
 <script setup>
 import { useAuth } from "@/composables/useAuth";
 
-const { user, isAuthenticated, isSalesManager, logout } = useAuth();
+const { user, isAuthenticated, isSalesManager, isMarketingManager, logout } =
+  useAuth();
 
 defineProps({
-  ongoingCount: {
+  salesManagerCount: {
+    type: Number,
+    default: 0,
+  },
+  marketingManagerCount: {
     type: Number,
     default: 0,
   },
@@ -24,14 +29,25 @@ defineProps({
           Opret sag
         </RouterLink>
         <RouterLink
+          v-if="isSalesManager"
           to="/my-processes"
           class="nav-btn btn-no-fill nav-btn-badge"
         >
           Mine sager
-          <span class="badge" v-if="ongoingCount > 0">{{ ongoingCount }}</span>
+          <span class="badge" v-if="salesManagerCount > 0">{{
+            salesManagerCount
+          }}</span>
         </RouterLink>
-        <RouterLink to="/all-processes" class="nav-btn btn-no-fill">
+        <RouterLink
+          to="/all-processes"
+          class="nav-btn btn-no-fill nav-btn-badge"
+        >
           Alle sager
+          <span
+            class="badge"
+            v-if="isMarketingManager && marketingManagerCount > 0"
+            >{{ marketingManagerCount }}</span
+          >
         </RouterLink>
       </div>
 

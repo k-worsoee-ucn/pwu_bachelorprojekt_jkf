@@ -96,6 +96,7 @@ const getStepIcon = (stepId) => {
 
 const canToggleStep = (stepId) => {
   const state = getStepState(stepId);
+  // Allow toggling if not locked (allow completed and active steps)
   return state !== "locked";
 };
 
@@ -278,6 +279,12 @@ const advanceToNextStep = async () => {
     } catch (error) {
       console.error("Error completing process:", error);
     }
+    return;
+  }
+
+  // If trying to advance from step 5 but consent is false, don't allow it
+  if (currentStep === 5 && nextStep === 6 && !process.value.consent) {
+    console.log("Cannot advance to step 6 without consent");
     return;
   }
 

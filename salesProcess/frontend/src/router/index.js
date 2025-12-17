@@ -25,7 +25,7 @@ const routes = [
     component: MyProcessesView,
     meta: {
       requiresAuth: true,
-      allowedRoles: ["salesManager", "marketingManager"],
+      allowedRoles: ["salesManager"],
     },
   },
   {
@@ -61,7 +61,7 @@ const routes = [
     name: "Profile",
     component: ProfileView,
     meta: { requiresAuth: true },
-  }
+  },
 ];
 
 const router = createRouter({
@@ -96,7 +96,7 @@ router.beforeEach((to, from, next) => {
       if (isViewer.value) {
         next("/all-processes");
       } else if (isMarketingManager.value) {
-        next("/my-processes");
+        next("/all-processes");
       } else {
         next("/all-processes");
       }
