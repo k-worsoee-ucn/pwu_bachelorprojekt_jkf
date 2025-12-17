@@ -60,10 +60,16 @@ export function useAuth() {
     return token.value ? { Authorization: `Bearer ${token.value}` } : {}
   }
   
+  // Add setUser method to update user info and localStorage
+  const setUser = (newUser) => {
+    user.value = newUser;
+    localStorage.setItem('user', JSON.stringify(newUser));
+  };
+
   return {
     user: computed(() => user.value),
     token: computed(() => token.value),
-    
+
     isAuthenticated,
     isSalesManager,
     isMarketingManager, 
@@ -72,6 +78,7 @@ export function useAuth() {
     login,
     logout,
     initAuth,
-    getAuthHeader
+    getAuthHeader,
+    setUser
   }
 }
