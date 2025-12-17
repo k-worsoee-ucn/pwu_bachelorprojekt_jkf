@@ -21,7 +21,7 @@ onMounted(() => {
     :salesManagerCount="salesManagerCount"
     :marketingManagerCount="marketingManagerCount"
   />
-  <TabHeader />
+  <TabHeader v-if="$route.path === '/my-processes' || $route.path === '/all-processes'" />
 
   <RouterView />
 </template>
