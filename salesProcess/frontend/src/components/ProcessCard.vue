@@ -52,7 +52,7 @@ const props = defineProps({
     status: {
         type: String,
         required: false,
-        default: '',
+        default: 'ongoing',
     },
 });
 
