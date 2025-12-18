@@ -6,7 +6,7 @@
     <div class="download-section">
       <button
         @click="generatePDF"
-        :disabled="generatingPDF"
+        :disabled="generatingPDF || props.disabled"
         class="download-button"
       >
         <span v-if="generatingPDF">Generating PDF...</span>
@@ -15,7 +15,7 @@
 
       <button
         @click="downloadImages"
-        :disabled="generatingZip"
+        :disabled="generatingZip || props.disabled"
         class="download-button"
       >
         <span v-if="generatingZip">Creating ZIP...</span>
@@ -57,6 +57,10 @@ const props = defineProps({
     type: Object,
     required: false,
     default: null,
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
   },
 });
 

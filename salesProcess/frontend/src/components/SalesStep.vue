@@ -17,6 +17,7 @@
               v-model="formData.title"
               type="text"
               placeholder="Enter a descriptive title for this process"
+              :disabled="props.disabled"
               required
             />
             <label class="privacy-checkbox">
@@ -33,6 +34,7 @@
               id="description"
               v-model="formData.description"
               placeholder="Enter a detailed description of the project"
+              :disabled="props.disabled"
               rows="3"
             ></textarea>
             <label class="privacy-checkbox">
@@ -47,6 +49,7 @@
           <div class="input-with-checkbox">
             <select
               id="customerId"
+              :disabled="props.disabled"
               v-model="formData.customerId"
               required
               @change="onCustomerChange"
@@ -95,6 +98,7 @@
               id="endUser"
               v-model="formData.endUser"
               type="text"
+              :disabled="props.disabled"
               placeholder="Name of the end user company"
               required
             />
@@ -113,6 +117,7 @@
               v-model="formData.phoneNumber"
               type="tel"
               placeholder="e.g., +45 12 34 56 78"
+              :disabled="props.disabled"
             />
             <label class="privacy-checkbox">
               <input type="checkbox" v-model="privacyFlags.phoneNumber" />
@@ -135,6 +140,7 @@
                   countryQuery = formData.country;
                   showCountryDropdown = true;
                 "
+                :disabled="props.disabled"
                 required
               />
               <div
@@ -167,7 +173,7 @@
         <div class="form-group">
           <label for="industry">Industry *</label>
           <div class="input-with-checkbox">
-            <select id="industry" v-model="formData.industry" required>
+            <select id="industry" v-model="formData.industry" :disabled="props.disabled" required>
               <option value="">Select Industry</option>
               <option value="woodworking">Woodworking</option>
               <option value="agroAndMilling">Agro- and Milling</option>
@@ -191,6 +197,7 @@
               v-model="formData.customIndustry"
               type="text"
               placeholder="Enter custom industry"
+              :disabled="props.disabled"
               required
             />
             <label class="privacy-checkbox">
@@ -212,6 +219,7 @@
               <select
                 id="filtersAndSeparators"
                 v-model="formData.selectedFilters"
+                :disabled="props.disabled"
                 multiple
                 class="multi-select"
               >
@@ -240,6 +248,7 @@
             <div style="flex: 1">
               <select
                 id="fanSystems"
+                :disabled="props.disabled"
                 v-model="formData.selectedFans"
                 multiple
                 class="multi-select"
@@ -269,6 +278,7 @@
             <div style="flex: 1">
               <select
                 id="ductSystems"
+                :disabled="props.disabled"
                 v-model="formData.selectedDucts"
                 multiple
                 class="multi-select"
@@ -302,6 +312,7 @@
           <div class="input-with-checkbox">
             <input
               id="plantType"
+              :disabled="props.disabled"
               v-model="formData.plantType"
               type="text"
               placeholder="e.g., Wooden furniture manufacturer..."
@@ -353,6 +364,7 @@
           <div class="input-with-checkbox">
             <input
               id="dustType"
+              :disabled="props.disabled"
               v-model="formData.dustType"
               type="text"
               placeholder="e.g., Mixed wood..."
@@ -391,6 +403,7 @@
               id="totalExtractionVolume"
               v-model.number="formData.totalExtractionVolume"
               type="number"
+              :disabled="props.disabled"
               min="0"
               step="0.1"
               placeholder="e.g., 75.000 m3/hr"
@@ -412,6 +425,7 @@
             <input
               id="pressure"
               v-model.number="formData.pressure"
+              :disabled="props.disabled"
               type="number"
               min="0"
               step="1"
@@ -435,6 +449,7 @@
               min="0"
               step="0.1"
               placeholder="e.g., 75.000 m3/hr"
+              :disabled="props.disabled"
               required
             />
             <label class="privacy-checkbox">
@@ -446,10 +461,10 @@
       </div>
 
       <div class="form-actions">
-        <button type="button" @click="resetForm" class="btn-secondary">
+        <button type="button" @click="resetForm" class="btn-secondary" :disabled="props.disabled">
           Reset
         </button>
-        <button type="submit" class="btn-primary" :disabled="isSubmitting">
+        <button type="submit" class="btn-primary" :disabled="isSubmitting || props.disabled">
           {{
             isSubmitting ? "Saving..." : isEdit ? "Update Sale" : "Create Sale"
           }}
@@ -484,6 +499,10 @@ const props = defineProps({
   currentUserId: {
     type: Number,
     required: true,
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
   },
 });
 
@@ -848,6 +867,13 @@ watch(
         outline: none;
         border-color: #3b82f6;
         box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+      }
+
+      &:disabled {
+        background-color: #f3f4f6;
+        color: #9ca3af;
+        cursor: not-allowed;
+        opacity: 0.6;
       }
     }
 

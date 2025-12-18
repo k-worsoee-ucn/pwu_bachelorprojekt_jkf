@@ -14,13 +14,14 @@
         <QuillEditor
           v-model:content="caseContent"
           :options="editorOptions"
+          :readOnly="props.disabled"
           contentType="html"
           theme="snow"
         />
       </div>
 
       <div class="action-buttons">
-        <button @click="saveCase" class="save-button" :disabled="saving">
+        <button @click="saveCase" class="save-button" :disabled="saving || props.disabled">
           <i
             class="fa-solid"
             :class="saving ? 'fa-spinner fa-spin' : 'fa-save'"
@@ -58,6 +59,10 @@ const props = defineProps({
   process: {
     type: Object,
     default: null,
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
   },
 });
 
@@ -225,6 +230,14 @@ onMounted(() => {
       background: #f8f9fa;
       border-top-left-radius: 4px;
       border-top-right-radius: 4px;
+    }
+
+    :deep(.ql-disabled .ql-toolbar) {
+      background: #f3f4f6;
+    }
+
+    :deep(.ql-editor.ql-blank::before) {
+      display: none !important;
     }
   }
 

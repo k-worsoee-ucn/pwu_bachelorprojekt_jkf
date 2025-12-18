@@ -12,6 +12,7 @@
           @change="handleFileSelect"
           accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
           multiple
+          :disabled="props.disabled"
           class="file-input"
           id="imageUpload"
         />
@@ -26,7 +27,7 @@
 
       <button
         @click="uploadImages"
-        :disabled="!selectedFiles.length || uploading"
+        :disabled="!selectedFiles.length || uploading || props.disabled"
         class="upload-button"
       >
         <span v-if="uploading">Uploading...</span>
@@ -104,6 +105,10 @@ const props = defineProps({
   processId: {
     type: [String, Number],
     required: true,
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
   },
 });
 

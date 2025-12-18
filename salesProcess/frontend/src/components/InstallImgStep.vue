@@ -12,6 +12,7 @@
           id="consentCheckbox"
           v-model="consentValue"
           @change="updateConsent"
+          :disabled="props.disabled"
           class="consent-checkbox"
         />
         <label for="consentCheckbox" class="consent-label">
@@ -34,6 +35,7 @@
           @change="handleFileSelect"
           accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
           multiple
+          :disabled="props.disabled"
           class="file-input"
           id="imageUpload"
         />
@@ -47,7 +49,7 @@
       </div>
 
       <button
-        @click="uploadImages"
+        @click="uploadImages" || props.disabled
         :disabled="!selectedFiles.length || uploading"
         class="upload-button"
       >
@@ -136,6 +138,10 @@ const props = defineProps({
     type: Object,
     required: false,
     default: null,
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
   },
 });
 
