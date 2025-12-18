@@ -82,6 +82,11 @@ const displayedProcesses = computed(() => {
 const tabLabel = computed(() => {
   return activeTab.value === "ongoing" ? "Ongoing" : "Completed";
 });
+
+// Helper to get the number of steps for a process
+function getStepCount(process) {
+  return process.consent ? 6 : 5;
+}
 </script>
 
 <template>
@@ -110,6 +115,8 @@ const tabLabel = computed(() => {
           :startDate="process.startDate"
           :expectedEndDate="process.expectedEndDate"
           :step="process.currentStep"
+          :totalSteps="getStepCount(process)"
+          :status="process.status"
         />
         <div v-if="displayedProcesses.length === 0" class="no-results">
           <p>No {{ tabLabel.toLowerCase() }} processes found.</p>

@@ -112,6 +112,7 @@ const tabLabel = computed(() => {
           :startDate="process.startDate"
           :expectedEndDate="process.expectedEndDate"
           :step="process.currentStep"
+          :status="process.status"
         />
         <div v-if="displayedProcesses.length === 0" class="no-results">
           <p>No {{ tabLabel.toLowerCase() }} processes found.</p>
