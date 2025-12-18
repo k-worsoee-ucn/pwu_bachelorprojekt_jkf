@@ -136,14 +136,14 @@ async function getFilterOptions(req, res) {
       orderBy: { name: "asc" },
     });
 
-    // Industry enum values
+    // Industry enum values (must match the enum in schema)
     const industries = [
-      "Woodworking",
-      "Agro and Milling",
-      "Recycling",
-      "Metalworking",
-      "Paper",
-      "Other",
+      "woodworking",
+      "agroAndMilling",
+      "recycling",
+      "metalworking",
+      "paper",
+      "other",
     ];
 
     // Get distinct countries from Sales

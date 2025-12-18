@@ -27,19 +27,21 @@ const filterOptionsData = ref({
 });
 
 // System filters
-const selectedStep = ref("");
-const selectedSalesManager = ref("");
-const selectedYear = ref("");
-const selectedMonth = ref("");
+const selectedStep = ref([]);
+const selectedSalesManager = ref([]);
+const selectedYear = ref([]);
+const selectedMonth = ref([]);
 
 // Customer Attr. filters
-const selectedIndustry = ref("");
-const selectedCountry = ref("");
-const selectedCustomer = ref("");
+const selectedIndustry = ref([]);
+const selectedCountry = ref([]);
+const selectedCustomer = ref([]);
 
 // Specification filters
-const selectedFilter = ref("");
-const selectedVentilation = ref("");
+const selectedFilter = ref([]);
+const selectedVentilation = ref([]);
+const extractionVolumeFrom = ref("");
+const extractionVolumeTo = ref("");
 const volumeFlowFrom = ref("");
 const volumeFlowTo = ref("");
 
@@ -96,6 +98,20 @@ const filters = computed(() => filterOptionsData.value.filterTypes);
 
 const ventilations = computed(() => filterOptionsData.value.fanTypes);
 
+// Industry labels mapping
+const industryLabels = {
+  woodworking: "Woodworking",
+  agroAndMilling: "Agro- and Milling",
+  recycling: "Recycling",
+  metalworking: "Metalworking",
+  paper: "Paper",
+  other: "Other",
+};
+
+function getIndustryLabel(value) {
+  return industryLabels[value] || value;
+}
+
 function applyFilter() {
   const filterData = {
     step: selectedStep.value,
@@ -107,6 +123,8 @@ function applyFilter() {
     customer: selectedCustomer.value,
     productGroup: selectedFilter.value,
     ventilation: selectedVentilation.value,
+    extractionVolumeFrom: extractionVolumeFrom.value,
+    extractionVolumeTo: extractionVolumeTo.value,
     volumeFlowFrom: volumeFlowFrom.value,
     volumeFlowTo: volumeFlowTo.value,
   };
@@ -115,15 +133,17 @@ function applyFilter() {
 }
 
 function resetFilters() {
-  selectedStep.value = "";
-  selectedSalesManager.value = "";
-  selectedYear.value = "";
-  selectedMonth.value = "";
-  selectedIndustry.value = "";
-  selectedCountry.value = "";
-  selectedCustomer.value = "";
-  selectedFilter.value = "";
-  selectedVentilation.value = "";
+  selectedStep.value = [];
+  selectedSalesManager.value = [];
+  selectedYear.value = [];
+  selectedMonth.value = [];
+  selectedIndustry.value = [];
+  selectedCountry.value = [];
+  selectedCustomer.value = [];
+  selectedFilter.value = [];
+  selectedVentilation.value = [];
+  extractionVolumeFrom.value = "";
+  extractionVolumeTo.value = "";
   volumeFlowFrom.value = "";
   volumeFlowTo.value = "";
 }
@@ -149,9 +169,14 @@ function closeModal() {
           <h3>System</h3>
           <div class="filter-group">
             <label for="step">Step</label>
-            <select id="step" v-model="selectedStep" class="filter-select">
+            <select
+              id="step"
+              v-model="selectedStep"
+              class="filter-select"
+              multiple
+            >
               <option value="">All Steps</option>
-              <option v-for="step in steps" :key="step" :value="step">
+              <option v-for="step in steps" :key="step" :value="String(step)">
                 Step {{ step }}
               </option>
             </select>
@@ -163,12 +188,13 @@ function closeModal() {
               id="salesManager"
               v-model="selectedSalesManager"
               class="filter-select"
+              multiple
             >
               <option value="">All</option>
               <option
                 v-for="manager in salesManagers"
                 :key="manager.id"
-                :value="manager.id"
+                :value="String(manager.id)"
               >
                 {{ manager.name }}
               </option>
@@ -177,9 +203,14 @@ function closeModal() {
 
           <div class="filter-group">
             <label for="year">Year</label>
-            <select id="year" v-model="selectedYear" class="filter-select">
+            <select
+              id="year"
+              v-model="selectedYear"
+              class="filter-select"
+              multiple
+            >
               <option value="">All Years</option>
-              <option v-for="year in years" :key="year" :value="year">
+              <option v-for="year in years" :key="year" :value="String(year)">
                 {{ year }}
               </option>
             </select>
@@ -187,7 +218,12 @@ function closeModal() {
 
           <div class="filter-group">
             <label for="month">Month</label>
-            <select id="month" v-model="selectedMonth" class="filter-select">
+            <select
+              id="month"
+              v-model="selectedMonth"
+              class="filter-select"
+              multiple
+            >
               <option value="">All Months</option>
               <option v-for="m in months" :key="m.value" :value="m.value">
                 {{ m.label }}
@@ -205,6 +241,7 @@ function closeModal() {
               id="industry"
               v-model="selectedIndustry"
               class="filter-select"
+              multiple
             >
               <option value="">All</option>
               <option
@@ -212,7 +249,7 @@ function closeModal() {
                 :key="industry"
                 :value="industry"
               >
-                {{ industry }}
+                {{ getIndustryLabel(industry) }}
               </option>
             </select>
           </div>
@@ -223,6 +260,7 @@ function closeModal() {
               id="country"
               v-model="selectedCountry"
               class="filter-select"
+              multiple
             >
               <option value="">All</option>
               <option
@@ -241,6 +279,7 @@ function closeModal() {
               id="customer"
               v-model="selectedCustomer"
               class="filter-select"
+              multiple
             >
               <option value="">All</option>
               <option
@@ -263,6 +302,7 @@ function closeModal() {
               id="productGroup"
               v-model="selectedFilter"
               class="filter-select"
+              multiple
             >
               <option value="">All</option>
               <option v-for="filter in filters" :key="filter" :value="filter">
@@ -277,6 +317,7 @@ function closeModal() {
               id="ventilation"
               v-model="selectedVentilation"
               class="filter-select"
+              multiple
             >
               <option value="">All</option>
               <option
@@ -293,14 +334,14 @@ function closeModal() {
             <label>Tot. Extr. Vol.</label>
             <div class="range-inputs">
               <input
-                v-model="volumeFlowFrom"
+                v-model="extractionVolumeFrom"
                 type="number"
                 placeholder="From"
                 class="filter-input"
               />
               <span class="range-separator">-</span>
               <input
-                v-model="volumeFlowTo"
+                v-model="extractionVolumeTo"
                 type="number"
                 placeholder="To"
                 class="filter-input"

@@ -12,6 +12,21 @@ const allProcesses = ref([]);
 const activeTab = ref("ongoing");
 const salesManagerCount = inject("salesManagerCount");
 const isFilterModalOpen = ref(false);
+const activeFilters = ref({
+  step: [],
+  salesManager: [],
+  year: [],
+  month: [],
+  industry: [],
+  country: [],
+  customer: [],
+  productGroup: [],
+  ventilation: [],
+  extractionVolumeFrom: "",
+  extractionVolumeTo: "",
+  volumeFlowFrom: "",
+  volumeFlowTo: "",
+});
 
 // Watch route query for tab changes
 watch(
@@ -46,17 +61,150 @@ const userProcesses = computed(() => {
 });
 
 const filteredProcesses = computed(() => {
-  if (!searchQuery.value.trim()) {
-    return userProcesses.value;
+  let filtered = userProcesses.value;
+
+  // Apply search filter
+  if (searchQuery.value.trim()) {
+    const query = searchQuery.value.toLowerCase();
+    filtered = filtered.filter(
+      (process) =>
+        process.title.toLowerCase().includes(query) ||
+        process.caseNo.toString().includes(query) ||
+        process.status.toLowerCase().includes(query)
+    );
   }
 
-  const query = searchQuery.value.toLowerCase();
-  return userProcesses.value.filter(
-    (process) =>
-      process.title.toLowerCase().includes(query) ||
-      process.caseNo.toString().includes(query) ||
-      process.status.toLowerCase().includes(query)
-  );
+  // Apply step filter
+  if (activeFilters.value.step && activeFilters.value.step.length > 0) {
+    filtered = filtered.filter((process) =>
+      activeFilters.value.step.includes(String(process.currentStep))
+    );
+  }
+
+  // Apply sales manager filter (though this is my processes, so usually only one)
+  if (
+    activeFilters.value.salesManager &&
+    activeFilters.value.salesManager.length > 0
+  ) {
+    filtered = filtered.filter((process) =>
+      activeFilters.value.salesManager.includes(
+        String(process.sale?.salesManager?.id)
+      )
+    );
+  }
+
+  // Apply year filter
+  if (activeFilters.value.year && activeFilters.value.year.length > 0) {
+    filtered = filtered.filter((process) => {
+      const year = new Date(process.createdAt).getFullYear();
+      return activeFilters.value.year.includes(String(year));
+    });
+  }
+
+  // Apply month filter
+  if (activeFilters.value.month && activeFilters.value.month.length > 0) {
+    filtered = filtered.filter((process) => {
+      const month = String(new Date(process.createdAt).getMonth() + 1).padStart(
+        2,
+        "0"
+      );
+      return activeFilters.value.month.includes(month);
+    });
+  }
+
+  // Apply industry filter
+  if (activeFilters.value.industry && activeFilters.value.industry.length > 0) {
+    filtered = filtered.filter((process) =>
+      activeFilters.value.industry.includes(process.sale?.industry)
+    );
+  }
+
+  // Apply country filter
+  if (activeFilters.value.country && activeFilters.value.country.length > 0) {
+    filtered = filtered.filter((process) =>
+      activeFilters.value.country.includes(process.sale?.country)
+    );
+  }
+
+  // Apply customer filter
+  if (activeFilters.value.customer && activeFilters.value.customer.length > 0) {
+    filtered = filtered.filter((process) =>
+      activeFilters.value.customer.includes(process.sale?.customer?.name)
+    );
+  }
+
+  // Apply filter product type
+  if (
+    activeFilters.value.productGroup &&
+    activeFilters.value.productGroup.length > 0
+  ) {
+    filtered = filtered.filter((process) => {
+      return process.sale?.saleProducts?.some((sp) =>
+        activeFilters.value.productGroup.includes(sp.product?.title)
+      );
+    });
+  }
+
+  // Apply ventilation product type
+  if (
+    activeFilters.value.ventilation &&
+    activeFilters.value.ventilation.length > 0
+  ) {
+    filtered = filtered.filter((process) => {
+      return process.sale?.saleProducts?.some((sp) =>
+        activeFilters.value.ventilation.includes(sp.product?.title)
+      );
+    });
+  }
+
+  // Apply extraction volume range filter
+  if (
+    activeFilters.value.extractionVolumeFrom ||
+    activeFilters.value.extractionVolumeTo
+  ) {
+    filtered = filtered.filter((process) => {
+      const extractionVolume = process.sale?.totalExtractionVolume;
+      if (!extractionVolume) return false;
+
+      if (
+        activeFilters.value.extractionVolumeFrom &&
+        extractionVolume < parseInt(activeFilters.value.extractionVolumeFrom)
+      ) {
+        return false;
+      }
+      if (
+        activeFilters.value.extractionVolumeTo &&
+        extractionVolume > parseInt(activeFilters.value.extractionVolumeTo)
+      ) {
+        return false;
+      }
+      return true;
+    });
+  }
+
+  // Apply volume flow range filter
+  if (activeFilters.value.volumeFlowFrom || activeFilters.value.volumeFlowTo) {
+    filtered = filtered.filter((process) => {
+      const volumeFlow = process.sale?.volumeFlow;
+      if (!volumeFlow) return false;
+
+      if (
+        activeFilters.value.volumeFlowFrom &&
+        volumeFlow < parseInt(activeFilters.value.volumeFlowFrom)
+      ) {
+        return false;
+      }
+      if (
+        activeFilters.value.volumeFlowTo &&
+        volumeFlow > parseInt(activeFilters.value.volumeFlowTo)
+      ) {
+        return false;
+      }
+      return true;
+    });
+  }
+
+  return filtered;
 });
 
 const ongoingProcesses = computed(() => {
@@ -89,8 +237,7 @@ const tabLabel = computed(() => {
 });
 
 function handleApplyFilter(filters) {
-  console.log("Filters applied:", filters);
-  // Filter logic will be added here next
+  activeFilters.value = { ...filters };
 }
 </script>
 
