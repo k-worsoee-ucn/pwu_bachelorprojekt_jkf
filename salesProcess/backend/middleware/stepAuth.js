@@ -210,9 +210,71 @@ const canUpdateProcess = async (req, res, next) => {
   }
 };
 
+// Middleware to check if user can upload/delete images for a step
+const canManageImages = async (req, res, next) => {
+  try {
+    const user = req.user;
+    if (!user) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
+    // Determine step from image type in request body (for upload) or from image in database (for delete)
+    let stepId;
+
+    if (req.method === "POST") {
+      // For upload: get type from request body
+      const { type } = req.body;
+      const imageTypeToStep = {
+        production: 3,
+        installation: 4,
+      };
+      stepId = imageTypeToStep[type] || 3;
+    } else if (req.method === "DELETE") {
+      // For delete: get image type from database
+      const imageId = parseInt(req.params.id);
+      const image = await prisma.image.findUnique({
+        where: { id: imageId },
+      });
+
+      if (!image) {
+        return res.status(404).json({ error: "Image not found" });
+      }
+
+      const imageTypeToStep = {
+        production: 3,
+        installation: 4,
+      };
+      stepId = imageTypeToStep[image.type] || 3;
+    } else {
+      // For GET, no authorization needed
+      return next();
+    }
+
+    // Check permissions for the step
+    const permissions = STEP_PERMISSIONS[stepId];
+
+    if (!permissions || !permissions.role) {
+      return res.status(403).json({
+        error: `Cannot manage images for step ${stepId}.`,
+      });
+    }
+
+    if (user.role !== permissions.role) {
+      return res.status(403).json({
+        error: `Only ${permissions.role}s can manage images for step ${stepId}.`,
+      });
+    }
+
+    next();
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   canAccessStep,
   canUpdateProcess,
   canUpdateSale,
+  canManageImages,
   STEP_PERMISSIONS,
 };
