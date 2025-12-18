@@ -10,7 +10,7 @@ import CaseUploadStep from "@/components/CaseUploadStep.vue";
 
 const route = useRoute();
 const router = useRouter();
-const { getAuthHeader, user } = useAuth();
+const { getAuthHeader, user, isViewer } = useAuth();
 const processId = computed(() => route.params.id);
 
 const process = ref(null);
@@ -428,6 +428,7 @@ const handleStepCompleted = async () => {
             :process-id="0"
             :current-user-id="currentUserId || 0"
             :sale="null"
+            :disabled="isViewer"
             @sale-created="handleSaleCreated"
           />
           <ProdImgStep
@@ -549,17 +550,20 @@ const handleStepCompleted = async () => {
             :process-id="process.id"
             :current-user-id="currentUserId || process.userId || 0"
             :sale="process.sale || null"
+            :disabled="isViewer"
             @sale-updated="fetchProcess"
           />
           <ProdImgStep
             v-else-if="step.component === 'ProdImgStep'"
             :process-id="process.id"
+            :disabled="isViewer"
           />
           <InstallImgStep
             v-else-if="step.component === 'InstallImgStep'"
             :process-id="process.id"
             :sale="process.sale || null"
             :process="process"
+            :disabled="isViewer"
             @consent-updated="fetchProcess"
           />
           <CaseRefStep
@@ -567,11 +571,13 @@ const handleStepCompleted = async () => {
             :process-id="process.id"
             :sale="process.sale || null"
             :process="process"
+            :disabled="isViewer"
           />
           <CaseUploadStep
             v-else-if="step.component === 'CaseUploadStep'"
             :process-id="process.id"
             :process="process"
+            :disabled="isViewer"
           />
           <div v-else class="placeholder">
             {{ step.component }} - Content coming soon
@@ -579,15 +585,8 @@ const handleStepCompleted = async () => {
           <button
             v-if="step.component !== 'SalesStep'"
             @click="handleStepCompleted"
-            style="
-              margin-top: 1rem;
-              padding: 0.5rem 1rem;
-              background: #204485;
-              color: white;
-              border: none;
-              border-radius: 4px;
-              cursor: pointer;
-            "
+            :disabled="isViewer"
+            class="complete-step-button"
           >
             Complete Step
           </button>
@@ -862,6 +861,28 @@ const handleStepCompleted = async () => {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+.complete-step-button {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background: #204485;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-weight: 500;
+
+  &:hover:not(:disabled) {
+    background-color: #1a3767;
+  }
+
+  &:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+    opacity: 0.6;
   }
 }
 
