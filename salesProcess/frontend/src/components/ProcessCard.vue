@@ -49,6 +49,11 @@ const props = defineProps({
             'Afslutning/upload',
         ],
     },
+    status: {
+        type: String,
+        required: false,
+        default: '',
+    },
 });
 
 const handleClick = () => {
@@ -71,15 +76,18 @@ const handleClick = () => {
             </div>
         </div>
         <div class="progress-bar">
-            <div class="progress-fill" :style="{ width: ((step - 1) / (totalSteps + 1)) * 100 + '%' }"></div>
+            <div
+                class="progress-fill"
+                :style="{ width: (status === 'completed' ? '100%' : ((step - 1) / totalSteps) * 100 + '%') }"
+            ></div>
             <div class="step-dots">
                 <span
-                    v-for="n in totalSteps"
+                    v-for="n in (totalSteps - 1)"
                     :key="n"
                     class="dot"
-                    :class="{ active: n <= (step - 1) }"
-                    :style="{ left: ((n) / (totalSteps + 1)) * 100 + '%' }"
-                    :title="stepTitles[n - 1] || `Step ${n}`"
+                    :class="{ active: n < step }"
+                    :style="{ left: ((n) / (totalSteps)) * 100 + '%' }"
+                    :title="stepTitles[n] || `Step ${n + 2}`"
                 ></span>
             </div>
         </div>

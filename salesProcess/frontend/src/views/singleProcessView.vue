@@ -472,16 +472,16 @@ const handleStepCompleted = async () => {
       <div class="progress-bar">
         <div
           class="progress-fill"
-          :style="{ width: (getCurrentStep() / (visibleSteps.length + 1)) * 100 + '%' }"
+          :style="{ width: (process.status === 'completed' ? '100%' : ((getCurrentStep() - 1) / visibleSteps.length) * 100 + '%') }"
         ></div>
         <div class="step-dots">
           <span
-            v-for="(stepObj, idx) in visibleSteps"
-            :key="stepObj.id"
+            v-for="(stepObj, idx) in (visibleSteps.length - 1)"
+            :key="visibleSteps[idx + 1].id"
             class="dot"
-            :class="{ active: idx < getCurrentStep() }"
-            :style="{ left: ((idx + 1) / (visibleSteps.length + 1)) * 100 + '%' }"
-            :title="stepObj.title"
+            :class="{ active: idx < getCurrentStep() - 1 }"
+            :style="{ left: ((idx + 1) / visibleSteps.length) * 100 + '%' }"
+            :title="visibleSteps[idx + 1].title"
           ></span>
         </div>
       </div>

@@ -116,6 +116,7 @@ function getStepCount(process) {
           :expectedEndDate="process.expectedEndDate"
           :step="process.currentStep"
           :totalSteps="getStepCount(process)"
+          :status="process.status"
         />
         <div v-if="displayedProcesses.length === 0" class="no-results">
           <p>No {{ tabLabel.toLowerCase() }} processes found.</p>
