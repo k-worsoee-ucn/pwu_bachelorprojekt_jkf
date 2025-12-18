@@ -1,9 +1,20 @@
 <script setup>
-  import { ref } from 'vue'
+  import { ref, watch } from 'vue'
+  import { useRoute } from 'vue-router'
   import SignIn from '../components/SignIn.vue'
   import SignUp from '../components/SignUp.vue'
 
+  const route = useRoute()
   const isSignUp = ref(false)
+
+  // Watch route query to determine which form to show
+  watch(
+    () => route.query.signup,
+    (signup) => {
+      isSignUp.value = signup === 'true'
+    },
+    { immediate: true }
+  )
 
   const toggleMode = () => {
     isSignUp.value = !isSignUp.value

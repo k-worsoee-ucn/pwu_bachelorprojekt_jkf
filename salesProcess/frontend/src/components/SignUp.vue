@@ -1,5 +1,8 @@
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 // Form data
 const formData = ref({
@@ -49,7 +52,10 @@ const handleSubmit = async () => {
         name: '',
         role: 'viewer'
       }
-      // TODO: Redirect to login or auto-login
+      // Redirect to login after successful registration
+      setTimeout(() => {
+        router.push('/login')
+      }, 1500)
     } else {
       errorMessage.value = data.error || 'Registration failed'
     }
