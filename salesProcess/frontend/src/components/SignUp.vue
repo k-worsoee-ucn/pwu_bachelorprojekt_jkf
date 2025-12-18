@@ -9,6 +9,7 @@ const formData = ref({
   accessCode: '',
   email: '',
   password: '',
+  passwordConfirm: '',
   name: '',
   role: 'viewer'
 })
@@ -18,14 +19,50 @@ const isLoading = ref(false)
 const errorMessage = ref('')
 const successMessage = ref('')
 
+// Password regex pattern: at least 8 characters, 1 uppercase, 1 lowercase, 1 number, 1 special character
+const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/
+
+// Validate password strength
+const validatePassword = (password) => {
+  if (password.length < 8) {
+    return 'Password must be at least 8 characters long'
+  }
+  if (!/(?=.*[A-Z])/.test(password)) {
+    return 'Password must include at least 1 uppercase letter'
+  }
+  if (!/(?=.*[a-z])/.test(password)) {
+    return 'Password must include at least 1 lowercase letter'
+  }
+  if (!/(?=.*\d)/.test(password)) {
+    return 'Password must include at least 1 number'
+  }
+  if (!/(?=.*[@$!%*?&])/.test(password)) {
+    return 'Password must include at least 1 special character (@$!%*?&)'
+  }
+  return null
+}
+
 // Handle form submission
 const handleSubmit = async () => {
   errorMessage.value = ''
   successMessage.value = ''
   
   // Basic validation
-  if (!formData.value.accessCode || !formData.value.email || !formData.value.password || !formData.value.name) {
+  if (!formData.value.accessCode || !formData.value.email || !formData.value.password || !formData.value.passwordConfirm || !formData.value.name) {
     errorMessage.value = 'All fields are required'
+    return
+  }
+
+  // Validate password strength
+  const passwordError = validatePassword(formData.value.password)
+  if (passwordError) {
+    errorMessage.value = passwordError
+    return
+  }
+
+  // Check if passwords match
+  if (formData.value.password !== formData.value.passwordConfirm) {
+    errorMessage.value = 'Passwords do not match'
     return
   }
 
@@ -37,7 +74,13 @@ const handleSubmit = async () => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(formData.value)
+      body: JSON.stringify({
+        accessCode: formData.value.accessCode,
+        email: formData.value.email,
+        password: formData.value.password,
+        name: formData.value.name,
+        role: formData.value.role
+      })
     })
 
     const data = await response.json()
@@ -49,6 +92,7 @@ const handleSubmit = async () => {
         accessCode: '',
         email: '',
         password: '',
+        passwordConfirm: '',
         name: '',
         role: 'viewer'
       }
@@ -114,8 +158,20 @@ const handleSubmit = async () => {
           type="password" 
           id="password" 
           v-model="formData.password"
-          placeholder="Enter your password (min 6 characters)" 
-          minlength="6"
+          placeholder="Enter your password" 
+          required 
+        />
+        <small class="password-hint">Password must contain at least 8 characters, including uppercase, lowercase, number and special character</small>
+      </div>
+
+      <!-- Confirm Password Field -->
+      <div class="form-group">
+        <label for="passwordConfirm">Confirm Password:</label>
+        <input 
+          type="password" 
+          id="passwordConfirm" 
+          v-model="formData.passwordConfirm"
+          placeholder="Confirm your password" 
           required 
         />
       </div>
