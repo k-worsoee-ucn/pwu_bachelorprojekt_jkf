@@ -3,7 +3,16 @@ const prisma = require("./prisma");
 async function getAllProcesses(req, res) {
   try {
     const processes = await prisma.process.findMany({
-      include: {
+      select: {
+        id: true,
+        title: true,
+        caseNo: true,
+        status: true,
+        currentStep: true,
+        consent: true,
+        shippingDate: true,
+        createdAt: true,
+        updatedAt: true,
         sale: {
           include: {
             saleProducts: {
