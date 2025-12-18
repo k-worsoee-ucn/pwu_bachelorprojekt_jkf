@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const upload = require("../config/multer");
 const { verifyToken } = require("../middleware/auth");
-const { canAccessStep } = require("../middleware/stepAuth");
+const { canManageImages } = require("../middleware/stepAuth");
 const {
   uploadImages,
   getProcessImages,
@@ -15,6 +15,7 @@ router.post(
   "/processes/:processId/images",
   verifyToken,
   upload.array("images", 10),
+  canManageImages,
   uploadImages
 );
 
@@ -22,6 +23,6 @@ router.post(
 router.get("/processes/:processId/images", verifyToken, getProcessImages);
 
 // Delete an image
-router.delete("/images/:id", verifyToken, deleteImage);
+router.delete("/images/:id", verifyToken, canManageImages, deleteImage);
 
 module.exports = router;
