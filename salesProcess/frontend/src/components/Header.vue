@@ -14,6 +14,12 @@ defineProps({
     default: 0,
   },
 });
+
+const roleLabels = {
+  salesManager: "Sales Manager",
+  marketingManager: "Marketing Manager",
+  viewer: "Viewer",
+};
 </script>
 
 <template>
@@ -55,7 +61,7 @@ defineProps({
       <div class="user-actions">
         <div v-if="user" class="user-info">
           <span class="user-name">{{ user.name }}</span>
-          <span class="user-role">{{ user.role }}</span>
+          <span class="user-role">{{ roleLabels[user.role] }}</span>
         </div>
         <RouterLink to="/profile" class="edit-user-btn btn-no-fill">
           Edit user
