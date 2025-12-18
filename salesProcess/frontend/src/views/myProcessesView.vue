@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, watch, inject } from "vue";
 import { useRoute } from "vue-router";
 import ProcessCard from "@/components/ProcessCard.vue";
+import FilterModal from "@/components/FilterModal.vue";
 import { useAuth } from "@/composables/useAuth";
 
 const { getAuthHeader, user } = useAuth();
@@ -10,6 +11,7 @@ const searchQuery = ref("");
 const allProcesses = ref([]);
 const activeTab = ref("ongoing");
 const salesManagerCount = inject("salesManagerCount");
+const isFilterModalOpen = ref(false);
 
 // Watch route query for tab changes
 watch(
@@ -85,20 +87,38 @@ const displayedProcesses = computed(() => {
 const tabLabel = computed(() => {
   return activeTab.value === "ongoing" ? "Ongoing" : "Completed";
 });
+
+function handleApplyFilter(filters) {
+  console.log("Filters applied:", filters);
+  // Filter logic will be added here next
+}
 </script>
 
 <template>
   <div class="processes-container">
     <h1>My Processes</h1>
-    <div class="search-container">
-      <input
-        v-model="searchQuery"
-        type="text"
-        placeholder="Search by name, case number, or date..."
-        class="search-input"
-      />
-      <i class="fa-solid fa-magnifying-glass search-icon"></i>
+    <div class="search-filter-bar">
+      <div class="search-container">
+        <input
+          v-model="searchQuery"
+          type="text"
+          placeholder="Search by name, case number, or date..."
+          class="search-input"
+        />
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+      </div>
+      <button class="filter-btn" @click="isFilterModalOpen = true">
+        <i class="fa-solid fa-sliders"></i>
+        Filter
+      </button>
     </div>
+
+    <FilterModal
+      :isOpen="isFilterModalOpen"
+      :processes="allProcesses"
+      @close="isFilterModalOpen = false"
+      @apply-filter="handleApplyFilter"
+    />
 
     <!-- Tab Content -->
     <div class="section">
@@ -131,10 +151,16 @@ const tabLabel = computed(() => {
     color: #333;
   }
 
-  .search-container {
+  .search-filter-bar {
     margin-bottom: 2rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .search-container {
+    flex: 1;
     position: relative;
-    width: 100%;
     max-width: 500px;
 
     .search-input {
@@ -164,6 +190,31 @@ const tabLabel = computed(() => {
       transform: translateY(-50%);
       color: #999;
       pointer-events: none;
+      font-size: 1rem;
+    }
+  }
+
+  .filter-btn {
+    padding: 0.75rem 1.25rem;
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    color: #333;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    white-space: nowrap;
+
+    &:hover {
+      border-color: #204485;
+      background-color: #f8f9fa;
+    }
+
+    i {
       font-size: 1rem;
     }
   }

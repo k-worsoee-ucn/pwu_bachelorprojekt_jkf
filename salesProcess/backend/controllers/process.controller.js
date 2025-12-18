@@ -127,9 +127,72 @@ async function deleteProcess(req, res) {
   }
 }
 
+async function getFilterOptions(req, res) {
+  try {
+    // Get all sales managers
+    const salesManagers = await prisma.user.findMany({
+      where: { role: "salesManager" },
+      select: { id: true, name: true },
+      orderBy: { name: "asc" },
+    });
+
+    // Industry enum values
+    const industries = [
+      "Woodworking",
+      "Agro and Milling",
+      "Recycling",
+      "Metalworking",
+      "Paper",
+      "Other",
+    ];
+
+    // Get distinct countries from Sales
+    const countriesRaw = await prisma.sale.findMany({
+      select: { country: true },
+    });
+    const countries = [...new Set(countriesRaw.map((s) => s.country))].sort();
+
+    // Get distinct customers
+    const customersRaw = await prisma.customer.findMany({
+      select: { name: true },
+      orderBy: { name: "asc" },
+    });
+    const customers = customersRaw.map((c) => c.name);
+
+    // Get distinct product categories for filters (filtersAndSeparators)
+    const filterProductsRaw = await prisma.product.findMany({
+      where: { category: "filtersAndSeparators" },
+      select: { title: true },
+      orderBy: { title: "asc" },
+    });
+    const filterTypes = [...new Set(filterProductsRaw.map((p) => p.title))];
+
+    // Get distinct product categories for ventilation (fanSystems)
+    const fanProductsRaw = await prisma.product.findMany({
+      where: { category: "fanSystems" },
+      select: { title: true },
+      orderBy: { title: "asc" },
+    });
+    const fanTypes = [...new Set(fanProductsRaw.map((p) => p.title))];
+
+    res.json({
+      salesManagers,
+      industries,
+      countries,
+      customers,
+      filterTypes,
+      fanTypes,
+    });
+  } catch (error) {
+    console.error("Filter options error:", error);
+    res.status(500).json({ error: error.message });
+  }
+}
+
 module.exports = {
   getAllProcesses,
   getProcessById,
   updateProcess,
   deleteProcess,
+  getFilterOptions,
 };

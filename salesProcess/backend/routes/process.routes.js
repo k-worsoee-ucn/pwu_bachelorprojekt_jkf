@@ -5,6 +5,7 @@ const { verifyToken, requireRole } = require("../middleware/auth");
 const { canUpdateProcess } = require("../middleware/stepAuth");
 
 router.get("/", verifyToken, processController.getAllProcesses);
+router.get("/filter-options", verifyToken, processController.getFilterOptions);
 router.get("/:id", verifyToken, processController.getProcessById);
 
 router.put(
