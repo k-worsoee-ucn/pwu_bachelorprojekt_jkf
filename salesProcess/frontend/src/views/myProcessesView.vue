@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, watch, inject } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import ProcessCard from "@/components/ProcessCard.vue";
+import FilterModal from "@/components/FilterModal.vue";
 import { useAuth } from "@/composables/useAuth";
 
 const { getAuthHeader, user } = useAuth();
@@ -11,6 +12,22 @@ const searchQuery = ref("");
 const allProcesses = ref([]);
 const activeTab = ref("ongoing");
 const salesManagerCount = inject("salesManagerCount");
+const isFilterModalOpen = ref(false);
+const activeFilters = ref({
+  step: [],
+  salesManager: [],
+  year: [],
+  month: [],
+  industry: [],
+  country: [],
+  customer: [],
+  productGroup: [],
+  ventilation: [],
+  extractionVolumeFrom: "",
+  extractionVolumeTo: "",
+  volumeFlowFrom: "",
+  volumeFlowTo: "",
+});
 
 const fetchProcesses = async () => {
   try {
@@ -59,17 +76,150 @@ const userProcesses = computed(() => {
 });
 
 const filteredProcesses = computed(() => {
-  if (!searchQuery.value.trim()) {
-    return userProcesses.value;
+  let filtered = userProcesses.value;
+
+  // Apply search filter
+  if (searchQuery.value.trim()) {
+    const query = searchQuery.value.toLowerCase();
+    filtered = filtered.filter(
+      (process) =>
+        process.title.toLowerCase().includes(query) ||
+        process.caseNo.toString().includes(query) ||
+        process.status.toLowerCase().includes(query)
+    );
   }
 
-  const query = searchQuery.value.toLowerCase();
-  return userProcesses.value.filter(
-    (process) =>
-      process.title.toLowerCase().includes(query) ||
-      process.caseNo.toString().includes(query) ||
-      process.status.toLowerCase().includes(query)
-  );
+  // Apply step filter
+  if (activeFilters.value.step && activeFilters.value.step.length > 0) {
+    filtered = filtered.filter((process) =>
+      activeFilters.value.step.includes(String(process.currentStep))
+    );
+  }
+
+  // Apply sales manager filter (though this is my processes, so usually only one)
+  if (
+    activeFilters.value.salesManager &&
+    activeFilters.value.salesManager.length > 0
+  ) {
+    filtered = filtered.filter((process) =>
+      activeFilters.value.salesManager.includes(
+        String(process.sale?.salesManager?.id)
+      )
+    );
+  }
+
+  // Apply year filter
+  if (activeFilters.value.year && activeFilters.value.year.length > 0) {
+    filtered = filtered.filter((process) => {
+      const year = new Date(process.createdAt).getFullYear();
+      return activeFilters.value.year.includes(String(year));
+    });
+  }
+
+  // Apply month filter
+  if (activeFilters.value.month && activeFilters.value.month.length > 0) {
+    filtered = filtered.filter((process) => {
+      const month = String(new Date(process.createdAt).getMonth() + 1).padStart(
+        2,
+        "0"
+      );
+      return activeFilters.value.month.includes(month);
+    });
+  }
+
+  // Apply industry filter
+  if (activeFilters.value.industry && activeFilters.value.industry.length > 0) {
+    filtered = filtered.filter((process) =>
+      activeFilters.value.industry.includes(process.sale?.industry)
+    );
+  }
+
+  // Apply country filter
+  if (activeFilters.value.country && activeFilters.value.country.length > 0) {
+    filtered = filtered.filter((process) =>
+      activeFilters.value.country.includes(process.sale?.country)
+    );
+  }
+
+  // Apply customer filter
+  if (activeFilters.value.customer && activeFilters.value.customer.length > 0) {
+    filtered = filtered.filter((process) =>
+      activeFilters.value.customer.includes(process.sale?.customer?.name)
+    );
+  }
+
+  // Apply filter product type
+  if (
+    activeFilters.value.productGroup &&
+    activeFilters.value.productGroup.length > 0
+  ) {
+    filtered = filtered.filter((process) => {
+      return process.sale?.saleProducts?.some((sp) =>
+        activeFilters.value.productGroup.includes(sp.product?.title)
+      );
+    });
+  }
+
+  // Apply ventilation product type
+  if (
+    activeFilters.value.ventilation &&
+    activeFilters.value.ventilation.length > 0
+  ) {
+    filtered = filtered.filter((process) => {
+      return process.sale?.saleProducts?.some((sp) =>
+        activeFilters.value.ventilation.includes(sp.product?.title)
+      );
+    });
+  }
+
+  // Apply extraction volume range filter
+  if (
+    activeFilters.value.extractionVolumeFrom ||
+    activeFilters.value.extractionVolumeTo
+  ) {
+    filtered = filtered.filter((process) => {
+      const extractionVolume = process.sale?.totalExtractionVolume;
+      if (!extractionVolume) return false;
+
+      if (
+        activeFilters.value.extractionVolumeFrom &&
+        extractionVolume < parseInt(activeFilters.value.extractionVolumeFrom)
+      ) {
+        return false;
+      }
+      if (
+        activeFilters.value.extractionVolumeTo &&
+        extractionVolume > parseInt(activeFilters.value.extractionVolumeTo)
+      ) {
+        return false;
+      }
+      return true;
+    });
+  }
+
+  // Apply volume flow range filter
+  if (activeFilters.value.volumeFlowFrom || activeFilters.value.volumeFlowTo) {
+    filtered = filtered.filter((process) => {
+      const volumeFlow = process.sale?.volumeFlow;
+      if (!volumeFlow) return false;
+
+      if (
+        activeFilters.value.volumeFlowFrom &&
+        volumeFlow < parseInt(activeFilters.value.volumeFlowFrom)
+      ) {
+        return false;
+      }
+      if (
+        activeFilters.value.volumeFlowTo &&
+        volumeFlow > parseInt(activeFilters.value.volumeFlowTo)
+      ) {
+        return false;
+      }
+      return true;
+    });
+  }
+
+  return filtered;
 });
 
 const ongoingProcesses = computed(() => {
@@ -100,20 +250,37 @@ const displayedProcesses = computed(() => {
 const tabLabel = computed(() => {
   return activeTab.value === "ongoing" ? "Ongoing" : "Completed";
 });
+
+function handleApplyFilter(filters) {
+  activeFilters.value = { ...filters };
+}
 </script>
 
 <template>
   <div class="processes-container">
     <h1>My Processes</h1>
-    <div class="search-container">
-      <input
-        v-model="searchQuery"
-        type="text"
-        placeholder="Search by name, case number, or date..."
-        class="search-input"
-      />
-      <i class="fa-solid fa-magnifying-glass search-icon"></i>
+    <div class="search-filter-bar">
+      <div class="search-container">
+        <input
+          v-model="searchQuery"
+          type="text"
+          placeholder="Search by name, case number, or date..."
+          class="search-input"
+        />
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+      </div>
+      <button class="filter-btn" @click="isFilterModalOpen = true">
+        <i class="fa-solid fa-sliders"></i>
+        Filter
+      </button>
     </div>
+
+    <FilterModal
+      :isOpen="isFilterModalOpen"
+      :processes="allProcesses"
+      @close="isFilterModalOpen = false"
+      @apply-filter="handleApplyFilter"
+    />
 
     <!-- Tab Content -->
     <div class="section">
@@ -146,10 +313,16 @@ const tabLabel = computed(() => {
     color: #333;
   }
 
-  .search-container {
+  .search-filter-bar {
     margin-bottom: 2rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .search-container {
+    flex: 1;
     position: relative;
-    width: 100%;
     max-width: 500px;
 
     .search-input {
@@ -179,6 +352,31 @@ const tabLabel = computed(() => {
       transform: translateY(-50%);
       color: #999;
       pointer-events: none;
+      font-size: 1rem;
+    }
+  }
+
+  .filter-btn {
+    padding: 0.75rem 1.25rem;
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    color: #333;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    white-space: nowrap;
+
+    &:hover {
+      border-color: #204485;
+      background-color: #f8f9fa;
+    }
+
+    i {
       font-size: 1rem;
     }
   }
