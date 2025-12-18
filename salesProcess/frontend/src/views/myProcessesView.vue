@@ -1,15 +1,30 @@
 <script setup>
 import { ref, computed, onMounted, watch, inject } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import ProcessCard from "@/components/ProcessCard.vue";
 import { useAuth } from "@/composables/useAuth";
 
 const { getAuthHeader, user } = useAuth();
 const route = useRoute();
+const router = useRouter();
 const searchQuery = ref("");
 const allProcesses = ref([]);
 const activeTab = ref("ongoing");
 const salesManagerCount = inject("salesManagerCount");
+
+const fetchProcesses = async () => {
+  try {
+    const response = await fetch("/api/processes", {
+      headers: {
+        ...getAuthHeader(),
+      },
+    });
+    const data = await response.json();
+    allProcesses.value = data;
+  } catch (error) {
+    console.error("Error fetching processes:", error);
+  }
+};
 
 // Watch route query for tab changes
 watch(
@@ -22,19 +37,19 @@ watch(
   { immediate: true }
 );
 
-onMounted(async () => {
-  try {
-    const response = await fetch("/api/processes", {
-      headers: {
-        ...getAuthHeader(),
-      },
-    });
-    const data = await response.json();
-    allProcesses.value = data;
-  } catch (error) {
-    console.error("Error fetching processes:", error);
-  }
+onMounted(() => {
+  fetchProcesses();
 });
+
+// Refresh data when returning to the view
+watch(
+  () => route.path,
+  (newPath) => {
+    if (newPath === "/my-processes") {
+      fetchProcesses();
+    }
+  }
+);
 
 const userProcesses = computed(() => {
   if (!user.value?.id) return [];

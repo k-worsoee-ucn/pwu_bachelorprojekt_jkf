@@ -74,7 +74,12 @@ const roleLabels = {
     <nav v-else class="nav-bar login-nav">
       <div></div>
       <div class="user-actions">
-        <RouterLink to="/login" class="btn">Login</RouterLink>
+        <RouterLink 
+          :to="$route.query.signup === 'true' ? '/login' : '/login?signup=true'" 
+          class="btn"
+        >
+          {{ $route.query.signup === 'true' ? 'Login' : 'Sign Up' }}
+        </RouterLink>
       </div>
     </nav>
   </header>
