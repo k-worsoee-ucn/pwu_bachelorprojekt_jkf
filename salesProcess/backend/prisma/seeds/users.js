@@ -16,52 +16,32 @@ async function seedUsers() {
   
   const users = await Promise.all([
     prisma.user.upsert({
-      where: { email: 'john.smith@salesmanager.com' },
+      where: { email: 'sally@sales.com' },
       update: {},
       create: {
-        email: 'john.smith@salesmanager.com',
+        email: 'sally@sales.com',
         password: hashedPassword,
-        name: 'John Smith',
+        name: 'Sally Sales',
         role: 'salesManager'
       }
     }),
     prisma.user.upsert({
-      where: { email: 'sarah.johnson@salesmanager.com' },
+      where: { email: 'mark@marketing.com' },
       update: {},
       create: {
-        email: 'sarah.johnson@salesmanager.com',
+        email: 'mark@marketing.com',
         password: hashedPassword,
-        name: 'Sarah Johnson',
-        role: 'salesManager'
-      }
-    }),
-    prisma.user.upsert({
-      where: { email: 'mike.davis@salesmanager.com' },
-      update: {},
-      create: {
-        email: 'mike.davis@salesmanager.com',
-        password: hashedPassword,
-        name: 'Mike Davis',
-        role: 'salesManager'
-      }
-    }),
-    prisma.user.upsert({
-      where: { email: 'anna.wilson@marketing.com' },
-      update: {},
-      create: {
-        email: 'anna.wilson@marketing.com',
-        password: hashedPassword,
-        name: 'Anna Wilson',
+        name: 'Mark Marketing',
         role: 'marketingManager'
       }
     }),
     prisma.user.upsert({
-      where: { email: 'tom.brown@viewer.com' },
+      where: { email: 'viggo@viewer.com' },
       update: {},
       create: {
-        email: 'tom.brown@viewer.com',
+        email: 'viggo@viewer.com',
         password: hashedPassword,
-        name: 'Tom Brown',
+        name: 'Viggo Viewer',
         role: 'viewer'
       }
     })
