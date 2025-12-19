@@ -315,8 +315,13 @@ function handleApplyFilter(filters) {
           :id="process.id"
           :name="process.title"
           :caseNumber="process.caseNo"
-          :startDate="process.startDate"
-          :expectedEndDate="process.expectedEndDate"
+          :createdAt="
+            new Date(process.createdAt).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            })
+          "
           :step="process.currentStep"
           :totalSteps="getStepCount(process)"
           :status="process.status"

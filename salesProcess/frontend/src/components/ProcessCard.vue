@@ -22,6 +22,11 @@ const props = defineProps({
     required: false,
     default: "N/A",
   },
+  createdAt: {
+    type: String,
+    required: false,
+    default: "N/A",
+  },
   expectedEndDate: {
     type: String,
     required: false,
@@ -69,7 +74,7 @@ const handleClick = () => {
       </div>
       <div class="column column-date">
         <h4 class="label">Dato:</h4>
-        <p class="date">{{ startDate }} - {{ expectedEndDate }}</p>
+        <p class="date">{{ createdAt }}</p>
       </div>
       <div class="column column-icon">
         <i class="fa-solid fa-chevron-right"></i>

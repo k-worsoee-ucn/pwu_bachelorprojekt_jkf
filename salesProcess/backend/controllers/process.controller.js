@@ -32,6 +32,9 @@ async function getAllProcesses(req, res) {
           },
         },
       },
+      orderBy: {
+        createdAt: "desc",
+      },
     });
     res.json(processes);
   } catch (error) {
