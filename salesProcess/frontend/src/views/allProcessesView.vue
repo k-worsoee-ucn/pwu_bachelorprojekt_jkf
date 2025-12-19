@@ -74,12 +74,33 @@ const filteredProcesses = computed(() => {
   // Apply search filter
   if (searchQuery.value.trim()) {
     const query = searchQuery.value.toLowerCase();
-    filtered = filtered.filter(
-      (process) =>
+    filtered = filtered.filter((process) => {
+      const sale = process.sale;
+      return (
         process.title.toLowerCase().includes(query) ||
         process.caseNo.toString().includes(query) ||
-        process.status.toLowerCase().includes(query)
-    );
+        process.status.toLowerCase().includes(query) ||
+        sale?.description?.toLowerCase().includes(query) ||
+        sale?.endUser?.toLowerCase().includes(query) ||
+        sale?.country?.toLowerCase().includes(query) ||
+        sale?.industry?.toLowerCase().includes(query) ||
+        sale?.customIndustry?.toLowerCase().includes(query) ||
+        sale?.plantType?.toLowerCase().includes(query) ||
+        sale?.filterType?.toLowerCase().includes(query) ||
+        sale?.fanType?.toLowerCase().includes(query) ||
+        sale?.dustType?.toLowerCase().includes(query) ||
+        sale?.ductSystem?.toLowerCase().includes(query) ||
+        sale?.totalExtractionVolume?.toString().includes(query) ||
+        sale?.pressure?.toString().includes(query) ||
+        sale?.volumeFlow?.toString().includes(query) ||
+        sale?.phoneNumber?.includes(query) ||
+        sale?.customer?.name?.toLowerCase().includes(query) ||
+        sale?.salesManager?.name?.toLowerCase().includes(query) ||
+        sale?.saleProducts?.some((sp) =>
+          sp.product?.title?.toLowerCase().includes(query)
+        )
+      );
+    });
   }
 
   // Apply step filter
