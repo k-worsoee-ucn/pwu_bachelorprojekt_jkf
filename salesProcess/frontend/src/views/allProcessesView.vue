@@ -18,6 +18,7 @@ const activeFilters = ref({
   salesManager: [],
   year: [],
   month: [],
+  consent: [],
   industry: [],
   country: [],
   customer: [],
@@ -138,6 +139,14 @@ const filteredProcesses = computed(() => {
         "0"
       );
       return activeFilters.value.month.includes(month);
+    });
+  }
+
+  // Apply consent filter
+  if (activeFilters.value.consent && activeFilters.value.consent.length > 0) {
+    filtered = filtered.filter((process) => {
+      const consentValue = process.consent ? "true" : "false";
+      return activeFilters.value.consent.includes(consentValue);
     });
   }
 
