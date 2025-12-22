@@ -245,18 +245,29 @@ const filteredProcesses = computed(() => {
   return filtered;
 });
 
+const actionsRequiredProcesses = computed(() => {
+  // Steps that require marketingManager action: 3 (product images), 5 (case & references), 6 (case upload)
+  const marketingManagerSteps = [3, 5, 6];
+  return filteredProcesses.value.filter(
+    (process) =>
+      marketingManagerSteps.includes(parseInt(process.currentStep)) &&
+      process.status !== "completed" &&
+      process.status !== "done"
+  );
+});
+
 const ongoingProcesses = computed(() => {
   return filteredProcesses.value.filter(
     (process) => process.status !== "completed" && process.status !== "done"
   );
 });
 
-// Update the injected count for marketing managers whenever ongoing processes change
+// Update the injected count for marketing managers whenever actions required processes change
 watch(
-  ongoingProcesses,
-  (newOngoing) => {
+  actionsRequiredProcesses,
+  (newActionsRequired) => {
     if (isMarketingManager && marketingManagerCount) {
-      marketingManagerCount.value = newOngoing.length;
+      marketingManagerCount.value = newActionsRequired.length;
     }
   },
   { immediate: true }
@@ -313,6 +324,32 @@ function handleApplyFilter(filters) {
       @close="isFilterModalOpen = false"
       @apply-filter="handleApplyFilter"
     />
+
+    <!-- Actions Required Section -->
+    <div
+      v-if="isMarketingManager && actionsRequiredProcesses.length > 0 && activeTab === 'ongoing'"
+      class="section actions-required-section"
+    >
+      <h2>Actions Required</h2>
+      <div class="cards-grid">
+        <ProcessCard
+          v-for="process in actionsRequiredProcesses"
+          :key="process.id"
+          :id="process.id"
+          :name="process.title"
+          :caseNumber="process.caseNo"
+          :createdAt="
+            new Date(process.createdAt).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            })
+          "
+          :step="process.currentStep"
+          :status="process.status"
+        />
+      </div>
+    </div>
 
     <!-- Tab Content -->
     <div class="section">
@@ -429,6 +466,13 @@ function handleApplyFilter(filters) {
       font-size: 1.3rem;
       border-bottom: 2px solid #e0e0e0;
       padding-bottom: 0.75rem;
+    }
+
+    &.actions-required-section {
+      h2 {
+        color: #d32f2f;
+        border-bottom-color: #d32f2f;
+      }
     }
 
     .cards-grid {
