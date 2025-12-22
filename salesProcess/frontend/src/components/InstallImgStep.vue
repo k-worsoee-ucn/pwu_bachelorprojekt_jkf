@@ -49,8 +49,8 @@
       </div>
 
       <button
-        @click="uploadImages" || props.disabled
-        :disabled="!selectedFiles.length || uploading"
+        @click="uploadImages"
+        :disabled="!selectedFiles.length || uploading || props.disabled"
         class="upload-button"
       >
         <span v-if="uploading">Uploading...</span>
