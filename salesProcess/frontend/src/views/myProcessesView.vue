@@ -252,6 +252,16 @@ const filteredProcesses = computed(() => {
   return filtered;
 });
 
+const actionsRequiredProcesses = computed(() => {
+  // Steps that require salesManager action: 1 (sales creation) and 4 (installation images)
+  const salesManagerSteps = [1, 4];
+  return filteredProcesses.value.filter(
+    (process) =>
+      salesManagerSteps.includes(parseInt(process.currentStep)) &&
+      process.status !== "completed"
+  );
+});
+
 const ongoingProcesses = computed(() => {
   return filteredProcesses.value.filter((process) => process.currentStep < 6);
 });
@@ -260,12 +270,12 @@ const completedProcesses = computed(() => {
   return filteredProcesses.value.filter((process) => process.currentStep === 6);
 });
 
-// Update the injected count whenever ongoing processes change
+// Update the injected count whenever actions required processes change
 watch(
-  ongoingProcesses,
-  (newOngoing) => {
+  actionsRequiredProcesses,
+  (newActionsRequired) => {
     if (salesManagerCount) {
-      salesManagerCount.value = newOngoing.length;
+      salesManagerCount.value = newActionsRequired.length;
     }
   },
   { immediate: true }
@@ -312,8 +322,35 @@ function handleApplyFilter(filters) {
       @apply-filter="handleApplyFilter"
     />
 
+    <!-- Actions Required Section -->
+    <div
+      v-if="actionsRequiredProcesses.length > 0"
+      class="section actions-required-section"
+    >
+      <h2>Actions Required</h2>
+      <div class="cards-grid">
+        <ProcessCard
+          v-for="process in actionsRequiredProcesses"
+          :key="process.id"
+          :id="process.id"
+          :name="process.title"
+          :caseNumber="process.caseNo"
+          :createdAt="
+            new Date(process.createdAt).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            })
+          "
+          :step="process.currentStep"
+          :status="process.status"
+        />
+      </div>
+    </div>
+
     <!-- Tab Content -->
     <div class="section">
+      <h2>{{ tabLabel }}</h2>
       <div class="cards-grid">
         <ProcessCard
           v-for="process in displayedProcesses"
@@ -425,6 +462,13 @@ function handleApplyFilter(filters) {
       font-size: 1.3rem;
       border-bottom: 2px solid #e0e0e0;
       padding-bottom: 0.75rem;
+    }
+
+    &.actions-required-section {
+      h2 {
+        color: #d32f2f;
+        border-bottom-color: #d32f2f;
+      }
     }
 
     .cards-grid {

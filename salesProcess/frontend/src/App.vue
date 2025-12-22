@@ -5,7 +5,8 @@ import { useRoute } from "vue-router";
 import Header from "./components/Header.vue";
 import TabHeader from "./components/TabHeader.vue";
 
-const { initAuth, getAuthHeader, user, isSalesManager, isMarketingManager } = useAuth();
+const { initAuth, getAuthHeader, user, isSalesManager, isMarketingManager } =
+  useAuth();
 const route = useRoute();
 const salesManagerCount = ref(0);
 const marketingManagerCount = ref(0);
@@ -21,22 +22,31 @@ const updateBadgeCounts = async () => {
       },
     });
     const data = await response.json();
-    
-    // Calculate sales manager count (my processes)
+
+    // Calculate sales manager count (action-required processes)
     if (isSalesManager.value && user.value?.id) {
       const userProcesses = data.filter(
         (process) => process.sale?.salesManager?.id === user.value.id
       );
-      const ongoingCount = userProcesses.filter((process) => process.currentStep < 6).length;
-      salesManagerCount.value = ongoingCount;
-    }
-    
-    // Calculate marketing manager count (all processes)
-    if (isMarketingManager.value) {
-      const ongoingCount = data.filter(
-        (process) => process.status !== "completed" && process.status !== "done"
+      const salesManagerSteps = [1, 4]; // Steps requiring sales manager action
+      const actionsRequired = userProcesses.filter(
+        (process) =>
+          salesManagerSteps.includes(process.currentStep) &&
+          process.status !== "completed"
       ).length;
-      marketingManagerCount.value = ongoingCount;
+      salesManagerCount.value = actionsRequired;
+    }
+
+    // Calculate marketing manager count (action-required processes)
+    if (isMarketingManager.value) {
+      const marketingManagerSteps = [3, 5, 6]; // Steps requiring marketing manager action
+      const actionsRequired = data.filter(
+        (process) =>
+          marketingManagerSteps.includes(process.currentStep) &&
+          process.status !== "completed" &&
+          process.status !== "done"
+      ).length;
+      marketingManagerCount.value = actionsRequired;
     }
   } catch (error) {
     console.error("Error fetching processes for badge counts:", error);
@@ -52,7 +62,11 @@ onMounted(() => {
 watch(
   () => route.path,
   (newPath) => {
-    if (newPath.includes("/processes") || newPath === "/my-processes" || newPath === "/all-processes") {
+    if (
+      newPath.includes("/processes") ||
+      newPath === "/my-processes" ||
+      newPath === "/all-processes"
+    ) {
       updateBadgeCounts();
     }
   }
@@ -72,7 +86,9 @@ watch(
     :salesManagerCount="salesManagerCount"
     :marketingManagerCount="marketingManagerCount"
   />
-  <TabHeader v-if="$route.path === '/my-processes' || $route.path === '/all-processes'" />
+  <TabHeader
+    v-if="$route.path === '/my-processes' || $route.path === '/all-processes'"
+  />
 
   <RouterView />
 </template>
