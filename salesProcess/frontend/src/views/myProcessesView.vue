@@ -13,6 +13,7 @@ const allProcesses = ref([]);
 const activeTab = ref("ongoing");
 const salesManagerCount = inject("salesManagerCount");
 const isFilterModalOpen = ref(false);
+const displayCount = ref(6); // Number of processes to show initially
 const activeFilters = ref({
   step: [],
   salesManager: [],
@@ -287,6 +288,18 @@ const displayedProcesses = computed(() => {
     : completedProcesses.value;
 });
 
+const paginatedProcesses = computed(() => {
+  return displayedProcesses.value.slice(0, displayCount.value);
+});
+
+const hasMoreProcesses = computed(() => {
+  return displayedProcesses.value.length > displayCount.value;
+});
+
+const showMore = () => {
+  displayCount.value += 6;
+};
+
 const tabLabel = computed(() => {
   return activeTab.value === "ongoing" ? "Ongoing" : "Completed";
 });
@@ -353,7 +366,7 @@ function handleApplyFilter(filters) {
       <h2>{{ tabLabel }}</h2>
       <div class="cards-grid">
         <ProcessCard
-          v-for="process in displayedProcesses"
+          v-for="process in paginatedProcesses"
           :key="process.id"
           :id="process.id"
           :name="process.title"
@@ -372,6 +385,9 @@ function handleApplyFilter(filters) {
           <p>No {{ tabLabel.toLowerCase() }} processes found.</p>
         </div>
       </div>
+      <button v-if="hasMoreProcesses" @click="showMore" class="show-more-btn">
+        Show More
+      </button>
     </div>
   </div>
 </template>
@@ -473,7 +489,7 @@ function handleApplyFilter(filters) {
 
     .cards-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: 1fr;
       gap: 1.5rem;
 
       .no-results {
@@ -487,6 +503,23 @@ function handleApplyFilter(filters) {
           font-size: 1.1rem;
         }
       }
+    }
+  }
+
+  .show-more-btn {
+    margin-top: 2rem;
+    padding: 0.75rem 1.5rem;
+    background-color: #204485;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: #1a3767;
     }
   }
 }
