@@ -209,8 +209,11 @@ const startShippingDateTimer = () => {
     }
 
     // Production step is now complete, advance to next step
-    await advanceToNextStep();
-  }, 15000); // 15 seconds
+    // Only advance from step 2 to step 3, but step 3 requires manual advancement
+    if (process.value.currentStep === 2) {
+      await advanceToNextStep();
+    }
+  }, 5000); // 5 seconds
 };
 
 const advanceToNextStep = async () => {
@@ -473,11 +476,16 @@ const handleStepCompleted = async () => {
       <div class="progress-bar">
         <div
           class="progress-fill"
-          :style="{ width: (process.status === 'completed' ? '100%' : ((getCurrentStep() - 1) / visibleSteps.length) * 100 + '%') }"
+          :style="{
+            width:
+              process.status === 'completed'
+                ? '100%'
+                : ((getCurrentStep() - 1) / visibleSteps.length) * 100 + '%',
+          }"
         ></div>
         <div class="step-dots">
           <span
-            v-for="(stepObj, idx) in (visibleSteps.length - 1)"
+            v-for="(stepObj, idx) in visibleSteps.length - 1"
             :key="visibleSteps[idx + 1].id"
             class="dot"
             :class="{ active: idx < getCurrentStep() - 1 }"
@@ -639,51 +647,51 @@ const handleStepCompleted = async () => {
   }
 
   .progress-bar {
-        height: 8px;
-        background-color: #e0e0e0;
-        position: relative;
-        border-radius: 4px;
-        overflow: hidden;
+    height: 8px;
+    background-color: #e0e0e0;
+    position: relative;
+    border-radius: 4px;
+    overflow: hidden;
 
-        .progress-fill {
-            height: 100%;
-            background-color: #4caf50;
-            transition: width 0.3s ease;
-            border-radius: 4px;
-        }
-
-        .step-dots {
-            position: absolute;
-            top: 50%;
-            left: 0;
-            width: 100%;
-            height: 0;
-            pointer-events: auto;
-        }
-        .dot {
-            position: absolute;
-            transform: translate(-50%, -50%);
-            width: 8px;
-            height: 8px;
-            background-color: #ffffff;
-            border-radius: 50%;
-            z-index: 1;
-            transition: background 0.3s;
-            pointer-events: auto;
-
-            &:first-child {
-                transform: translate(0%, -50%);
-            }
-            &:last-child {
-                transform: translate(-100%, -50%);
-            }
-        }
-        .dot.active {
-            box-sizing: border-box;
-            background: #4caf50;
-            border: 2px solid #fff;
-        }
+    .progress-fill {
+      height: 100%;
+      background-color: #4caf50;
+      transition: width 0.3s ease;
+      border-radius: 4px;
     }
+
+    .step-dots {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      width: 100%;
+      height: 0;
+      pointer-events: auto;
+    }
+    .dot {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      width: 8px;
+      height: 8px;
+      background-color: #ffffff;
+      border-radius: 50%;
+      z-index: 1;
+      transition: background 0.3s;
+      pointer-events: auto;
+
+      &:first-child {
+        transform: translate(0%, -50%);
+      }
+      &:last-child {
+        transform: translate(-100%, -50%);
+      }
+    }
+    .dot.active {
+      box-sizing: border-box;
+      background: #4caf50;
+      border: 2px solid #fff;
+    }
+  }
 
   .steps-container {
     display: flex;
