@@ -324,7 +324,7 @@ function handleApplyFilter(filters) {
 
     <!-- Actions Required Section -->
     <div
-      v-if="actionsRequiredProcesses.length > 0"
+      v-if="actionsRequiredProcesses.length > 0 && activeTab === 'ongoing'"
       class="section actions-required-section"
     >
       <h2>Actions Required</h2>
