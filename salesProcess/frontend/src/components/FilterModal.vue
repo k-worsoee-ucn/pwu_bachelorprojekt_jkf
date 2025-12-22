@@ -31,6 +31,7 @@ const selectedStep = ref([]);
 const selectedSalesManager = ref([]);
 const selectedYear = ref([]);
 const selectedMonth = ref([]);
+const selectedConsent = ref([]);
 
 // Customer Attr. filters
 const selectedIndustry = ref([]);
@@ -118,6 +119,7 @@ function applyFilter() {
     salesManager: selectedSalesManager.value,
     year: selectedYear.value,
     month: selectedMonth.value,
+    consent: selectedConsent.value,
     industry: selectedIndustry.value,
     country: selectedCountry.value,
     customer: selectedCustomer.value,
@@ -137,6 +139,7 @@ function resetFilters() {
   selectedSalesManager.value = [];
   selectedYear.value = [];
   selectedMonth.value = [];
+  selectedConsent.value = [];
   selectedIndustry.value = [];
   selectedCountry.value = [];
   selectedCustomer.value = [];
@@ -228,6 +231,20 @@ function closeModal() {
               <option v-for="m in months" :key="m.value" :value="m.value">
                 {{ m.label }}
               </option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label for="consent">Consent</label>
+            <select
+              id="consent"
+              v-model="selectedConsent"
+              class="filter-select"
+              multiple
+            >
+              <option value="">All</option>
+              <option value="true">Has Consent</option>
+              <option value="false">No Consent</option>
             </select>
           </div>
         </div>
