@@ -1,5 +1,5 @@
 .btn {
-  padding: 10px 20px;
+  padding: 0.6rem 1.2rem;
   background-color: $primary-jkf-blue;
   color: white;
   border: none;
@@ -21,9 +21,7 @@
   border-radius: 4px;
   background-color: white;
   cursor: pointer;
-  font-size: 0.95rem;
   transition: all 0.3s ease;
-  font-weight: 500;
 
   &:hover {
     border-color: $primary-jkf-blue;
@@ -39,16 +37,15 @@
 }
 
 .logout-btn {
-  background-color: #dc3545;
+  background-color: $error-500-main;
   color: white;
   border: none;
-  padding: 0.5rem 1rem;
+  padding: 0.6rem 1.2rem;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 0.9rem;
   transition: background-color 0.3s;
 
   &:hover {
-    background-color: #c82333;
+    background-color: $error-600;
   }
 }

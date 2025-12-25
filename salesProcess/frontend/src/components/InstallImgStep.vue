@@ -19,7 +19,7 @@
           End user has given consent for case publication
         </label>
       </div>
-      <p v-if="!consentValue" class="warning-text">
+      <p v-if="!consentValue" class="warning-message">
         Step 6 will be skipped without consent
       </p>
     </div>
@@ -398,29 +398,26 @@ const formatDate = (dateString) => {
 
   h3 {
     margin-bottom: 10px;
-    color: #333;
   }
 
   p {
-    color: #666;
     margin-bottom: 20px;
   }
 
   h4 {
     margin-bottom: 15px;
-    color: #333;
   }
 
   .consent-section {
-    background-color: #f5f5f5;
+    background-color: $neutral-100-light;
     padding: 20px;
-    border-radius: 8px;
     margin-bottom: 25px;
-    border: 1px solid #ddd;
+    
+    @include default-border;
   }
 
   .phone-info {
-    background-color: #e3f2fd;
+    background-color: $neutral-200-light;
     padding: 15px;
     border-radius: 8px;
     margin-bottom: 15px;
@@ -429,7 +426,6 @@ const formatDate = (dateString) => {
     p {
       margin: 0;
       color: #1565c0;
-      font-size: 16px;
     }
   }
 
@@ -449,16 +445,8 @@ const formatDate = (dateString) => {
   .consent-label {
     font-size: 16px;
     font-weight: 500;
-    color: #333;
     cursor: pointer;
     user-select: none;
-  }
-
-  .warning-text {
-    color: #ff9800;
-    font-size: 14px;
-    margin: 10px 0 0 0;
-    font-weight: 500;
   }
 
   .upload-section {
@@ -483,25 +471,20 @@ const formatDate = (dateString) => {
     align-items: center;
     gap: 8px;
     padding: 10px 20px;
-    background-color: #f0f0f0;
+    background-color: $neutral-100-light;
     border: 2px dashed #ccc;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.3s ease;
 
     &:hover {
-      background-color: #e0e0e0;
+      background-color: $neutral-200-light;
       border-color: #999;
     }
   }
 
   .upload-icon {
     font-size: 20px;
-  }
-
-  .file-count {
-    color: #666;
-    font-size: 14px;
   }
 
   .upload-button {

@@ -7,7 +7,7 @@
       <button
         @click="generatePDF"
         :disabled="generatingPDF || props.disabled"
-        class="download-button"
+        class="btn"
       >
         <span v-if="generatingPDF">Generating PDF...</span>
         <span v-else>Download Sale Data (PDF)</span>
@@ -16,7 +16,7 @@
       <button
         @click="downloadImages"
         :disabled="generatingZip || props.disabled"
-        class="download-button"
+        class="btn"
       >
         <span v-if="generatingZip">Creating ZIP...</span>
         <span v-else>Download Images (ZIP)</span>
@@ -406,11 +406,9 @@ const downloadImages = async () => {
 
   h3 {
     margin-bottom: 10px;
-    color: #333;
   }
 
   p {
-    color: #666;
     margin-bottom: 20px;
   }
 
@@ -419,47 +417,6 @@ const downloadImages = async () => {
     display: flex;
     gap: 15px;
     flex-wrap: wrap;
-  }
-
-  .download-button {
-    padding: 12px 30px;
-    background-color: #204485;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-
-    &:hover:not(:disabled) {
-      background-color: #0b5ed7;
-    }
-
-    &:disabled {
-      background-color: #ccc;
-      cursor: not-allowed;
-    }
-  }
-
-  .error-message {
-    padding: 10px 15px;
-    background-color: #ffebee;
-    color: #c62828;
-    border-left: 4px solid #c62828;
-    border-radius: 4px;
-    margin: 15px 0;
-  }
-
-  .success-message {
-    padding: 10px 15px;
-    background-color: #e8f5e9;
-    color: #2e7d32;
-    border-left: 4px solid #2e7d32;
-    border-radius: 4px;
-    margin: 15px 0;
   }
 }
 </style>

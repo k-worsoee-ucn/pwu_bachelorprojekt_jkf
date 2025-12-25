@@ -30,14 +30,14 @@ const roleLabels = {
         <RouterLink
           v-if="isSalesManager"
           to="/processes/new"
-          class="nav-btn btn-no-fill"
+          class=" btn-no-fill"
         >
           Opret sag
         </RouterLink>
         <RouterLink
           v-if="isSalesManager"
           to="/my-processes"
-          class="nav-btn btn-no-fill nav-btn-badge"
+          class="btn-no-fill nav-btn-badge"
         >
           Mine sager
           <span class="badge" v-if="salesManagerCount > 0">{{
@@ -46,7 +46,7 @@ const roleLabels = {
         </RouterLink>
         <RouterLink
           to="/all-processes"
-          class="nav-btn btn-no-fill nav-btn-badge"
+          class="btn-no-fill nav-btn-badge"
         >
           Alle sager
           <span
@@ -120,10 +120,7 @@ header {
         height: 24px;
         padding: 0.2rem;
         background-color: $warning-500-main;
-        color: black;
         border-radius: 50%;
-        font-size: 0.8rem;
-        font-weight: 600;
         border: 3px solid white;
       }
     }
@@ -141,34 +138,12 @@ header {
       align-items: flex-end;
       gap: 0.2rem;
       padding-right: 1rem;
-      border-right: 1px solid #ddd;
-    }
-
-    .user-name {
-      font-weight: 600;
-      font-size: 0.95rem;
+      border-right: 1px solid $neutral-500-light;
     }
 
     .user-role {
-      font-size: 0.8rem;
-      color: #666;
-      text-transform: capitalize;
-    }
-
-    .logout-btn {
-      padding: 0.6rem 1.2rem;
-      background-color: #dc3545;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.95rem;
-      transition: background-color 0.3s ease;
-      font-weight: 500;
-
-      &:hover {
-        background-color: #c82333;
-      }
+      color: $neutral-500;
+      font-weight: 400;
     }
   }
 }
