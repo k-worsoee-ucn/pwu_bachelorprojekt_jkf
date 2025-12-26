@@ -11,6 +11,11 @@
 .btn:hover {
   background-color: #0B5ED7;
 }
+.btn:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
 
 .btn-no-fill {
   text-decoration: none;
@@ -84,45 +89,26 @@
 .form-container .form-group input {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #ddd;
+  border: 1px solid #C9D2E2;
   border-radius: 4px;
-  font-size: 1rem;
   box-sizing: border-box;
 }
 .form-container .form-group input:focus {
   outline: none;
   border-color: #204485;
-  box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 .form-container .form-group select {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #ddd;
+  border: 1px solid #C9D2E2;
   border-radius: 4px;
-  font-size: 1rem;
   box-sizing: border-box;
-  background-color: white;
 }
 .form-container .form-group select:focus {
   outline: none;
   border-color: #204485;
-  box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
-}
-.form-container .error-message {
-  background-color: #fee;
-  color: #c33;
-  padding: 0.75rem;
-  border-radius: 4px;
-  margin-bottom: 1rem;
-  border: 1px solid #fcc;
-}
-.form-container .success-message {
-  background-color: #efe;
-  color: #363;
-  padding: 0.75rem;
-  border-radius: 4px;
-  margin-bottom: 1rem;
-  border: 1px solid #cfc;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 h1,
@@ -206,7 +192,9 @@ span {
 
 p,
 button,
-label {
+label,
+input,
+select {
   font-family: "Titillium Web", sans-serif;
   font-weight: 400;
   font-size: 1rem;

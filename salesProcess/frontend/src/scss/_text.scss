@@ -27,6 +27,8 @@ span{
 
 p,
 button,
-label{
+label,
+input,
+select{
     @include body-regular;
 }

@@ -385,7 +385,7 @@ function handleApplyFilter(filters) {
           <p>No {{ tabLabel.toLowerCase() }} processes found.</p>
         </div>
       </div>
-      <button v-if="hasMoreProcesses" @click="showMore" class="show-more-btn">
+      <button v-if="hasMoreProcesses" @click="showMore" class="btn">
         Show More
       </button>
     </div>
@@ -398,7 +398,6 @@ function handleApplyFilter(filters) {
 
   h1 {
     margin-bottom: 2rem;
-    color: #333;
   }
 
   .search-filter-bar {
@@ -416,20 +415,17 @@ function handleApplyFilter(filters) {
     .search-input {
       width: 100%;
       padding: 0.75rem 2.5rem 0.75rem 1rem;
-      font-size: 1rem;
-      border: 1px solid #e0e0e0;
-      border-radius: 4px;
+      @include default-border;
       transition: border-color 0.3s ease;
       box-sizing: border-box;
 
       &:focus {
         outline: none;
-        border-color: #204485;
-        box-shadow: 0 0 0 3px rgba(32, 68, 133, 0.1);
+        box-shadow: $box-shadow;
       }
 
       &::placeholder {
-        color: #999;
+        color: $neutral-500;
       }
     }
 
@@ -447,21 +443,18 @@ function handleApplyFilter(filters) {
   .filter-btn {
     padding: 0.75rem 1.25rem;
     background-color: white;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
+    @include default-border;
     cursor: pointer;
     display: flex;
     align-items: center;
     gap: 0.5rem;
     font-size: 1rem;
-    color: #333;
     transition: all 0.2s ease;
-    font-weight: 500;
     white-space: nowrap;
 
     &:hover {
-      border-color: #204485;
-      background-color: #f8f9fa;
+      border-color: $primary-jkf-blue;
+      background-color: $neutral-100-light;
     }
 
     i {
@@ -474,16 +467,12 @@ function handleApplyFilter(filters) {
 
     h2 {
       margin-bottom: 1.5rem;
-      color: #333;
-      font-size: 1.3rem;
-      border-bottom: 2px solid #e0e0e0;
       padding-bottom: 0.75rem;
     }
 
     &.actions-required-section {
       h2 {
-        color: #d32f2f;
-        border-bottom-color: #d32f2f;
+        color: $error-500-main;
       }
     }
 
@@ -496,30 +485,12 @@ function handleApplyFilter(filters) {
         grid-column: 1 / -1;
         text-align: center;
         padding: 2rem;
-        color: #666;
+        color: $neutral-500;
 
         p {
           margin: 0;
-          font-size: 1.1rem;
         }
       }
-    }
-  }
-
-  .show-more-btn {
-    margin-top: 2rem;
-    padding: 0.75rem 1.5rem;
-    background-color: #204485;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: 500;
-    transition: background-color 0.2s ease;
-
-    &:hover {
-      background-color: #1a3767;
     }
   }
 }

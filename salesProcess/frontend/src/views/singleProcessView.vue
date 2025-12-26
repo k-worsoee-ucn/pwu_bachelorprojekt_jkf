@@ -450,9 +450,6 @@ const handleStepCompleted = async () => {
             :sale="null"
             :process="null"
           />
-          <div v-else class="placeholder">
-            {{ step.component }} - Content coming soon
-          </div>
         </div>
       </div>
     </div>
@@ -587,14 +584,11 @@ const handleStepCompleted = async () => {
             :process="process"
             :disabled="isViewer"
           />
-          <div v-else class="placeholder">
-            {{ step.component }} - Content coming soon
-          </div>
           <button
             v-if="step.component !== 'SalesStep'"
             @click="handleStepCompleted"
             :disabled="isViewer"
-            class="complete-step-button"
+            class="btn"
           >
             Complete Step
           </button>
@@ -632,15 +626,13 @@ const handleStepCompleted = async () => {
 
         .manager-name {
           margin: 0;
-          font-size: 1rem;
           font-weight: 600;
-          color: #333;
         }
 
         .manager-role {
           margin: 0;
-          font-size: 0.875rem;
-          color: #666;
+          color: $neutral-500;
+          font-weight: 400;
         }
       }
     }
@@ -648,14 +640,14 @@ const handleStepCompleted = async () => {
 
   .progress-bar {
     height: 8px;
-    background-color: #e0e0e0;
+    background-color: $neutral-500-light;
     position: relative;
     border-radius: 4px;
     overflow: hidden;
 
     .progress-fill {
       height: 100%;
-      background-color: #4caf50;
+      background-color: $success-400;
       transition: width 0.3s ease;
       border-radius: 4px;
     }
@@ -688,7 +680,7 @@ const handleStepCompleted = async () => {
     }
     .dot.active {
       box-sizing: border-box;
-      background: #4caf50;
+      background: $success-400;
       border: 2px solid #fff;
     }
   }
@@ -705,7 +697,7 @@ const handleStepCompleted = async () => {
 
       &.state-completed {
         .accordion-header {
-          background-color: #204485;
+          background-color: $primary-jkf-blue;
           color: white;
 
           .step-icon {
@@ -717,7 +709,7 @@ const handleStepCompleted = async () => {
           }
 
           .step-status {
-            color: rgba(255, 255, 255, 0.9);
+            color: white;
           }
 
           .chevron-icon {
@@ -725,41 +717,24 @@ const handleStepCompleted = async () => {
           }
 
           &:hover {
-            background-color: #1a3767;
+            background-color: $jkf-hover-blue;
           }
         }
       }
 
       &.state-active {
         .accordion-header {
-          background-color: #89cff0;
-          color: #333;
-
-          .step-icon {
-            color: #333;
-          }
-
-          .step-text h3 {
-            color: #333;
-          }
-
-          .step-status {
-            color: #555;
-          }
-
-          .chevron-icon {
-            color: #333;
-          }
+          background-color: $secondary-jkf-blue;
 
           &:hover {
-            background-color: #6fb8d9;
+            background-color: $secondary-hover-blue;
           }
         }
       }
 
       &.state-locked {
         .accordion-header {
-          background-color: #808080;
+          background-color: $neutral-500;
           color: white;
           cursor: not-allowed;
 
@@ -772,7 +747,7 @@ const handleStepCompleted = async () => {
           }
 
           &:hover {
-            background-color: #808080;
+            background-color: $neutral-700;
           }
         }
       }
@@ -809,14 +784,10 @@ const handleStepCompleted = async () => {
 
             h3 {
               margin: 0 0 0.25rem 0;
-              font-size: 1.125rem;
-              font-weight: 600;
             }
 
             .step-status {
               margin: 0;
-              font-size: 0.875rem;
-              opacity: 0.9;
             }
           }
         }
@@ -847,15 +818,7 @@ const handleStepCompleted = async () => {
       .accordion-content {
         padding: 1.5rem;
         background-color: white;
-        border-top: 1px solid #e0e0e0;
         animation: slideDown 0.3s ease;
-
-        .placeholder {
-          padding: 2rem;
-          text-align: center;
-          color: #6b7280;
-          font-style: italic;
-        }
       }
     }
   }
@@ -869,28 +832,6 @@ const handleStepCompleted = async () => {
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-.complete-step-button {
-  margin-top: 1rem;
-  padding: 0.5rem 1rem;
-  background: #204485;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  font-weight: 500;
-
-  &:hover:not(:disabled) {
-    background-color: #1a3767;
-  }
-
-  &:disabled {
-    background-color: #9ca3af;
-    cursor: not-allowed;
-    opacity: 0.6;
   }
 }
 

@@ -11,6 +11,12 @@
   &:hover {
     background-color: $jkf-hover-blue;
   }
+  
+  &:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
 }
 
 .btn-no-fill {

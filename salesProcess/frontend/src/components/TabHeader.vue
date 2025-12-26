@@ -65,10 +65,7 @@ const switchTab = (tab) => {
     padding: 0.6rem 1.2rem;
     border: none;
     background-color: transparent;
-    color: #666;
     cursor: pointer;
-    font-size: 0.95rem;
-    font-weight: 500;
     border-bottom: 1px solid $primary-jkf-blue;
     position: relative;
     width: 100%;
