@@ -105,18 +105,18 @@ const handleClick = () => {
 </template>
 <style scoped lang="scss">
 .process-card {
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  background-color: #f9f9f9;
+  @include default-border;
+  background-color: $neutral-100-light;
   overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  transition: box-shadow 0.3s ease;
+  box-shadow: $box-shadow;
+  transition: all 0.3s ease;
   cursor: pointer;
   display: flex;
   flex-direction: column;
 
   &:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: $box-shadow-hover;
+    background-color: $neutral-200-light;
   }
 
   .card-content {
@@ -135,13 +135,6 @@ const handleClick = () => {
       &.column-name {
         justify-content: left;
 
-        h3 {
-          margin: 0 0 0.5rem 0;
-          font-size: 1rem;
-          color: #333;
-          font-weight: 600;
-        }
-
         .case-number {
           margin: 0;
           font-size: 0.8rem;
@@ -156,13 +149,6 @@ const handleClick = () => {
           margin: 0 0 0.25rem 0;
           font-weight: normal;
           text-align: left;
-        }
-
-        .date {
-          margin: 0;
-          font-size: 0.9rem;
-          color: #333;
-          font-weight: 500;
         }
       }
 
@@ -180,14 +166,14 @@ const handleClick = () => {
 
   .progress-bar {
     height: 8px;
-    background-color: #e0e0e0;
+    background-color: $neutral-500-light;
     position: relative;
     border-radius: 4px;
     overflow: hidden;
 
     .progress-fill {
       height: 100%;
-      background-color: #4caf50;
+      background-color: $success-400;
       transition: width 0.3s ease;
       border-radius: 4px;
     }
@@ -220,7 +206,7 @@ const handleClick = () => {
     }
     .dot.active {
       box-sizing: border-box;
-      background: #4caf50;
+      background: $success-400;
       border: 2px solid #fff;
     }
   }

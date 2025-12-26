@@ -1,0 +1,26 @@
+  .error-message {
+    padding: 10px 15px;
+    background-color: $error-50;
+    color: $error-500-main;
+    border-left: 4px solid $error-500-main;
+    border-radius: 4px;
+    margin: 15px 0;
+  }
+
+  .success-message {
+    padding: 10px 15px;
+    background-color: $success-50;
+    color: $success-500-main;
+    border-left: 4px solid $success-500-main;
+    border-radius: 4px;
+    margin: 15px 0;
+  }
+
+  .warning-message{
+    padding: 10px 15px;
+    background-color: $warning-50;
+    // color: $warning-500-main;
+    border-left: 4px solid $warning-500-main;
+    border-radius: 4px;
+    margin: 15px 0;
+  }

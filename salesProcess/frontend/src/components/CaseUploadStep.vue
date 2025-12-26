@@ -21,7 +21,7 @@
       </div>
 
       <div class="action-buttons">
-        <button @click="saveCase" class="save-button" :disabled="saving || props.disabled">
+        <button @click="saveCase" class="btn" :disabled="saving || props.disabled">
           <i
             class="fa-solid"
             :class="saving ? 'fa-spinner fa-spin' : 'fa-save'"
@@ -30,7 +30,7 @@
         </button>
       </div>
 
-      <div v-if="saveMessage" :class="['save-message', saveMessage.type]">
+      <div v-if="saveMessage" :class="['save-message', saveMessage.type + '-message']">
         <i
           class="fa-solid"
           :class="
@@ -193,12 +193,6 @@ onMounted(() => {
 
   h2 {
     margin-bottom: 0.5rem;
-    color: #204485;
-  }
-
-  .description {
-    color: #666;
-    margin-bottom: 1.5rem;
   }
 
   .loading {
@@ -208,16 +202,9 @@ onMounted(() => {
     font-size: 1.1rem;
   }
 
-  .editor-container {
-    background: white;
-    border-radius: 8px;
-    padding: 1rem;
-  }
-
   .editor-wrapper {
     margin-bottom: 1.5rem;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    @include default-border;
 
     :deep(.ql-container) {
       min-height: 400px;
@@ -247,29 +234,6 @@ onMounted(() => {
     justify-content: flex-end;
   }
 
-  .save-button {
-    padding: 0.75rem 1.5rem;
-    background: #204485;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: background 0.2s;
-
-    &:hover:not(:disabled) {
-      background: #163361;
-    }
-
-    &:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-  }
-
   .save-message {
     margin-top: 1rem;
     padding: 0.75rem 1rem;
@@ -278,18 +242,6 @@ onMounted(() => {
     align-items: center;
     gap: 0.5rem;
     font-size: 0.95rem;
-
-    &.success {
-      background: #d4edda;
-      color: #155724;
-      border: 1px solid #c3e6cb;
-    }
-
-    &.error {
-      background: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
-    }
   }
 }
 </style>
