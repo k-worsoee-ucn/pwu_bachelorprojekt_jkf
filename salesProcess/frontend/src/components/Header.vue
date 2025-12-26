@@ -66,7 +66,7 @@ const roleLabels = {
         <RouterLink to="/profile" class="edit-user-btn btn-no-fill">
           Edit user
         </RouterLink>
-        <button @click="logout" class="logout-btn">Logout</button>
+        <button @click="logout" class="error-btn">Logout</button>
       </div>
     </nav>
 

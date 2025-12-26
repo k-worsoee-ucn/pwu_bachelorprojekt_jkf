@@ -51,10 +51,9 @@
       <button
         @click="uploadImages"
         :disabled="!selectedFiles.length || uploading || props.disabled"
-        class="upload-button"
+        class="success-btn"
       >
-        <span v-if="uploading">Uploading...</span>
-        <span v-else>Upload Images</span>
+      Upload Images
       </button>
     </div>
 
@@ -108,7 +107,7 @@
           <div class="gallery-info">
             <p class="gallery-filename">{{ image.filename }}</p>
             <p class="gallery-date">{{ formatDate(image.createdAt) }}</p>
-            <button @click="deleteImage(image.id)" class="delete-button">
+            <button @click="deleteImage(image.id)" class="error-btn">
               Delete
             </button>
           </div>
@@ -443,8 +442,6 @@ const formatDate = (dateString) => {
   }
 
   .consent-label {
-    font-size: 16px;
-    font-weight: 500;
     cursor: pointer;
     user-select: none;
   }
@@ -472,39 +469,19 @@ const formatDate = (dateString) => {
     gap: 8px;
     padding: 10px 20px;
     background-color: $neutral-100-light;
-    border: 2px dashed #ccc;
-    border-radius: 8px;
+    
+    @include default-border;
+
     cursor: pointer;
     transition: all 0.3s ease;
 
     &:hover {
       background-color: $neutral-200-light;
-      border-color: #999;
     }
   }
 
   .upload-icon {
     font-size: 20px;
-  }
-
-  .upload-button {
-    padding: 10px 30px;
-    background-color: #4caf50;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
-
-    &:hover:not(:disabled) {
-      background-color: #45a049;
-    }
-
-    &:disabled {
-      background-color: #ccc;
-      cursor: not-allowed;
-    }
   }
 
   .preview-section,
@@ -522,10 +499,9 @@ const formatDate = (dateString) => {
   .preview-item,
   .gallery-item {
     position: relative;
-    border: 1px solid #ddd;
-    border-radius: 8px;
+    @include default-border;
     overflow: hidden;
-    background-color: #f9f9f9;
+    background-color: $neutral-100-light;
 
     img {
       width: 100%;
@@ -536,8 +512,6 @@ const formatDate = (dateString) => {
 
   .file-name {
     padding: 10px;
-    font-size: 12px;
-    color: #666;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
@@ -549,7 +523,7 @@ const formatDate = (dateString) => {
     right: 5px;
     width: 30px;
     height: 30px;
-    background-color: rgba(255, 0, 0, 0.7);
+    background-color: $error-500-main;
     color: white;
     border: none;
     border-radius: 50%;
@@ -561,7 +535,7 @@ const formatDate = (dateString) => {
     transition: background-color 0.3s ease;
 
     &:hover {
-      background-color: rgba(255, 0, 0, 0.9);
+      background-color: $error-600;
     }
   }
 
@@ -570,8 +544,7 @@ const formatDate = (dateString) => {
   }
 
   .gallery-filename {
-    font-size: 14px;
-    color: #333;
+    font-weight: 600;
     margin-bottom: 5px;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -579,24 +552,7 @@ const formatDate = (dateString) => {
   }
 
   .gallery-date {
-    font-size: 12px;
-    color: #999;
     margin-bottom: 10px;
-  }
-
-  .delete-button {
-    padding: 5px 15px;
-    background-color: #f44336;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s ease;
-
-    &:hover {
-      background-color: #da190b;
-    }
   }
 
   .progress-section {
@@ -606,7 +562,7 @@ const formatDate = (dateString) => {
   .progress-bar {
     width: 100%;
     height: 20px;
-    background-color: #f0f0f0;
+    background-color: $neutral-200-light;
     border-radius: 10px;
     overflow: hidden;
     margin-bottom: 10px;
@@ -614,26 +570,8 @@ const formatDate = (dateString) => {
 
   .progress-fill {
     height: 100%;
-    background-color: #4caf50;
+    background-color: $success-500-main;
     transition: width 0.3s ease;
-  }
-
-  .error-message {
-    padding: 10px 15px;
-    background-color: #ffebee;
-    color: #c62828;
-    border-left: 4px solid #c62828;
-    border-radius: 4px;
-    margin: 15px 0;
-  }
-
-  .success-message {
-    padding: 10px 15px;
-    background-color: #e8f5e9;
-    color: #2e7d32;
-    border-left: 4px solid #2e7d32;
-    border-radius: 4px;
-    margin: 15px 0;
   }
 }
 </style>

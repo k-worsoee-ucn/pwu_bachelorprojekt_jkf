@@ -36,7 +36,7 @@
   }
 }
 
-.logout-btn {
+.error-btn {
   background-color: $error-500-main;
   color: white;
   border: none;
@@ -47,5 +47,19 @@
 
   &:hover {
     background-color: $error-600;
+  }
+}
+
+.success-btn{
+  background-color: $success-500-main;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: $success-600;
   }
 }

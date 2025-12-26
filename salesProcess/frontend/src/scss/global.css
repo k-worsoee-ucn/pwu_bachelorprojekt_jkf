@@ -33,7 +33,7 @@
   border-color: #204485;
 }
 
-.logout-btn {
+.error-btn {
   background-color: #DC3545;
   color: white;
   border: none;
@@ -42,22 +42,34 @@
   cursor: pointer;
   transition: background-color 0.3s;
 }
-.logout-btn:hover {
+.error-btn:hover {
   background-color: #B02A37;
+}
+
+.success-btn {
+  background-color: #198754;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.success-btn:hover {
+  background-color: #146C43;
 }
 
 .form-container {
   max-width: 30%;
   margin: 2rem auto;
   padding: 2rem;
-  border: 1px solid #ddd;
+  border: 1px solid #C9D2E2;
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 .form-container h1 {
   text-align: center;
   margin-bottom: 1.5rem;
-  color: #333;
 }
 .form-container .btn {
   width: 100%;
@@ -68,8 +80,6 @@
 .form-container .form-group label {
   display: block;
   margin-bottom: 0.5rem;
-  font-weight: 500;
-  color: #555;
 }
 .form-container .form-group input {
   width: 100%;
