@@ -32,14 +32,14 @@ const roleLabels = {
           to="/processes/new"
           class=" btn-no-fill"
         >
-          Opret sag
+          Create new process
         </RouterLink>
         <RouterLink
           v-if="isSalesManager"
           to="/my-processes"
           class="btn-no-fill nav-btn-badge"
         >
-          Mine sager
+          My processes
           <span class="badge" v-if="salesManagerCount > 0">{{
             salesManagerCount
           }}</span>
@@ -48,7 +48,7 @@ const roleLabels = {
           to="/all-processes"
           class="btn-no-fill nav-btn-badge"
         >
-          Alle sager
+          All processes
           <span
             class="badge"
             v-if="isMarketingManager && marketingManagerCount > 0"

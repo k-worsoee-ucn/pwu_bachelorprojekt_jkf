@@ -386,8 +386,9 @@ function handleApplyFilter(filters) {
         </div>
       </div>
       <div class="show-more-container">
-        <button v-if="hasMoreProcesses" @click="showMore" class="btn">
+        <button v-if="hasMoreProcesses" @click="showMore" class="show-more-btn">
           Show More
+          <i class="fa-solid fa-chevron-down"></i>
         </button>
       </div>
     </div>

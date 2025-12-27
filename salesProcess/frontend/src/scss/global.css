@@ -64,6 +64,25 @@
   background-color: #146C43;
 }
 
+.show-more-btn {
+  background-color: transparent;
+  border: none;
+  display: inline-block;
+  padding-inline: 4rem;
+  min-height: 4rem;
+  font-weight: 600;
+  line-height: 2rem;
+  cursor: pointer;
+  transition: all 0.1s ease-in-out;
+  vertical-align: middle;
+}
+.show-more-btn:hover {
+  font-size: 1.05rem;
+}
+.show-more-btn .fa-chevron-down {
+  margin-left: 1rem;
+}
+
 .form-container {
   max-width: 30%;
   margin: 2rem auto;
