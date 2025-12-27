@@ -370,8 +370,8 @@ function handleApplyFilter(filters) {
 
     <!-- Tab Content -->
     <div class="section">
-      <h2>{{ tabLabel }}</h2>
       <div class="cards-grid">
+        <h2>{{ tabLabel }}</h2>
         <ProcessCard
           v-for="process in paginatedProcesses"
           :key="process.id"

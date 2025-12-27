@@ -119,6 +119,7 @@ p,
 span,
 label {
   color: #242B37;
+  margin: 0;
 }
 
 h1 {
@@ -231,13 +232,10 @@ select {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 4rem;
   padding: 2rem;
 }
-.processes-container h1 {
-  margin-bottom: 2rem;
-}
 .processes-container .search-filter-bar {
-  margin-bottom: 2rem;
   display: flex;
   gap: 1rem;
   align-items: center;
@@ -295,22 +293,18 @@ select {
 .processes-container .section {
   width: 80%;
   margin-inline: auto;
-  margin-bottom: 3rem;
-}
-.processes-container .section h2 {
-  margin-bottom: 1.5rem;
-  padding-bottom: 0.75rem;
 }
 .processes-container .section.actions-required-section .required-cards-grid {
   border-left: 4px solid #FFC107;
   border-radius: 4px;
-  padding: 1.5rem;
+  padding-inline: 2rem;
+  padding-block: 4rem;
   background-color: #EFF1F6;
 }
 .processes-container .section .cards-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.5rem;
+  gap: 2rem;
 }
 .processes-container .section .cards-grid .no-results {
   grid-column: 1/-1;
@@ -324,5 +318,5 @@ select {
 .processes-container .section .show-more-container {
   display: flex;
   justify-content: center;
-  margin-block: 1.5rem;
+  margin-block: 2rem;
 }/*# sourceMappingURL=global.css.map */
