@@ -225,4 +225,104 @@ select {
   border-left: 4px solid #FFC107;
   border-radius: 4px;
   margin: 15px 0;
+}
+
+.processes-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+}
+.processes-container h1 {
+  margin-bottom: 2rem;
+}
+.processes-container .search-filter-bar {
+  margin-bottom: 2rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  min-width: 80%;
+}
+.processes-container .search-container {
+  flex: 1;
+  position: relative;
+  width: 100%;
+}
+.processes-container .search-container .search-input {
+  width: 100%;
+  padding: 0.75rem 2.5rem 0.75rem 1rem;
+  border: 1px solid #C9D2E2;
+  border-radius: 4px;
+  transition: border-color 0.3s ease;
+  box-sizing: border-box;
+}
+.processes-container .search-container .search-input:focus {
+  outline: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+.processes-container .search-container .search-input::placeholder {
+  color: #49566D;
+}
+.processes-container .search-container .search-icon {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #49566D;
+  pointer-events: none;
+  font-size: 1rem;
+}
+.processes-container .filter-btn {
+  padding: 0.75rem 1.25rem;
+  background-color: white;
+  border: 1px solid #C9D2E2;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.processes-container .filter-btn:hover {
+  border-color: #204485;
+  background-color: #F7F8FB;
+}
+.processes-container .filter-btn i {
+  font-size: 1rem;
+}
+.processes-container .section {
+  width: 80%;
+  margin-inline: auto;
+  margin-bottom: 3rem;
+}
+.processes-container .section h2 {
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+}
+.processes-container .section.actions-required-section .required-cards-grid {
+  border-left: 4px solid #FFC107;
+  border-radius: 4px;
+  padding: 1.5rem;
+  background-color: #EFF1F6;
+}
+.processes-container .section .cards-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+.processes-container .section .cards-grid .no-results {
+  grid-column: 1/-1;
+  text-align: center;
+  padding: 2rem;
+  color: #49566D;
+}
+.processes-container .section .cards-grid .no-results p {
+  margin: 0;
+}
+.processes-container .section .show-more-container {
+  display: flex;
+  justify-content: center;
+  margin-block: 1.5rem;
 }/*# sourceMappingURL=global.css.map */

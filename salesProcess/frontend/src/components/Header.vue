@@ -136,7 +136,6 @@ header {
       display: flex;
       flex-direction: column;
       align-items: flex-end;
-      gap: 0.2rem;
       padding-right: 1rem;
       border-right: 1px solid $neutral-500-light;
     }

@@ -340,8 +340,8 @@ function handleApplyFilter(filters) {
       v-if="actionsRequiredProcesses.length > 0 && activeTab === 'ongoing'"
       class="section actions-required-section"
     >
-      <h2>Actions Required</h2>
-      <div class="cards-grid">
+    <div class="cards-grid required-cards-grid">
+        <h2>Actions Required</h2>
         <ProcessCard
           v-for="process in actionsRequiredProcesses"
           :key="process.id"
@@ -385,113 +385,15 @@ function handleApplyFilter(filters) {
           <p>No {{ tabLabel.toLowerCase() }} processes found.</p>
         </div>
       </div>
-      <button v-if="hasMoreProcesses" @click="showMore" class="btn">
-        Show More
-      </button>
+      <div class="show-more-container">
+        <button v-if="hasMoreProcesses" @click="showMore" class="btn">
+          Show More
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped lang="scss">
-.processes-container {
-  padding: 2rem;
 
-  h1 {
-    margin-bottom: 2rem;
-  }
-
-  .search-filter-bar {
-    margin-bottom: 2rem;
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-  }
-
-  .search-container {
-    flex: 1;
-    position: relative;
-    max-width: 500px;
-
-    .search-input {
-      width: 100%;
-      padding: 0.75rem 2.5rem 0.75rem 1rem;
-      @include default-border;
-      transition: border-color 0.3s ease;
-      box-sizing: border-box;
-
-      &:focus {
-        outline: none;
-        box-shadow: $box-shadow;
-      }
-
-      &::placeholder {
-        color: $neutral-500;
-      }
-    }
-
-    .search-icon {
-      position: absolute;
-      right: 1rem;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #999;
-      pointer-events: none;
-      font-size: 1rem;
-    }
-  }
-
-  .filter-btn {
-    padding: 0.75rem 1.25rem;
-    background-color: white;
-    @include default-border;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 1rem;
-    transition: all 0.2s ease;
-    white-space: nowrap;
-
-    &:hover {
-      border-color: $primary-jkf-blue;
-      background-color: $neutral-100-light;
-    }
-
-    i {
-      font-size: 1rem;
-    }
-  }
-
-  .section {
-    margin-bottom: 3rem;
-
-    h2 {
-      margin-bottom: 1.5rem;
-      padding-bottom: 0.75rem;
-    }
-
-    &.actions-required-section {
-      h2 {
-        color: $error-500-main;
-      }
-    }
-
-    .cards-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-
-      .no-results {
-        grid-column: 1 / -1;
-        text-align: center;
-        padding: 2rem;
-        color: $neutral-500;
-
-        p {
-          margin: 0;
-        }
-      }
-    }
-  }
-}
 </style>
