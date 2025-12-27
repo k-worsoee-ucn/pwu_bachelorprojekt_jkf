@@ -33,7 +33,7 @@
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .auth-container {
   display: flex;
   flex-direction: column;

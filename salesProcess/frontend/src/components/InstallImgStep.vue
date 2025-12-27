@@ -420,11 +420,11 @@ const formatDate = (dateString) => {
     padding: 15px;
     border-radius: 8px;
     margin-bottom: 15px;
-    border-left: 4px solid #2196f3;
+    border-left: 4px solid $jkf-hover-blue;
 
     p {
       margin: 0;
-      color: #1565c0;
+      color: $jkf-hover-blue;
     }
   }
 

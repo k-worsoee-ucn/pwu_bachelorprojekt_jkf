@@ -111,8 +111,6 @@ const handleClick = () => {
   box-shadow: $box-shadow;
   transition: all 0.3s ease;
   cursor: pointer;
-  display: flex;
-  flex-direction: column;
 
   &:hover {
     box-shadow: $box-shadow-hover;
@@ -120,20 +118,20 @@ const handleClick = () => {
   }
 
   .card-content {
-    padding: 1.5rem;
+    padding: 2rem;
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 2rem;
-    align-items: center;
     flex-grow: 1;
 
     .column {
-      display: grid;
-      grid-auto-flow: row;
-      justify-content: center;
+      display: flex;
+      flex-direction: row;
 
       &.column-name {
-        justify-content: left;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
 
         .case-number {
           margin: 0;
@@ -143,13 +141,10 @@ const handleClick = () => {
       }
 
       &.column-date {
-        text-align: right;
-
-        .label {
-          margin: 0 0 0.25rem 0;
-          font-weight: normal;
-          text-align: left;
-        }
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-inline: auto;
       }
 
       &.column-icon {

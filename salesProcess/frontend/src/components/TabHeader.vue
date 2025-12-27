@@ -54,7 +54,7 @@ const switchTab = (tab) => {
 @import '@/scss/variables';
 
 .tab-header {
-  padding: 0 2rem;
+  padding: 2rem 2rem;
 
   .tab-buttons {
     display: flex;
