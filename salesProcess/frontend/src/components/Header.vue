@@ -92,9 +92,14 @@ header {
   .nav-bar {
     padding: 2rem 2rem;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     gap: 2rem;
+
+  @media (max-width: 1024px) {
+    justify-content: center;
+  }
 
     &.login-nav {
       justify-content: flex-end;
@@ -129,7 +134,6 @@ header {
       display: flex;
       gap: 1rem;
       align-items: center;
-      margin-left: auto;
     }
 
     .user-info {

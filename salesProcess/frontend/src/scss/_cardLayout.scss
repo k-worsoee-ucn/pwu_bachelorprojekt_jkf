@@ -72,6 +72,11 @@
     width: 80%;
     margin-inline: auto;
 
+    @media(max-width: 1024px) {
+        width: 100% !important;
+        margin: 0;
+    }
+
     &.actions-required-section {
 
         .required-cards-grid{
