@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import { useAuth } from "@/composables/useAuth";
 
 const props = defineProps({
@@ -15,6 +15,14 @@ const props = defineProps({
 
 const emit = defineEmits(["close", "apply-filter"]);
 const { getAuthHeader } = useAuth();
+
+// Prevent page scroll when modal is open
+watch(
+  () => props.isOpen,
+  (isOpen) => {
+    document.body.style.overflow = isOpen ? "hidden" : "";
+  }
+);
 
 // Filter dropdown data from backend
 const filterOptionsData = ref({
@@ -32,6 +40,14 @@ const selectedSalesManager = ref([]);
 const selectedYear = ref([]);
 const selectedMonth = ref([]);
 const selectedConsent = ref([]);
+
+// Dropdown state: only one open at a time
+
+const openDropdownKey = ref(null); // null or string key of open dropdown
+
+function toggleDropdown(key) {
+  openDropdownKey.value = openDropdownKey.value === key ? null : key;
+}
 
 // Customer Attr. filters
 const selectedIndustry = ref([]);
@@ -170,228 +186,476 @@ function closeModal() {
         <!-- System Group -->
         <div class="filter-section">
           <h3>System</h3>
-          <div class="filter-group">
-            <label for="step">Step</label>
-            <select
-              id="step"
-              v-model="selectedStep"
-              class="filter-select"
-              multiple
-            >
-              <option value="">All Steps</option>
-              <option v-for="step in steps" :key="step" :value="String(step)">
-                Step {{ step }}
-              </option>
-            </select>
-          </div>
-
-          <div class="filter-group">
-            <label for="salesManager">Sales Mng.</label>
-            <select
-              id="salesManager"
-              v-model="selectedSalesManager"
-              class="filter-select"
-              multiple
-            >
-              <option value="">All</option>
-              <option
-                v-for="manager in salesManagers"
-                :key="manager.id"
-                :value="String(manager.id)"
-              >
-                {{ manager.name }}
-              </option>
-            </select>
-          </div>
-
-          <div class="filter-group">
-            <label for="year">Year</label>
-            <select
-              id="year"
-              v-model="selectedYear"
-              class="filter-select"
-              multiple
-            >
-              <option value="">All Years</option>
-              <option v-for="year in years" :key="year" :value="String(year)">
-                {{ year }}
-              </option>
-            </select>
-          </div>
-
-          <div class="filter-group">
-            <label for="month">Month</label>
-            <select
-              id="month"
-              v-model="selectedMonth"
-              class="filter-select"
-              multiple
-            >
-              <option value="">All Months</option>
-              <option v-for="m in months" :key="m.value" :value="m.value">
-                {{ m.label }}
-              </option>
-            </select>
-          </div>
-
-          <div class="filter-group">
-            <label for="consent">Consent</label>
-            <select
-              id="consent"
-              v-model="selectedConsent"
-              class="filter-select"
-              multiple
-            >
-              <option value="">All</option>
-              <option value="true">Has Consent</option>
-              <option value="false">No Consent</option>
-            </select>
+          <div class="filter-groups-wrapper">
+            <!-- Steps -->
+            <div class="filter-group">
+              <div class="dropdown-container">
+                <button
+                  class="dropdown-button btn-no-fill"
+                  @click="toggleDropdown('step')"
+                >
+                  Step
+                  <i
+                    :class="[
+                      'fa-solid',
+                      openDropdownKey === 'step'
+                        ? 'fa-chevron-up'
+                        : 'fa-chevron-down',
+                    ]"
+                  ></i>
+                </button>
+                <div v-if="openDropdownKey === 'step'" class="dropdown-menu">
+                  <div class="checkbox-group">
+                    <label
+                      v-for="step in steps"
+                      :key="step"
+                      class="checkbox-option"
+                    >
+                      <input
+                        type="checkbox"
+                        :value="String(step)"
+                        v-model="selectedStep"
+                      />
+                      Step {{ step }}
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Sales managers -->
+            <div class="filter-group">
+              <div class="dropdown-container">
+                <button
+                  class="dropdown-button btn-no-fill"
+                  @click="toggleDropdown('salesManager')"
+                >
+                  Sales Mng.
+                  <i
+                    :class="[
+                      'fa-solid',
+                      openDropdownKey === 'salesManager'
+                        ? 'fa-chevron-up'
+                        : 'fa-chevron-down',
+                    ]"
+                  ></i>
+                </button>
+                <div
+                  v-if="openDropdownKey === 'salesManager'"
+                  class="dropdown-menu"
+                >
+                  <div class="checkbox-group">
+                    <label
+                      v-for="manager in salesManagers"
+                      :key="manager.id"
+                      class="checkbox-option"
+                    >
+                      <input
+                        type="checkbox"
+                        :value="String(manager.id)"
+                        v-model="selectedSalesManager"
+                      />
+                      {{ manager.name }}
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Year -->
+            <div class="filter-group">
+              <div class="dropdown-container">
+                <button
+                  class="dropdown-button btn-no-fill"
+                  @click="toggleDropdown('year')"
+                >
+                  Year
+                  <i
+                    :class="[
+                      'fa-solid',
+                      openDropdownKey === 'year'
+                        ? 'fa-chevron-up'
+                        : 'fa-chevron-down',
+                    ]"
+                  ></i>
+                </button>
+                <div v-if="openDropdownKey === 'year'" class="dropdown-menu">
+                  <div class="checkbox-group">
+                    <label
+                      v-for="year in years"
+                      :key="year"
+                      class="checkbox-option"
+                    >
+                      <input
+                        type="checkbox"
+                        :value="String(year)"
+                        v-model="selectedYear"
+                      />
+                      {{ year }}
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Month -->
+            <div class="filter-group">
+              <div class="dropdown-container">
+                <button
+                  class=" dropdown-button btn-no-fill"
+                  @click="toggleDropdown('month')"
+                >
+                  Month
+                  <i
+                    :class="[
+                      'fa-solid',
+                      openDropdownKey === 'month'
+                        ? 'fa-chevron-up'
+                        : 'fa-chevron-down',
+                    ]"
+                  ></i>
+                </button>
+                <div v-if="openDropdownKey === 'month'" class="dropdown-menu">
+                  <div class="checkbox-group">
+                    <label
+                      v-for="m in months"
+                      :key="m.value"
+                      class="checkbox-option"
+                    >
+                      <input
+                        type="checkbox"
+                        :value="m.value"
+                        v-model="selectedMonth"
+                      />
+                      {{ m.label }}
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Consent -->
+            <div class="filter-group">
+              <div class="dropdown-container">
+                <button
+                  class="dropdown-button btn-no-fill"
+                  @click="toggleDropdown('consent')"
+                >
+                  Consent
+                  <i
+                    :class="[
+                      'fa-solid',
+                      openDropdownKey === 'consent'
+                        ? 'fa-chevron-up'
+                        : 'fa-chevron-down',
+                    ]"
+                  ></i>
+                </button>
+                <div v-if="openDropdownKey === 'consent'" class="dropdown-menu">
+                  <div class="checkbox-group">
+                    <label class="checkbox-option">
+                      <input
+                        type="checkbox"
+                        value="true"
+                        v-model="selectedConsent"
+                      />
+                      Has Consent
+                    </label>
+                    <label class="checkbox-option">
+                      <input
+                        type="checkbox"
+                        value="false"
+                        v-model="selectedConsent"
+                      />
+                      No Consent
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
         <!-- Customer Attr. Group -->
         <div class="filter-section">
           <h3>Customer Attr.</h3>
-          <div class="filter-group">
-            <label for="industry">Industry</label>
-            <select
-              id="industry"
-              v-model="selectedIndustry"
-              class="filter-select"
-              multiple
-            >
-              <option value="">All</option>
-              <option
-                v-for="industry in industries"
-                :key="industry"
-                :value="industry"
-              >
-                {{ getIndustryLabel(industry) }}
-              </option>
-            </select>
-          </div>
-
-          <div class="filter-group">
-            <label for="country">Country</label>
-            <select
-              id="country"
-              v-model="selectedCountry"
-              class="filter-select"
-              multiple
-            >
-              <option value="">All</option>
-              <option
-                v-for="country in countries"
-                :key="country"
-                :value="country"
-              >
-                {{ country }}
-              </option>
-            </select>
-          </div>
-
-          <div class="filter-group">
-            <label for="customer">Customer</label>
-            <select
-              id="customer"
-              v-model="selectedCustomer"
-              class="filter-select"
-              multiple
-            >
-              <option value="">All</option>
-              <option
-                v-for="customer in customers"
-                :key="customer"
-                :value="customer"
-              >
-                {{ customer }}
-              </option>
-            </select>
+          <div class="filter-groups-wrapper">
+            <!-- Industry -->
+            <div class="filter-group">
+              <div class="dropdown-container">
+                <button
+                  class="dropdown-button btn-no-fill"
+                  @click="toggleDropdown('industry')"
+                >
+                  Industry
+                  <i
+                    :class="[
+                      'fa-solid',
+                      openDropdownKey === 'industry'
+                        ? 'fa-chevron-up'
+                        : 'fa-chevron-down',
+                    ]"
+                  ></i>
+                </button>
+                <div
+                  v-if="openDropdownKey === 'industry'"
+                  class="dropdown-menu"
+                >
+                  <div class="checkbox-group">
+                    <label
+                      v-for="industry in industries"
+                      :key="industry"
+                      class="checkbox-option"
+                    >
+                      <input
+                        type="checkbox"
+                        :value="industry"
+                        v-model="selectedIndustry"
+                      />
+                      {{ getIndustryLabel(industry) }}
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Country -->
+            <div class="filter-group">
+              <div class="dropdown-container">
+                <button
+                  class="dropdown-button btn-no-fill"
+                  @click="toggleDropdown('country')"
+                >
+                  Country
+                  <i
+                    :class="[
+                      'fa-solid',
+                      openDropdownKey === 'country'
+                        ? 'fa-chevron-up'
+                        : 'fa-chevron-down',
+                    ]"
+                  ></i>
+                </button>
+                <div v-if="openDropdownKey === 'country'" class="dropdown-menu">
+                  <div class="checkbox-group">
+                    <label
+                      v-for="country in countries"
+                      :key="country"
+                      class="checkbox-option"
+                    >
+                      <input
+                        type="checkbox"
+                        :value="country"
+                        v-model="selectedCountry"
+                      />
+                      {{ country }}
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Customer -->
+            <div class="filter-group">
+              <div class="dropdown-container">
+                <button
+                  class="dropdown-button btn-no-fill"
+                  @click="toggleDropdown('customer')"
+                >
+                  Customer
+                  <i
+                    :class="[
+                      'fa-solid',
+                      openDropdownKey === 'customer'
+                        ? 'fa-chevron-up'
+                        : 'fa-chevron-down',
+                    ]"
+                  ></i>
+                </button>
+                <div
+                  v-if="openDropdownKey === 'customer'"
+                  class="dropdown-menu"
+                >
+                  <div class="checkbox-group">
+                    <label
+                      v-for="customer in customers"
+                      :key="customer"
+                      class="checkbox-option"
+                    >
+                      <input
+                        type="checkbox"
+                        :value="customer"
+                        v-model="selectedCustomer"
+                      />
+                      {{ customer }}
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
         <!-- Specification Group -->
         <div class="filter-section">
           <h3>Specification</h3>
-          <div class="filter-group">
-            <label for="productGroup">Filter</label>
-            <select
-              id="productGroup"
-              v-model="selectedFilter"
-              class="filter-select"
-              multiple
-            >
-              <option value="">All</option>
-              <option v-for="filter in filters" :key="filter" :value="filter">
-                {{ filter }}
-              </option>
-            </select>
-          </div>
-
-          <div class="filter-group">
-            <label for="ventilation">Ventilation</label>
-            <select
-              id="ventilation"
-              v-model="selectedVentilation"
-              class="filter-select"
-              multiple
-            >
-              <option value="">All</option>
-              <option
-                v-for="ventilation in ventilations"
-                :key="ventilation"
-                :value="ventilation"
-              >
-                {{ ventilation }}
-              </option>
-            </select>
-          </div>
-
-          <div class="filter-group-range">
-            <label>Tot. Extr. Vol.</label>
-            <div class="range-inputs">
-              <input
-                v-model="extractionVolumeFrom"
-                type="number"
-                placeholder="From"
-                class="filter-input"
-              />
-              <span class="range-separator">-</span>
-              <input
-                v-model="extractionVolumeTo"
-                type="number"
-                placeholder="To"
-                class="filter-input"
-              />
+          <div class="filter-groups-wrapper">
+            <!-- Filter -->
+            <div class="filter-group">
+              <div class="dropdown-container">
+                <button
+                  class="dropdown-button btn-no-fill"
+                  @click="toggleDropdown('filter')"
+                >
+                  Filter
+                  <i
+                    :class="[
+                      'fa-solid',
+                      openDropdownKey === 'filter'
+                        ? 'fa-chevron-up'
+                        : 'fa-chevron-down',
+                    ]"
+                  ></i>
+                </button>
+                <div v-if="openDropdownKey === 'filter'" class="dropdown-menu">
+                  <div class="checkbox-group">
+                    <label
+                      v-for="filter in filters"
+                      :key="filter"
+                      class="checkbox-option"
+                    >
+                      <input
+                        type="checkbox"
+                        :value="filter"
+                        v-model="selectedFilter"
+                      />
+                      {{ filter }}
+                    </label>
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-
-          <div class="filter-group-range">
-            <label>Volume flow</label>
-            <div class="range-inputs">
-              <input
-                v-model="volumeFlowFrom"
-                type="number"
-                placeholder="From"
-                class="filter-input"
-              />
-              <span class="range-separator">-</span>
-              <input
-                v-model="volumeFlowTo"
-                type="number"
-                placeholder="To"
-                class="filter-input"
-              />
+            <!-- Ventilation -->
+            <div class="filter-group">
+              <div class="dropdown-container">
+                <button
+                  class="dropdown-button btn-no-fill"
+                  @click="toggleDropdown('ventilation')"
+                >
+                  Ventilation
+                  <i
+                    :class="[
+                      'fa-solid',
+                      openDropdownKey === 'ventilation'
+                        ? 'fa-chevron-up'
+                        : 'fa-chevron-down',
+                    ]"
+                  ></i>
+                </button>
+                <div
+                  v-if="openDropdownKey === 'ventilation'"
+                  class="dropdown-menu"
+                >
+                  <div class="checkbox-group">
+                    <label
+                      v-for="ventilation in ventilations"
+                      :key="ventilation"
+                      class="checkbox-option"
+                    >
+                      <input
+                        type="checkbox"
+                        :value="ventilation"
+                        v-model="selectedVentilation"
+                      />
+                      {{ ventilation }}
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Extraction Volume -->
+            <div class="filter-group">
+              <div class="dropdown-container">
+                <button
+                  class="dropdown-button btn-no-fill"
+                  @click="toggleDropdown('extractionVolume')"
+                >
+                  Tot. Extr. Vol.
+                  <i
+                    :class="[
+                      'fa-solid',
+                      openDropdownKey === 'extractionVolume'
+                        ? 'fa-chevron-up'
+                        : 'fa-chevron-down',
+                    ]"
+                  ></i>
+                </button>
+                <div
+                  v-if="openDropdownKey === 'extractionVolume'"
+                  class="dropdown-menu"
+                >
+                  <div class="range-inputs">
+                    From:
+                    <input
+                      v-model="extractionVolumeFrom"
+                      type="number"
+                      placeholder="Min: 0"
+                      class="filter-input"
+                    />
+                    To:
+                    <input
+                      v-model="extractionVolumeTo"
+                      type="number"
+                      placeholder="Max: 400.000"
+                      class="filter-input"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Volume Flow -->
+            <div class="filter-group">
+              <div class="dropdown-container">
+                <button
+                  class="dropdown-button btn-no-fill"
+                  @click="toggleDropdown('volumeFlow')"
+                >
+                  Volume flow
+                  <i
+                    :class="[
+                      'fa-solid',
+                      openDropdownKey === 'volumeFlow'
+                        ? 'fa-chevron-up'
+                        : 'fa-chevron-down',
+                    ]"
+                  ></i>
+                </button>
+                <div
+                  v-if="openDropdownKey === 'volumeFlow'"
+                  class="dropdown-menu"
+                >
+                  <div class="range-inputs">
+                    From:
+                    <input
+                      v-model="volumeFlowFrom"
+                      type="number"
+                      placeholder="Min: 0"
+                      class="filter-input"
+                    />
+                    To:
+                    <input
+                      v-model="volumeFlowTo"
+                      type="number"
+                      placeholder="Max: 400.000"
+                      class="filter-input"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       <div class="modal-footer">
-        <button class="btn-reset" @click="resetFilters">Reset</button>
+        <button class="btn-no-fill" @click="resetFilters">Reset</button>
         <div class="action-buttons">
-          <button class="btn-cancel" @click="closeModal">Cancel</button>
-          <button class="btn-apply" @click="applyFilter">Apply</button>
+          <button class="btn-no-fill" @click="closeModal">Cancel</button>
+          <button class="btn" @click="applyFilter">Apply</button>
         </div>
       </div>
     </div>
@@ -413,13 +677,13 @@ function closeModal() {
 }
 
 .modal-content {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  width: 90%;
-  max-width: 600px;
-  max-height: 80vh;
+  background: $plain-white;
+  border-radius: 4px;
+  box-shadow: $box-shadow;
+  width: fit-content;
+  max-height: 90vh;
   overflow-y: auto;
+  margin: 1rem;
 }
 
 .modal-header {
@@ -427,12 +691,10 @@ function closeModal() {
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid $neutral-500-light;
 
   h2 {
-    margin: 0;
-    font-size: 1.5rem;
-    color: #333;
+    color: $neutral-800;
   }
 
   .close-btn {
@@ -440,16 +702,18 @@ function closeModal() {
     border: none;
     font-size: 1.5rem;
     cursor: pointer;
-    color: #666;
+    color: $neutral-500;
     padding: 0;
   }
 }
 
 .modal-body {
-  padding: 1.5rem;
+  margin-inline: 1.5rem;
+  margin-block: 5rem;
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  
 }
 
 .filter-section {
@@ -458,78 +722,96 @@ function closeModal() {
   gap: 1rem;
 
   h3 {
-    margin: 0;
-    font-size: 1rem;
-    font-weight: 600;
-    color: #333;
+    color: $neutral-800;
   }
 
-  .filter-group {
+  .filter-groups-wrapper {
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    flex-wrap: wrap;
+    gap: 1.5rem;
 
-    label {
-      font-weight: 500;
-      font-size: 0.9rem;
-      color: #333;
-    }
-
-    .filter-select {
-      padding: 0.75rem;
-      border: 1px solid #e0e0e0;
-      border-radius: 4px;
-      font-size: 0.95rem;
-      cursor: pointer;
-      transition: border-color 0.2s ease;
-      font-family: inherit;
-
-      &:focus {
-        outline: none;
-        border-color: #204485;
-        box-shadow: 0 0 0 3px rgba(32, 68, 133, 0.1);
-      }
-    }
-  }
-
-  .filter-group-range {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-
-    label {
-      font-weight: 500;
-      font-size: 0.9rem;
-      color: #333;
-    }
-
-    .range-inputs {
+    .filter-group {
       display: flex;
-      align-items: center;
+      flex-direction: column;
       gap: 0.5rem;
 
-      .filter-input {
-        flex: 1;
-        padding: 0.75rem;
-        border: 1px solid #e0e0e0;
-        border-radius: 4px;
-        font-size: 0.95rem;
-        transition: border-color 0.2s ease;
-
-        &:focus {
-          outline: none;
-          border-color: #204485;
-          box-shadow: 0 0 0 3px rgba(32, 68, 133, 0.1);
-        }
-
-        &::placeholder {
-          color: #999;
-        }
+      label {
+        font-weight: 500;
+        font-size: 0.9rem;
+        color: $neutral-700;
       }
 
-      .range-separator {
-        color: #999;
-        font-weight: 500;
+      .dropdown-container {
+        position: relative;
+      }
+
+      .dropdown-button {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 11rem;
+      }
+
+      .dropdown-menu {
+        width: 11rem;
+        max-height: 10.4rem;
+        overflow: scroll;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background-color: $plain-white;
+        border: 1px solid $neutral-200-light;
+        border-top: none;
+        border-radius: 0 0 4px 4px;
+        z-index: 10;
+        box-shadow: $box-shadow;
+
+        .checkbox-group {
+          display: flex;
+          gap: 1rem;
+          flex-wrap: wrap;
+          flex-direction: column;
+          padding: 0.75rem;
+        }
+
+        .checkbox-option {
+          display: flex;
+          flex-direction: row-reverse;
+          align-items: center;
+          justify-content: space-between;
+          cursor: pointer;
+
+          input {
+            cursor: pointer;
+          }
+        }
+
+        .range-inputs {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          padding: 0.75rem;
+
+          .filter-input {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid $neutral-500-light;
+            border-radius: 4px;
+            transition: border-color 0.2s ease;
+
+            &:focus {
+              outline: none;
+              border-color: $primary-jkf-blue;
+              box-shadow: $box-shadow;
+            }
+
+            &::placeholder {
+              color: #999;
+            }
+          }
+        }
       }
     }
   }
@@ -537,65 +819,82 @@ function closeModal() {
 
 .modal-footer {
   padding: 1.5rem;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid $neutral-500-light;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
 
-  .btn-reset {
-    padding: 0.75rem 1.5rem;
-    background-color: white;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.95rem;
-    font-weight: 500;
-    color: #333;
-    transition: all 0.2s ease;
+  // .btn-reset {
+  //   padding: 0.75rem 1.5rem;
+  //   background-color: white;
+  //   border: 1px solid #e0e0e0;
+  //   border-radius: 4px;
+  //   cursor: pointer;
+  //   font-size: 0.95rem;
+  //   font-weight: 500;
+  //   color: #333;
+  //   transition: all 0.2s ease;
 
-    &:hover {
-      background-color: #f8f9fa;
-      border-color: #204485;
-    }
-  }
+  //   &:hover {
+  //     background-color: #f8f9fa;
+  //     border-color: #204485;
+  //   }
+  // }
+
+  // .checkbox-group {
+  //   display: flex;
+  //   gap: 1rem;
+  //   flex-wrap: wrap;
+  // }
+
+  // .checkbox-option {
+  //   display: flex;
+  //   align-items: center;
+  //   gap: 0.5rem;
+  //   cursor: pointer;
+
+  //   input {
+  //     cursor: pointer;
+  //   }
+  // }
 
   .action-buttons {
     display: flex;
     gap: 1rem;
   }
 
-  .btn-cancel {
-    padding: 0.75rem 1.5rem;
-    background-color: white;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.95rem;
-    font-weight: 500;
-    color: #333;
-    transition: all 0.2s ease;
+  // .btn-cancel {
+  //   padding: 0.75rem 1.5rem;
+  //   background-color: white;
+  //   border: 1px solid #e0e0e0;
+  //   border-radius: 4px;
+  //   cursor: pointer;
+  //   font-size: 0.95rem;
+  //   font-weight: 500;
+  //   color: #333;
+  //   transition: all 0.2s ease;
 
-    &:hover {
-      background-color: #f8f9fa;
-      border-color: #204485;
-    }
-  }
+  //   &:hover {
+  //     background-color: #f8f9fa;
+  //     border-color: #204485;
+  //   }
+  // }
 
-  .btn-apply {
-    padding: 0.75rem 1.5rem;
-    background-color: #204485;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.95rem;
-    font-weight: 500;
-    color: white;
-    transition: background-color 0.2s ease;
+  // .btn-apply {
+  //   padding: 0.75rem 1.5rem;
+  //   background-color: #204485;
+  //   border: none;
+  //   border-radius: 4px;
+  //   cursor: pointer;
+  //   font-size: 0.95rem;
+  //   font-weight: 500;
+  //   color: white;
+  //   transition: background-color 0.2s ease;
 
-    &:hover {
-      background-color: #1a3a6b;
-    }
-  }
+  //   &:hover {
+  //     background-color: #1a3a6b;
+  //   }
+  // }
 }
 </style>
