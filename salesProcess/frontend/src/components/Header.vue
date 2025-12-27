@@ -32,14 +32,14 @@ const roleLabels = {
           to="/processes/new"
           class=" btn-no-fill"
         >
-          Opret sag
+          Create new process
         </RouterLink>
         <RouterLink
           v-if="isSalesManager"
           to="/my-processes"
           class="btn-no-fill nav-btn-badge"
         >
-          Mine sager
+          My processes
           <span class="badge" v-if="salesManagerCount > 0">{{
             salesManagerCount
           }}</span>
@@ -48,7 +48,7 @@ const roleLabels = {
           to="/all-processes"
           class="btn-no-fill nav-btn-badge"
         >
-          Alle sager
+          All processes
           <span
             class="badge"
             v-if="isMarketingManager && marketingManagerCount > 0"
@@ -90,11 +90,16 @@ const roleLabels = {
 
 header {
   .nav-bar {
-    padding: 1rem 2rem;
+    padding: 2rem 2rem;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     gap: 2rem;
+
+  @media (max-width: 1024px) {
+    justify-content: center;
+  }
 
     &.login-nav {
       justify-content: flex-end;
@@ -129,14 +134,12 @@ header {
       display: flex;
       gap: 1rem;
       align-items: center;
-      margin-left: auto;
     }
 
     .user-info {
       display: flex;
       flex-direction: column;
       align-items: flex-end;
-      gap: 0.2rem;
       padding-right: 1rem;
       border-right: 1px solid $neutral-500-light;
     }
