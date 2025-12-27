@@ -191,10 +191,10 @@ function closeModal() {
             <div class="filter-group">
               <div class="dropdown-container">
                 <button
-                  class="dropdown-button"
+                  class="dropdown-button btn-no-fill"
                   @click="toggleDropdown('step')"
                 >
-                  <span>Step</span>
+                  Step
                   <i
                     :class="[
                       'fa-solid',
@@ -226,10 +226,10 @@ function closeModal() {
             <div class="filter-group">
               <div class="dropdown-container">
                 <button
-                  class="dropdown-button"
+                  class="dropdown-button btn-no-fill"
                   @click="toggleDropdown('salesManager')"
                 >
-                  <span>Sales Mng.</span>
+                  Sales Mng.
                   <i
                     :class="[
                       'fa-solid',
@@ -264,10 +264,10 @@ function closeModal() {
             <div class="filter-group">
               <div class="dropdown-container">
                 <button
-                  class="dropdown-button"
+                  class="dropdown-button btn-no-fill"
                   @click="toggleDropdown('year')"
                 >
-                  <span>Year</span>
+                  Year
                   <i
                     :class="[
                       'fa-solid',
@@ -299,10 +299,10 @@ function closeModal() {
             <div class="filter-group">
               <div class="dropdown-container">
                 <button
-                  class="dropdown-button"
+                  class=" dropdown-button btn-no-fill"
                   @click="toggleDropdown('month')"
                 >
-                  <span>Month</span>
+                  Month
                   <i
                     :class="[
                       'fa-solid',
@@ -334,10 +334,10 @@ function closeModal() {
             <div class="filter-group">
               <div class="dropdown-container">
                 <button
-                  class="dropdown-button"
+                  class="dropdown-button btn-no-fill"
                   @click="toggleDropdown('consent')"
                 >
-                  <span>Consent</span>
+                  Consent
                   <i
                     :class="[
                       'fa-solid',
@@ -380,10 +380,10 @@ function closeModal() {
             <div class="filter-group">
               <div class="dropdown-container">
                 <button
-                  class="dropdown-button"
+                  class="dropdown-button btn-no-fill"
                   @click="toggleDropdown('industry')"
                 >
-                  <span>Industry</span>
+                  Industry
                   <i
                     :class="[
                       'fa-solid',
@@ -418,10 +418,10 @@ function closeModal() {
             <div class="filter-group">
               <div class="dropdown-container">
                 <button
-                  class="dropdown-button"
+                  class="dropdown-button btn-no-fill"
                   @click="toggleDropdown('country')"
                 >
-                  <span>Country</span>
+                  Country
                   <i
                     :class="[
                       'fa-solid',
@@ -453,10 +453,10 @@ function closeModal() {
             <div class="filter-group">
               <div class="dropdown-container">
                 <button
-                  class="dropdown-button"
+                  class="dropdown-button btn-no-fill"
                   @click="toggleDropdown('customer')"
                 >
-                  <span>Customer</span>
+                  Customer
                   <i
                     :class="[
                       'fa-solid',
@@ -498,10 +498,10 @@ function closeModal() {
             <div class="filter-group">
               <div class="dropdown-container">
                 <button
-                  class="dropdown-button"
+                  class="dropdown-button btn-no-fill"
                   @click="toggleDropdown('filter')"
                 >
-                  <span>Filter</span>
+                  Filter
                   <i
                     :class="[
                       'fa-solid',
@@ -533,10 +533,10 @@ function closeModal() {
             <div class="filter-group">
               <div class="dropdown-container">
                 <button
-                  class="dropdown-button"
+                  class="dropdown-button btn-no-fill"
                   @click="toggleDropdown('ventilation')"
                 >
-                  <span>Ventilation</span>
+                  Ventilation
                   <i
                     :class="[
                       'fa-solid',
@@ -571,10 +571,10 @@ function closeModal() {
             <div class="filter-group">
               <div class="dropdown-container">
                 <button
-                  class="dropdown-button"
+                  class="dropdown-button btn-no-fill"
                   @click="toggleDropdown('extractionVolume')"
                 >
-                  <span>Tot. Extr. Vol.</span>
+                  Tot. Extr. Vol.
                   <i
                     :class="[
                       'fa-solid',
@@ -611,10 +611,10 @@ function closeModal() {
             <div class="filter-group">
               <div class="dropdown-container">
                 <button
-                  class="dropdown-button"
+                  class="dropdown-button btn-no-fill"
                   @click="toggleDropdown('volumeFlow')"
                 >
-                  <span>Volume flow</span>
+                  Volume flow
                   <i
                     :class="[
                       'fa-solid',
@@ -652,10 +652,10 @@ function closeModal() {
       </div>
 
       <div class="modal-footer">
-        <button class="btn-reset" @click="resetFilters">Reset</button>
+        <button class="btn-no-fill" @click="resetFilters">Reset</button>
         <div class="action-buttons">
-          <button class="btn-cancel" @click="closeModal">Cancel</button>
-          <button class="btn-apply" @click="applyFilter">Apply</button>
+          <button class="btn-no-fill" @click="closeModal">Cancel</button>
+          <button class="btn" @click="applyFilter">Apply</button>
         </div>
       </div>
     </div>
@@ -677,12 +677,13 @@ function closeModal() {
 }
 
 .modal-content {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  width: 70%;
-  max-height: 80vh;
+  background: $plain-white;
+  border-radius: 4px;
+  box-shadow: $box-shadow;
+  width: fit-content;
+  max-height: 90vh;
   overflow-y: auto;
+  margin: 1rem;
 }
 
 .modal-header {
@@ -690,12 +691,10 @@ function closeModal() {
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid $neutral-500-light;
 
   h2 {
-    margin: 0;
-    font-size: 1.5rem;
-    color: #333;
+    color: $neutral-800;
   }
 
   .close-btn {
@@ -703,16 +702,18 @@ function closeModal() {
     border: none;
     font-size: 1.5rem;
     cursor: pointer;
-    color: #666;
+    color: $neutral-500;
     padding: 0;
   }
 }
 
 .modal-body {
-  padding: 1.5rem;
+  margin-inline: 1.5rem;
+  margin-block: 5rem;
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  
 }
 
 .filter-section {
@@ -721,14 +722,12 @@ function closeModal() {
   gap: 1rem;
 
   h3 {
-    margin: 0;
-    font-size: 1rem;
-    font-weight: 600;
-    color: #333;
+    color: $neutral-800;
   }
 
   .filter-groups-wrapper {
     display: flex;
+    flex-wrap: wrap;
     gap: 1.5rem;
 
     .filter-group {
@@ -739,23 +738,7 @@ function closeModal() {
       label {
         font-weight: 500;
         font-size: 0.9rem;
-        color: #333;
-      }
-
-      .filter-select {
-        padding: 0.75rem;
-        border: 1px solid #e0e0e0;
-        border-radius: 4px;
-        font-size: 0.95rem;
-        cursor: pointer;
-        transition: border-color 0.2s ease;
-        font-family: inherit;
-
-        &:focus {
-          outline: none;
-          border-color: #204485;
-          box-shadow: 0 0 0 3px rgba(32, 68, 133, 0.1);
-        }
+        color: $neutral-700;
       }
 
       .dropdown-container {
@@ -764,39 +747,26 @@ function closeModal() {
 
       .dropdown-button {
         width: 100%;
-        padding: 0.75rem;
-        background-color: white;
-        border: 1px solid #e0e0e0;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 0.95rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        transition: border-color 0.2s ease;
         width: 11rem;
-
-        &:hover {
-          border-color: #204485;
-        }
-
-        i {
-          font-size: 0.75rem;
-        }
       }
 
       .dropdown-menu {
         width: 11rem;
+        max-height: 10.4rem;
+        overflow: scroll;
         position: absolute;
         top: 100%;
         left: 0;
         right: 0;
-        background-color: white;
-        border: 1px solid #e0e0e0;
+        background-color: $plain-white;
+        border: 1px solid $neutral-200-light;
         border-top: none;
         border-radius: 0 0 4px 4px;
         z-index: 10;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        box-shadow: $box-shadow;
 
         .checkbox-group {
           display: flex;
@@ -811,7 +781,6 @@ function closeModal() {
           flex-direction: row-reverse;
           align-items: center;
           justify-content: space-between;
-          gap: 0.5rem;
           cursor: pointer;
 
           input {
@@ -819,39 +788,27 @@ function closeModal() {
           }
         }
 
-        .filter-group-range {
+        .range-inputs {
           display: flex;
           flex-direction: column;
-          gap: 0.5rem;
+          justify-content: center;
+          padding: 0.75rem;
 
-          label {
-            font-weight: 500;
-            font-size: 0.9rem;
-            color: #333;
-          }
+          .filter-input {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid $neutral-500-light;
+            border-radius: 4px;
+            transition: border-color 0.2s ease;
 
-          .range-inputs {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            &:focus {
+              outline: none;
+              border-color: $primary-jkf-blue;
+              box-shadow: $box-shadow;
+            }
 
-            .filter-input {
-              flex: 1;
-              padding: 0.75rem;
-              border: 1px solid #e0e0e0;
-              border-radius: 4px;
-              font-size: 0.95rem;
-              transition: border-color 0.2s ease;
-
-              &:focus {
-                outline: none;
-                border-color: #204485;
-                box-shadow: 0 0 0 3px rgba(32, 68, 133, 0.1);
-              }
-
-              &::placeholder {
-                color: #999;
-              }
+            &::placeholder {
+              color: #999;
             }
           }
         }
@@ -862,82 +819,82 @@ function closeModal() {
 
 .modal-footer {
   padding: 1.5rem;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid $neutral-500-light;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
 
-  .btn-reset {
-    padding: 0.75rem 1.5rem;
-    background-color: white;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.95rem;
-    font-weight: 500;
-    color: #333;
-    transition: all 0.2s ease;
+  // .btn-reset {
+  //   padding: 0.75rem 1.5rem;
+  //   background-color: white;
+  //   border: 1px solid #e0e0e0;
+  //   border-radius: 4px;
+  //   cursor: pointer;
+  //   font-size: 0.95rem;
+  //   font-weight: 500;
+  //   color: #333;
+  //   transition: all 0.2s ease;
 
-    &:hover {
-      background-color: #f8f9fa;
-      border-color: #204485;
-    }
-  }
+  //   &:hover {
+  //     background-color: #f8f9fa;
+  //     border-color: #204485;
+  //   }
+  // }
 
-  .checkbox-group {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
+  // .checkbox-group {
+  //   display: flex;
+  //   gap: 1rem;
+  //   flex-wrap: wrap;
+  // }
 
-  .checkbox-option {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
+  // .checkbox-option {
+  //   display: flex;
+  //   align-items: center;
+  //   gap: 0.5rem;
+  //   cursor: pointer;
 
-    input {
-      cursor: pointer;
-    }
-  }
+  //   input {
+  //     cursor: pointer;
+  //   }
+  // }
 
   .action-buttons {
     display: flex;
     gap: 1rem;
   }
 
-  .btn-cancel {
-    padding: 0.75rem 1.5rem;
-    background-color: white;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.95rem;
-    font-weight: 500;
-    color: #333;
-    transition: all 0.2s ease;
+  // .btn-cancel {
+  //   padding: 0.75rem 1.5rem;
+  //   background-color: white;
+  //   border: 1px solid #e0e0e0;
+  //   border-radius: 4px;
+  //   cursor: pointer;
+  //   font-size: 0.95rem;
+  //   font-weight: 500;
+  //   color: #333;
+  //   transition: all 0.2s ease;
 
-    &:hover {
-      background-color: #f8f9fa;
-      border-color: #204485;
-    }
-  }
+  //   &:hover {
+  //     background-color: #f8f9fa;
+  //     border-color: #204485;
+  //   }
+  // }
 
-  .btn-apply {
-    padding: 0.75rem 1.5rem;
-    background-color: #204485;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.95rem;
-    font-weight: 500;
-    color: white;
-    transition: background-color 0.2s ease;
+  // .btn-apply {
+  //   padding: 0.75rem 1.5rem;
+  //   background-color: #204485;
+  //   border: none;
+  //   border-radius: 4px;
+  //   cursor: pointer;
+  //   font-size: 0.95rem;
+  //   font-weight: 500;
+  //   color: white;
+  //   transition: background-color 0.2s ease;
 
-    &:hover {
-      background-color: #1a3a6b;
-    }
-  }
+  //   &:hover {
+  //     background-color: #1a3a6b;
+  //   }
+  // }
 }
 </style>
