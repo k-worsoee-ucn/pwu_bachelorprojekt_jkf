@@ -90,7 +90,7 @@ const roleLabels = {
 
 header {
   .nav-bar {
-    padding: 1rem 2rem;
+    padding: 2rem 2rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
