@@ -9,6 +9,8 @@ const { getAuthHeader, user } = useAuth();
 const route = useRoute();
 const router = useRouter();
 const searchQuery = ref("");
+const searchDisplayText = ref("");
+let debounceTimer = null;
 const allProcesses = ref([]);
 const activeTab = ref("ongoing");
 const salesManagerCount = inject("salesManagerCount");
@@ -55,6 +57,21 @@ watch(
   },
   { immediate: true }
 );
+
+// Debounce search display text
+watch(searchQuery, (newValue) => {
+  if (debounceTimer) {
+    clearTimeout(debounceTimer);
+  }
+  
+  if (newValue.trim()) {
+    debounceTimer = setTimeout(() => {
+      searchDisplayText.value = newValue;
+    }, 1000);
+  } else {
+    searchDisplayText.value = "";
+  }
+});
 
 onMounted(() => {
   fetchProcesses();
@@ -321,6 +338,7 @@ function handleApplyFilter(filters) {
           class="search-input"
         />
         <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <p v-if="searchDisplayText" class="search-result-text">Viser resultater for: {{ searchDisplayText }}</p>
       </div>
       <button class="filter-btn" @click="isFilterModalOpen = true">
         <i class="fa-solid fa-sliders"></i>
