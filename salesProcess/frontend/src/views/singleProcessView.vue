@@ -819,6 +819,17 @@ const handleStepCompleted = async () => {
         padding: 1.5rem;
         background-color: white;
         animation: slideDown 0.3s ease;
+        display: flex;
+        flex-direction: column;
+
+        > :not(.btn) {
+          width: 100%;
+        }
+
+        .btn {
+          align-self: flex-end;
+          margin-top: 1.5rem;
+        }
       }
     }
   }
