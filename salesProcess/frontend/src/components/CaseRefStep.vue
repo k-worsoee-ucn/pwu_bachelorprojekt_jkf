@@ -402,20 +402,13 @@ const downloadImages = async () => {
 
 <style scoped lang="scss">
 .case-ref-step {
-  padding: 20px;
-
-  h3 {
-    margin-bottom: 10px;
-  }
-
-  p {
-    margin-bottom: 20px;
-  }
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 
   .download-section {
-    margin-bottom: 20px;
     display: flex;
-    gap: 15px;
+    gap: 1rem;
     flex-wrap: wrap;
 
     .btn span {

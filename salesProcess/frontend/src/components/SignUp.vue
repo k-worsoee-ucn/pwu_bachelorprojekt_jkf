@@ -109,6 +109,7 @@ const handleSubmit = async () => {
     isLoading.value = false
   }
 }
+
 </script>
 
 <template>
@@ -179,11 +180,14 @@ const handleSubmit = async () => {
       <!-- Role Selection -->
       <div class="form-group">
         <label for="role">Role:</label>
-        <select id="role" v-model="formData.role" required>
-          <option value="viewer">Viewer</option>
-          <option value="salesManager">Sales Manager</option>
-          <option value="marketingManager">Marketing Manager</option>
-        </select>
+        <div>
+          <select id="role" v-model="formData.role" required>
+            <option value="viewer">Viewer</option>
+            <option value="salesManager">Sales Manager</option>
+            <option value="marketingManager">Marketing Manager</option>
+          </select>
+          <i class="fa-solid fa-chevron-down"></i>
+        </div>
       </div>
 
       <!-- Error Message -->
