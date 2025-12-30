@@ -72,6 +72,6 @@ const updateProfile = async () => {
         </div>
       <button type="submit" class="btn">Save Changes</button>
     </form>
-    <p v-if="message">{{ message }}</p>
+    <p v-if="message" class="success-message">{{ message }}</p>
   </div>
 </template>
