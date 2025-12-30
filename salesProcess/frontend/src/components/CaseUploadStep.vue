@@ -21,7 +21,7 @@
       </div>
 
       <div class="action-buttons">
-        <button @click="saveCase" class="btn" :disabled="saving || props.disabled">
+        <button @click="saveCase" class="success-btn" :disabled="saving || props.disabled">
           <i
             class="fa-solid"
             :class="saving ? 'fa-spinner fa-spin' : 'fa-save'"

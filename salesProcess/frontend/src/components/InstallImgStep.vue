@@ -47,14 +47,6 @@
           {{ selectedFiles.length }} file(s) selected
         </span>
       </div>
-
-      <button
-        @click="uploadImages"
-        :disabled="!selectedFiles.length || uploading || props.disabled"
-        class="success-btn"
-      >
-        Upload Images
-      </button>
     </div>
 
     <!-- Preview Selected Files -->
@@ -73,17 +65,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Error Message -->
-    <div v-if="errorMessage" class="error-message">
-      {{ errorMessage }}
-    </div>
-
-    <!-- Success Message -->
-    <div v-if="successMessage" class="success-message">
-      {{ successMessage }}
-    </div>
-
     <!-- Uploaded Images Gallery -->
     <div v-if="uploadedImages.length" class="gallery-section">
       <h4>Uploaded Installation Images</h4>
@@ -104,6 +85,25 @@
         </div>
       </div>
     </div>
+  </div>
+  
+  <div>
+    <button
+    @click="uploadImages"
+    :disabled="!selectedFiles.length || uploading || props.disabled"
+    class="success-btn"
+    >
+    Upload Images
+    </button>
+  </div>
+  <!-- Error Message -->
+  <div v-if="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Success Message -->
+  <div v-if="successMessage" class="success-message">
+    {{ successMessage }}
   </div>
 </template>
 
