@@ -1,3 +1,11 @@
+hr {
+  margin: 0;
+  max-height: 0.5px;
+  width: 100%;
+  background-color: #F7F8FB;
+  opacity: 0.5;
+}
+
 .btn {
   padding: 0.6rem 1.2rem;
   background-color: #204485;
@@ -83,6 +91,24 @@
   margin-left: 1rem;
 }
 
+.rotate {
+  transform: rotate(180deg);
+}
+
+.form-group {
+  position: relative;
+}
+.form-group #role {
+  position: relative;
+}
+.form-group .fa-chevron-down {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(50%);
+  font-size: 1rem;
+}
+
 .form-container {
   max-width: 30%;
   margin: 2rem auto;
@@ -123,6 +149,7 @@
   border: 1px solid #C9D2E2;
   border-radius: 4px;
   box-sizing: border-box;
+  appearance: none;
 }
 .form-container .form-group select:focus {
   outline: none;
@@ -222,29 +249,26 @@ select {
 }
 
 .error-message {
-  padding: 10px 15px;
+  padding: 1rem;
   background-color: #FCEBEC;
   color: #DC3545;
   border-left: 4px solid #DC3545;
   border-radius: 4px;
-  margin: 15px 0;
 }
 
 .success-message {
-  padding: 10px 15px;
+  padding: 1rem;
   background-color: #E8F3EE;
   color: #198754;
   border-left: 4px solid #198754;
   border-radius: 4px;
-  margin: 15px 0;
 }
 
 .warning-message {
-  padding: 10px 15px;
+  padding: 1rem;
   background-color: #FFF9E6;
   border-left: 4px solid #FFC107;
   border-radius: 4px;
-  margin: 15px 0;
 }
 
 .processes-container {
@@ -288,6 +312,12 @@ select {
   color: #49566D;
   pointer-events: none;
   font-size: 1rem;
+}
+.processes-container .search-container .search-result-text {
+  font-size: 0.875rem;
+  color: #A1B1CC;
+  margin-top: 0.5rem;
+  margin-bottom: 0;
 }
 .processes-container .filter-btn {
   padding: 0.75rem 1.25rem;

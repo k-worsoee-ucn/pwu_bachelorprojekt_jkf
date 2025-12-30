@@ -21,26 +21,34 @@ const currentUserId = ref(null);
 let shippingDateTimer = null;
 
 const steps = [
-  { id: 1, title: "Salg - Sag oprettelse", component: "SalesStep" },
-  { id: 2, title: "Under produktion", component: "ProductionStep" },
+  { id: 1, 
+    title: "Sale Information", 
+    role: "Sales Manager",
+    component: "SalesStep" 
+  },
+  { id: 2, title: "Production", component: "ProductionStep" },
   {
     id: 3,
-    title: "Marketing - Billedtagning af produkter",
+    title: "Product Images",
+    role: "Marketing Manager",
     component: "ProdImgStep",
   },
   {
     id: 4,
-    title: "Salg - Case samtykke & installations billeder",
+    title: "Case Consent & Installation Images",
+    role: "Sales Manager",
     component: "InstallImgStep",
   },
   {
     id: 5,
-    title: "Marketing - Case og reference oprettelse",
+    title: "Case & Reference Creation",
+    role: "Marketing Manager",
     component: "CaseRefStep",
   },
   {
     id: 6,
-    title: "Marketing - (Efter godkendelse) case upload",
+    title: "Case Upload",
+    role: "Marketing Manager",
     component: "CaseUploadStep",
   },
 ];
@@ -516,6 +524,7 @@ const handleStepCompleted = async () => {
             <i class="fa-solid step-icon" :class="getStepIcon(step.id)"></i>
             <div class="step-text">
               <h3>{{ step.title }}</h3>
+              <h4>{{ step.role }}</h4>
               <p
                 v-if="getStepState(step.id) === 'completed' && step.id !== 2"
                 class="step-status"
@@ -600,24 +609,20 @@ const handleStepCompleted = async () => {
 
 <style scoped lang="scss">
 .single-process-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
   padding: 2rem;
 
   .process-header {
     margin-bottom: 2rem;
-
-    h1 {
-      margin-bottom: 1rem;
-    }
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
 
     .status-row {
       display: flex;
       justify-content: space-between;
-      align-items: flex-end;
-      margin-bottom: 1rem;
-
-      p {
-        margin: 0;
-      }
 
       .sales-manager-info {
         display: flex;
@@ -625,14 +630,7 @@ const handleStepCompleted = async () => {
         align-items: flex-end;
 
         .manager-name {
-          margin: 0;
           font-weight: 600;
-        }
-
-        .manager-role {
-          margin: 0;
-          color: $neutral-500;
-          font-weight: 400;
         }
       }
     }
@@ -691,7 +689,7 @@ const handleStepCompleted = async () => {
     gap: 1rem;
 
     .step-accordion {
-      border-radius: 8px;
+      border-radius: 4px;
       overflow: hidden;
       transition: all 0.3s ease;
 
@@ -700,20 +698,16 @@ const handleStepCompleted = async () => {
           background-color: $primary-jkf-blue;
           color: white;
 
-          .step-icon {
-            color: white;
-          }
-
-          .step-text h3 {
-            color: white;
-          }
-
-          .step-status {
-            color: white;
-          }
-
+          .step-icon,
+          .step-text h3,
+          .step-text h4,
+          .step-status,
           .chevron-icon {
             color: white;
+          }
+
+          .step-text h4{
+            font-weight: 400;
           }
 
           &:hover {
@@ -725,6 +719,10 @@ const handleStepCompleted = async () => {
       &.state-active {
         .accordion-header {
           background-color: $secondary-jkf-blue;
+
+          .step-text h4{
+            font-weight: 400;
+          }
 
           &:hover {
             background-color: $secondary-hover-blue;
@@ -738,12 +736,14 @@ const handleStepCompleted = async () => {
           color: white;
           cursor: not-allowed;
 
-          .step-icon {
+          .step-icon,
+          .step-text h3,
+          .step-text h4{
             color: white;
           }
 
-          .step-text h3 {
-            color: white;
+          .step-text h4{
+            font-weight: 400;
           }
 
           &:hover {
@@ -771,64 +771,45 @@ const handleStepCompleted = async () => {
         .step-info {
           display: flex;
           align-items: center;
-          gap: 1rem;
+          gap: 1.5rem;
           flex: 1;
 
           .step-icon {
-            font-size: 1.75rem;
+            font-size: 2rem;
             flex-shrink: 0;
           }
 
           .step-text {
-            flex: 1;
-
-            h3 {
-              margin: 0 0 0.25rem 0;
-            }
-
-            .step-status {
-              margin: 0;
-            }
+            display: flex;
+            flex-direction: column;
+            gap: .5rem;
           }
         }
 
         .chevron-icon {
-          font-size: 1.25rem;
+          font-size: 1.5rem;
           transition: transform 0.3s ease;
           flex-shrink: 0;
           margin-left: 1rem;
         }
 
-        &.production-step {
-          justify-content: flex-end;
-          position: relative;
-
-          .step-info {
-            position: absolute;
-            left: 1.5rem;
-          }
-        }
-
         .shipping-date-badge {
-          font-size: 1.15rem;
+          font-size: 1.2rem;
+          font-weight: 400;
           color: white;
         }
       }
 
       .accordion-content {
-        padding: 1.5rem;
+        padding: 1.5rem 1.5rem .5rem 1.5rem;
         background-color: white;
         animation: slideDown 0.3s ease;
         display: flex;
         flex-direction: column;
-
-        > :not(.btn) {
-          width: 100%;
-        }
+        gap: 2rem;
 
         .btn {
           align-self: flex-end;
-          margin-top: 1.5rem;
         }
       }
     }
@@ -854,12 +835,6 @@ const handleStepCompleted = async () => {
       .step-accordion {
         .accordion-header {
           padding: 1rem;
-
-          .step-info {
-            h3 {
-              font-size: 1rem;
-            }
-          }
         }
 
         .accordion-content {

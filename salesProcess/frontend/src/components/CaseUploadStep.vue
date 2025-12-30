@@ -5,11 +5,11 @@
       Write and format the case content that will be published.
     </p>
 
-    <div v-if="loading" class="loading">
+    <!-- <div v-if="loading" class="loading">
       <i class="fa-solid fa-spinner fa-spin"></i> Loading...
-    </div>
+    </div> -->
 
-    <div v-else class="editor-container">
+    <div class="editor-container">
       <div class="editor-wrapper">
         <QuillEditor
           v-model:content="caseContent"
@@ -69,7 +69,6 @@ const props = defineProps({
 const { getAuthHeader } = useAuth();
 
 const caseContent = ref("");
-const loading = ref(false);
 const saving = ref(false);
 const saveMessage = ref(null);
 const currentCaseId = ref(null);
@@ -92,7 +91,6 @@ const editorOptions = {
 const fetchCaseContent = async () => {
   if (!props.processId) return;
 
-  loading.value = true;
   try {
     const response = await fetch(`/api/cases/process/${props.processId}`, {
       headers: {
@@ -111,7 +109,6 @@ const fetchCaseContent = async () => {
   } catch (error) {
     console.error("Error fetching case content:", error);
   } finally {
-    loading.value = false;
   }
 };
 
@@ -189,44 +186,41 @@ onMounted(() => {
 
 <style scoped lang="scss">
 .case-upload-step {
-  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 
-  h2 {
-    margin-bottom: 0.5rem;
-  }
-
-  .loading {
-    text-align: center;
-    padding: 2rem;
-    color: #666;
-    font-size: 1.1rem;
-  }
-
-  .editor-wrapper {
-    margin-bottom: 1.5rem;
-    @include default-border;
-
-    :deep(.ql-container) {
-      min-height: 400px;
-      font-size: 16px;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-        Ubuntu, Cantarell, sans-serif;
-    }
-
-    :deep(.ql-toolbar) {
-      background: #f8f9fa;
-      border-top-left-radius: 4px;
-      border-top-right-radius: 4px;
-    }
-
-    :deep(.ql-disabled .ql-toolbar) {
-      background: #f3f4f6;
-    }
-
-    :deep(.ql-editor.ql-blank::before) {
-      display: none !important;
+  .editor-container{
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    
+    .editor-wrapper {
+      @include default-border;
+  
+      :deep(.ql-container) {
+        min-height: 400px;
+        font-size: 16px;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+          Ubuntu, Cantarell, sans-serif;
+      }
+  
+      :deep(.ql-toolbar) {
+        background: #f8f9fa;
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
+      }
+  
+      :deep(.ql-disabled .ql-toolbar) {
+        background: #f3f4f6;
+      }
+  
+      :deep(.ql-editor.ql-blank::before) {
+        display: none !important;
+      }
     }
   }
+  
 
   .action-buttons {
     display: flex;
@@ -235,13 +229,11 @@ onMounted(() => {
   }
 
   .save-message {
-    margin-top: 1rem;
-    padding: 0.75rem 1rem;
+    padding: 1rem;
     border-radius: 4px;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    font-size: 0.95rem;
+    gap: 1rem;
   }
 }
 </style>

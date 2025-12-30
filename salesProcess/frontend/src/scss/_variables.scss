@@ -40,6 +40,16 @@ $box-shadow-hover: 0 4px 8px rgba(0, 0, 0, 0.15);
     border-radius: 4px;
 }
 
+// --- <hr/>
+
+hr {
+	margin: 0;
+	max-height: .5px;
+	width: 100%;
+	background-color: $neutral-100-light;
+	opacity: .5;
+}
+
 // --- Font mixins ( _text.scss )
 
 @mixin heading-1-semi-bold {

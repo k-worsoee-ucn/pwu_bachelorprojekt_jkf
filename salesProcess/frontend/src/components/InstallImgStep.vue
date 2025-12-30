@@ -53,12 +53,13 @@
         :disabled="!selectedFiles.length || uploading || props.disabled"
         class="success-btn"
       >
-      Upload Images
+        Upload Images
       </button>
     </div>
 
     <!-- Preview Selected Files -->
     <div v-if="selectedFiles.length" class="preview-section">
+      <hr />
       <h4>Selected Files</h4>
       <div class="preview-grid">
         <div
@@ -71,17 +72,6 @@
           <button @click="removeFile(index)" class="remove-button">×</button>
         </div>
       </div>
-    </div>
-
-    <!-- Upload Progress -->
-    <div v-if="uploading" class="progress-section">
-      <div class="progress-bar">
-        <div
-          class="progress-fill"
-          :style="{ width: uploadProgress + '%' }"
-        ></div>
-      </div>
-      <p>{{ uploadProgress }}%</p>
     </div>
 
     <!-- Error Message -->
@@ -150,7 +140,6 @@ const fileInput = ref(null);
 const selectedFiles = ref([]);
 const uploadedImages = ref([]);
 const uploading = ref(false);
-const uploadProgress = ref(0);
 const errorMessage = ref("");
 const successMessage = ref("");
 const consentValue = ref(props.process?.consent || false);
@@ -265,7 +254,6 @@ const uploadImages = async () => {
   if (!selectedFiles.value.length) return;
 
   uploading.value = true;
-  uploadProgress.value = 0;
   errorMessage.value = "";
   successMessage.value = "";
 
@@ -293,7 +281,6 @@ const uploadImages = async () => {
     }
 
     const result = await response.json();
-    uploadProgress.value = 100;
     successMessage.value = `Successfully uploaded ${result.images.length} image(s)`;
 
     // Clear selected files
@@ -393,37 +380,27 @@ const formatDate = (dateString) => {
 
 <style scoped lang="scss">
 .install-img-step {
-  padding: 20px;
-
-  h3 {
-    margin-bottom: 10px;
-  }
-
-  p {
-    margin-bottom: 20px;
-  }
-
-  h4 {
-    margin-bottom: 15px;
-  }
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 
   .consent-section {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
     background-color: $neutral-100-light;
-    padding: 20px;
-    margin-bottom: 25px;
-    
+    padding: 2rem;
+
     @include default-border;
   }
 
   .phone-info {
     background-color: $neutral-200-light;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 15px;
+    padding: 1rem;
+    border-radius: 4px;
     border-left: 4px solid $jkf-hover-blue;
 
     p {
-      margin: 0;
       color: $jkf-hover-blue;
     }
   }
@@ -431,8 +408,7 @@ const formatDate = (dateString) => {
   .consent-checkbox-wrapper {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 10px;
+    gap: 1rem;
   }
 
   .consent-checkbox {
@@ -448,15 +424,14 @@ const formatDate = (dateString) => {
 
   .upload-section {
     display: flex;
-    gap: 15px;
+    gap: 1rem;
     align-items: center;
-    margin-bottom: 30px;
   }
 
   .file-input-wrapper {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 1rem;
   }
 
   .file-input {
@@ -466,10 +441,10 @@ const formatDate = (dateString) => {
   .file-label {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
+    gap: 1rem;
+    padding: 0.6rem 1.2rem;
     background-color: $neutral-100-light;
-    
+
     @include default-border;
 
     cursor: pointer;
@@ -478,100 +453,105 @@ const formatDate = (dateString) => {
     &:hover {
       background-color: $neutral-200-light;
     }
-  }
 
-  .upload-icon {
-    font-size: 20px;
-  }
-
-  .preview-section,
-  .gallery-section {
-    margin-top: 30px;
-  }
-
-  .preview-grid,
-  .image-gallery {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 20px;
-  }
-
-  .preview-item,
-  .gallery-item {
-    position: relative;
-    @include default-border;
-    overflow: hidden;
-    background-color: $neutral-100-light;
-
-    img {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
+    span {
+      font-size: 1rem;
     }
   }
 
-  .file-name {
-    padding: 10px;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-  }
-
-  .remove-button {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    width: 30px;
-    height: 30px;
-    background-color: $error-500-main;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    font-size: 20px;
-    cursor: pointer;
+  .preview-section {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.3s ease;
+    flex-direction: column;
+    gap: 2rem;
 
-    &:hover {
-      background-color: $error-600;
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .preview-item,
+    .gallery-item {
+      position: relative;
+      @include default-border;
+      overflow: hidden;
+      background-color: $neutral-100-light;
+
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+
+      img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+      }
+    }
+
+    .file-name {
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+      padding: 0 1rem 1rem 1rem;
+    }
+
+    .remove-button {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 30px;
+      height: 30px;
+      background-color: $error-500-main;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.3s ease;
+
+      &:hover {
+        background-color: $error-600;
+      }
     }
   }
 
-  .gallery-info {
-    padding: 10px;
-  }
+  .gallery-section{
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
 
-  .gallery-filename {
-    font-weight: 600;
-    margin-bottom: 5px;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-  }
+    .image-gallery{
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
 
-  .gallery-date {
-    margin-bottom: 10px;
-  }
+      .gallery-item{
+        @include default-border;
+        background-color: $neutral-100-light;
 
-  .progress-section {
-    margin: 20px 0;
-  }
+        img {
+          width: 100%;
+          height: 200px;
+          object-fit: cover;
+        }
+    
+        .gallery-info{
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+          padding: 1rem;
+        }
 
-  .progress-bar {
-    width: 100%;
-    height: 20px;
-    background-color: $neutral-200-light;
-    border-radius: 10px;
-    overflow: hidden;
-    margin-bottom: 10px;
-  }
-
-  .progress-fill {
-    height: 100%;
-    background-color: $success-500-main;
-    transition: width 0.3s ease;
+        .gallery-filename {
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: nowrap;
+        } 
+      }
+    }
   }
 }
 </style>

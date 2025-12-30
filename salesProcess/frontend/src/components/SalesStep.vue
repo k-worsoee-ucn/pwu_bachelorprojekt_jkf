@@ -47,22 +47,25 @@
         <div class="form-group">
           <label for="customerId">Plant Manufacturer *</label>
           <div class="input-with-checkbox">
-            <select
-              id="customerId"
-              :disabled="props.disabled"
-              v-model="formData.customerId"
-              required
-              @change="onCustomerChange"
-            >
-              <option value="">Select Plant Manufacturer</option>
-              <option
-                v-for="customer in customers"
-                :key="customer.id"
-                :value="customer.id"
+            <div class="checkboxRel">
+              <select
+                id="customerId"
+                :disabled="props.disabled"
+                v-model="formData.customerId"
+                required
+                @change="onCustomerChange"
               >
-                {{ customer.name }}
-              </option>
-            </select>
+                <option value="">Select Plant Manufacturer</option>
+                <option
+                  v-for="customer in customers"
+                  :key="customer.id"
+                  :value="customer.id"
+                >
+                  {{ customer.name }}
+                </option>
+              </select>
+              <i class="fa-solid fa-chevron-down"></i>
+            </div>
             <label class="privacy-checkbox">
               <input type="checkbox" v-model="privacyFlags.customerId" />
               <span>Private</span>
@@ -173,15 +176,18 @@
         <div class="form-group">
           <label for="industry">Industry *</label>
           <div class="input-with-checkbox">
-            <select id="industry" v-model="formData.industry" :disabled="props.disabled" required>
-              <option value="">Select Industry</option>
-              <option value="woodworking">Woodworking</option>
-              <option value="agroAndMilling">Agro- and Milling</option>
-              <option value="recycling">Recycling</option>
-              <option value="metalworking">Metalworking</option>
-              <option value="paper">Paper</option>
-              <option value="other">Other</option>
-            </select>
+            <div class="checkboxRel">
+              <select id="industry" v-model="formData.industry" :disabled="props.disabled" required>
+                <option value="">Select Industry</option>
+                <option value="woodworking">Woodworking</option>
+                <option value="agroAndMilling">Agro- and Milling</option>
+                <option value="recycling">Recycling</option>
+                <option value="metalworking">Metalworking</option>
+                <option value="paper">Paper</option>
+                <option value="other">Other</option>
+              </select>
+              <i class="fa-solid fa-chevron-down"></i>
+            </div>
             <label class="privacy-checkbox">
               <input type="checkbox" v-model="privacyFlags.industry" />
               <span>Private</span>
@@ -209,7 +215,7 @@
       </div>
 
       <!-- Product Selection -->
-      <div class="form-section">
+      <div class="form-section product-selection">
         <h3>Product Selection</h3>
 
         <div class="form-group">
@@ -459,26 +465,23 @@
           </div>
         </div>
       </div>
-
+      <hr />
       <div class="form-actions">
-        <button type="button" @click="resetForm" class="btn-secondary" :disabled="props.disabled">
+        <button type="button" @click="resetForm" class="btn-no-fill" :disabled="props.disabled">
           Reset
         </button>
-        <button type="submit" class="btn-primary" :disabled="isSubmitting || props.disabled">
-          {{
-            isSubmitting ? "Saving..." : isEdit ? "Update Sale" : "Create Sale"
-          }}
+        <button type="submit" class="btn" :disabled="isSubmitting || props.disabled">
+          {{ isEdit ? "Update Sale" : "Create Sale" }}
         </button>
       </div>
+      <div v-if="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+  
+      <div v-if="successMessage" class="success-message">
+        {{ successMessage }}
+      </div>
     </form>
-
-    <div v-if="errorMessage" class="error-message">
-      {{ errorMessage }}
-    </div>
-
-    <div v-if="successMessage" class="success-message">
-      {{ successMessage }}
-    </div>
   </div>
 </template>
 
@@ -557,7 +560,6 @@ const privacyFlags = reactive({
 
 const customers = ref([]);
 const products = ref([]);
-const isSubmitting = ref(false);
 const errorMessage = ref("");
 const successMessage = ref("");
 const countryQuery = ref("");
@@ -729,7 +731,6 @@ const closeCountryDropdown = (event) => {
 };
 
 const submitForm = async () => {
-  isSubmitting.value = true;
   errorMessage.value = "";
   successMessage.value = "";
 
@@ -776,8 +777,6 @@ const submitForm = async () => {
   } catch (error) {
     console.error("Error submitting form:", error);
     errorMessage.value = "Network error. Please try again.";
-  } finally {
-    isSubmitting.value = false;
   }
 };
 
@@ -811,17 +810,14 @@ watch(
 
 <style scoped lang="scss">
 .sale-form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
   max-width: 800px;
   margin: 0 auto;
   padding: 2rem;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-
-  h2 {
-    margin: 0 0 1.5rem 0;
-    color: #374151;
-  }
+  border-radius: 4px;
+  box-shadow: $box-shadow;
 
   .form-grid {
     display: grid;
@@ -829,57 +825,57 @@ watch(
   }
 
   .form-section {
-    border: 1px solid #e5e7eb;
-    border-radius: 6px;
-    padding: 1.5rem;
-    background: #f9fafb;
+    @include default-border;
+    padding: 2rem;
+    background: $neutral-100-light;
 
-    h3 {
-      margin: 0 0 1rem 0;
-      color: #374151;
-      font-size: 1.1rem;
-      font-weight: 600;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+
+    select{
+      appearance: none;
+    }
+  }
+
+  .product-selection{
+    option:hover {
+      background-color: $secondary-hover-blue;
+      color: $jkf-hover-blue;
     }
   }
 
   .form-group {
-    margin-bottom: 1rem;
-
-    label {
-      display: block;
-      margin-bottom: 0.5rem;
-      color: #374151;
-      font-weight: 500;
-    }
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 
     input,
     select,
     textarea {
       width: 100%;
       padding: 0.75rem;
-      border: 1px solid #d1d5db;
-      border-radius: 4px;
-      font-size: 1rem;
+      
+      @include default-border;
+
       transition: border-color 0.2s;
       box-sizing: border-box;
 
       &:focus {
         outline: none;
-        border-color: #3b82f6;
-        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        border-color: $neutral-600-light;
+        box-shadow: $box-shadow;
       }
 
       &:disabled {
-        background-color: #f3f4f6;
-        color: #9ca3af;
+        background-color: $neutral-200-light;
         cursor: not-allowed;
-        opacity: 0.6;
+        opacity: 0.9;
       }
     }
 
     .disabled-field {
-      background-color: #f9fafb !important;
-      color: #6b7280 !important;
+      background-color: $neutral-100-light !important;
       cursor: not-allowed !important;
     }
   }
@@ -895,17 +891,28 @@ watch(
     .country-dropdown-container {
       flex: 1;
     }
+    
+    .checkboxRel{
+      position: relative;
+      flex: 1;
+
+      .fa-chevron-down {
+        position: absolute;
+        right: .75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1rem;
+      }
+    }
   }
 
   .privacy-checkbox {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 1rem;
     white-space: nowrap;
     cursor: pointer;
     user-select: none;
-    font-size: 0.875rem;
-    color: #6b7280;
 
     input[type="checkbox"] {
       cursor: pointer;
@@ -914,19 +921,18 @@ watch(
     }
 
     span {
-      font-weight: 500;
+      font-weight: 400;
     }
   }
 
   .multi-select {
     min-height: 80px !important;
-    padding: 0.5rem !important;
+    padding: 1rem !important;
   }
 
   .help-text {
-    color: #6b7280;
-    font-size: 0.875rem;
-    margin-top: 0.25rem;
+    color: $neutral-700;
+    font-size: 1rem;
     display: block;
   }
 
@@ -951,93 +957,30 @@ watch(
     max-height: 250px;
     overflow-y: auto;
     z-index: 10;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-shadow: $box-shadow;
 
     .no-results {
-      padding: 0.75rem;
-      color: #6b7280;
+      padding: 1rem;
+      color: $neutral-700;
       text-align: center;
     }
   }
 
   .country-option {
-    padding: 0.75rem;
+    padding: 1rem;
     cursor: pointer;
     transition: background-color 0.2s;
 
     &:hover {
-      background-color: #e0e7ff;
-      color: #3b82f6;
+      background-color: $secondary-hover-blue;
+      color: $jkf-hover-blue;
     }
-  }
-
-  .selected-country {
-    margin-top: 0.5rem;
-    font-size: 0.875rem;
-    color: #059669;
   }
 
   .form-actions {
     display: flex;
     gap: 1rem;
     justify-content: flex-end;
-    margin-top: 2rem;
-    padding-top: 1rem;
-    border-top: 1px solid #e5e7eb;
-  }
-
-  .btn-primary {
-    background: #3b82f6;
-    color: white;
-    border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: background-color 0.2s;
-
-    &:hover:not(:disabled) {
-      background: #2563eb;
-    }
-
-    &:disabled {
-      background: #9ca3af;
-      cursor: not-allowed;
-    }
-  }
-
-  .btn-secondary {
-    background: transparent;
-    color: #6b7280;
-    border: 1px solid #d1d5db;
-    padding: 0.75rem 1.5rem;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: all 0.2s;
-
-    &:hover {
-      background: #f3f4f6;
-      border-color: #9ca3af;
-    }
-  }
-
-  .error-message {
-    background: #fef2f2;
-    color: #dc2626;
-    padding: 1rem;
-    border-radius: 4px;
-    border: 1px solid #fecaca;
-    margin-top: 1rem;
-  }
-
-  .success-message {
-    background: #f0fdf4;
-    color: #16a34a;
-    padding: 1rem;
-    border-radius: 4px;
-    border: 1px solid #bbf7d0;
-    margin-top: 1rem;
   }
 
   @media (max-width: 768px) {
