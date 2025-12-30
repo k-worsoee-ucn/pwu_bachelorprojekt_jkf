@@ -109,6 +109,10 @@ header {
       display: flex;
       gap: 1rem;
       align-items: center;
+
+      @media (max-width: 536px) {
+        flex-direction: column;
+      }
     }
 
     .nav-btn-badge {
@@ -134,6 +138,10 @@ header {
       display: flex;
       gap: 1rem;
       align-items: center;
+
+      @media (max-width: 536px) {
+        flex-direction: column;
+      }
     }
 
     .user-info {
