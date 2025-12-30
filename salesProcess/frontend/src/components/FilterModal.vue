@@ -825,76 +825,9 @@ function closeModal() {
   align-items: center;
   gap: 1rem;
 
-  // .btn-reset {
-  //   padding: 0.75rem 1.5rem;
-  //   background-color: white;
-  //   border: 1px solid #e0e0e0;
-  //   border-radius: 4px;
-  //   cursor: pointer;
-  //   font-size: 0.95rem;
-  //   font-weight: 500;
-  //   color: #333;
-  //   transition: all 0.2s ease;
-
-  //   &:hover {
-  //     background-color: #f8f9fa;
-  //     border-color: #204485;
-  //   }
-  // }
-
-  // .checkbox-group {
-  //   display: flex;
-  //   gap: 1rem;
-  //   flex-wrap: wrap;
-  // }
-
-  // .checkbox-option {
-  //   display: flex;
-  //   align-items: center;
-  //   gap: 0.5rem;
-  //   cursor: pointer;
-
-  //   input {
-  //     cursor: pointer;
-  //   }
-  // }
-
   .action-buttons {
     display: flex;
     gap: 1rem;
   }
-
-  // .btn-cancel {
-  //   padding: 0.75rem 1.5rem;
-  //   background-color: white;
-  //   border: 1px solid #e0e0e0;
-  //   border-radius: 4px;
-  //   cursor: pointer;
-  //   font-size: 0.95rem;
-  //   font-weight: 500;
-  //   color: #333;
-  //   transition: all 0.2s ease;
-
-  //   &:hover {
-  //     background-color: #f8f9fa;
-  //     border-color: #204485;
-  //   }
-  // }
-
-  // .btn-apply {
-  //   padding: 0.75rem 1.5rem;
-  //   background-color: #204485;
-  //   border: none;
-  //   border-radius: 4px;
-  //   cursor: pointer;
-  //   font-size: 0.95rem;
-  //   font-weight: 500;
-  //   color: white;
-  //   transition: background-color 0.2s ease;
-
-  //   &:hover {
-  //     background-color: #1a3a6b;
-  //   }
-  // }
 }
 </style>
