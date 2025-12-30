@@ -7,6 +7,7 @@
       @click="closeCountryDropdown"
       class="form-grid"
     >
+      <!-- Basic Information -->
       <div class="form-section">
         <h3>Basic Information</h3>
         <div class="form-group">
