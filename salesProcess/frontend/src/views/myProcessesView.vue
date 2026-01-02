@@ -324,6 +324,26 @@ const tabLabel = computed(() => {
 function handleApplyFilter(filters) {
   activeFilters.value = { ...filters };
 }
+
+// function to reset filters
+function resetFilters() {
+  activeFilters.value = {
+    step: [],
+    salesManager: [],
+    year: [],
+    month: [],
+    consent: [],
+    industry: [],
+    country: [],
+    customer: [],
+    productGroup: [],
+    ventilation: [],
+    extractionVolumeFrom: "",
+    extractionVolumeTo: "",
+    volumeFlowFrom: "",
+    volumeFlowTo: "",
+  };
+}
 </script>
 
 <template>
@@ -340,10 +360,69 @@ function handleApplyFilter(filters) {
         <i class="fa-solid fa-magnifying-glass search-icon"></i>
         <p v-if="searchDisplayText" class="search-result-text">Viser resultater for: {{ searchDisplayText }}</p>
       </div>
-      <button class="filter-btn" @click="isFilterModalOpen = true">
-        <i class="fa-solid fa-sliders"></i>
-        Filter
-      </button>
+      <div class="filters-container">
+        <div class="filter-buttons">
+        <button class="filter-btn" @click="isFilterModalOpen = true">
+          <i class="fa-solid fa-sliders"></i>
+          Filter
+        </button>
+        <button v-if="Object.values(activeFilters).some(value => (Array.isArray(value) ? value.length > 0 : value))" class="filter-btn" @click="resetFilters">Reset Filters</button>
+        </div>
+        <div class="active-filters">
+          <div v-if="activeFilters.step.length > 0" class="filter-item">
+            <strong>Step:</strong> {{ activeFilters.step.join(", ") }}
+          </div>
+          <div v-if="activeFilters.salesManager.length > 0" class="filter-item">
+            <strong>Sales Manager:</strong>
+            {{ activeFilters.salesManager.join(", ") }}
+          </div>
+          <div v-if="activeFilters.year.length > 0" class="filter-item">
+            <strong>Year:</strong> {{ activeFilters.year.join(", ") }}
+          </div>
+          <div v-if="activeFilters.month.length > 0" class="filter-item">
+            <strong>Month:</strong> {{ activeFilters.month.join(", ") }}
+          </div>
+          <div v-if="activeFilters.consent.length > 0" class="filter-item">
+            <strong>Consent:</strong> {{ activeFilters.consent.join(", ") }}
+          </div>
+          <div v-if="activeFilters.industry.length > 0" class="filter-item">
+            <strong>Industry:</strong> {{ activeFilters.industry.join(", ") }}
+          </div>
+          <div v-if="activeFilters.country.length > 0" class="filter-item">
+            <strong>Country:</strong> {{ activeFilters.country.join(", ") }}
+          </div>
+          <div v-if="activeFilters.customer.length > 0" class="filter-item">
+            <strong>Customer:</strong> {{ activeFilters.customer.join(", ") }}
+          </div>
+          <div v-if="activeFilters.productGroup.length > 0" class="filter-item">
+            <strong>Product Group:</strong>
+            {{ activeFilters.productGroup.join(", ") }}
+          </div>
+          <div v-if="activeFilters.ventilation.length > 0" class="filter-item">
+            <strong>Ventilation:</strong>
+            {{ activeFilters.ventilation.join(", ") }}
+          </div>
+          <div
+            v-if="
+              activeFilters.extractionVolumeFrom ||
+              activeFilters.extractionVolumeTo
+            "
+            class="filter-item"
+          >
+            <strong>Extraction Volume:</strong>
+            {{ activeFilters.extractionVolumeFrom || "0" }} -
+            {{ activeFilters.extractionVolumeTo || "∞" }}
+          </div>
+          <div
+            v-if="activeFilters.volumeFlowFrom || activeFilters.volumeFlowTo"
+            class="filter-item"
+          >
+            <strong>Volume Flow:</strong>
+            {{ activeFilters.volumeFlowFrom || "0" }} -
+            {{ activeFilters.volumeFlowTo || "∞" }}
+          </div>
+        </div>
+      </div>
     </div>
 
     <FilterModal
