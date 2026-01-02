@@ -66,7 +66,7 @@ const props = defineProps({
   },
 });
 
-const { getAuthHeader } = useAuth();
+const { } = useAuth();
 
 const caseContent = ref("");
 const saving = ref(false);
@@ -93,9 +93,7 @@ const fetchCaseContent = async () => {
 
   try {
     const response = await fetch(`/api/cases/process/${props.processId}`, {
-      headers: {
-        ...getAuthHeader(),
-      },
+      credentials: 'include',
     });
 
     if (response.ok) {
@@ -135,8 +133,8 @@ const saveCase = async () => {
       method,
       headers: {
         "Content-Type": "application/json",
-        ...getAuthHeader(),
       },
+      credentials: 'include',
       body: JSON.stringify({
         content: caseContent.value,
         processId: parseInt(props.processId),

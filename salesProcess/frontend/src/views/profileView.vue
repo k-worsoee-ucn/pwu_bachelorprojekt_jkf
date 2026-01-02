@@ -2,7 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 
-const { user, getAuthHeader, setUser } = useAuth()
+const { user, setUser } = useAuth()
 const form = ref({ email: '', password: '', name: '', role: '', accessCode: '' })
 const message = ref('')
 
@@ -25,8 +25,8 @@ const updateProfile = async () => {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        ...getAuthHeader(),
       },
+      credentials: 'include',
       body: JSON.stringify(payload),
     })
     const data = await res.json();

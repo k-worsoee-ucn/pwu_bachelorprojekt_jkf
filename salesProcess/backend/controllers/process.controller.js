@@ -1,4 +1,5 @@
 const prisma = require("./prisma");
+const encryption = require("../utils/encryption");
 
 async function getAllProcesses(req, res) {
   try {
@@ -38,7 +39,8 @@ async function getAllProcesses(req, res) {
     });
     res.json(processes);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in getAllProcesses:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -65,14 +67,58 @@ async function getProcessById(req, res) {
             },
           },
         },
+        processUsers: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+              },
+            },
+          },
+        },
       },
     });
 
     if (!process) return res.status(404).json({ error: "Process not found" });
 
+    // Decrypt endUser from sale
+    if (process.sale && process.sale.endUser) {
+      process.sale.endUser = encryption.decrypt(process.sale.endUser);
+    }
+
+    // Decrypt salesManager name
+    if (process.sale && process.sale.salesManager && process.sale.salesManager.name) {
+      process.sale.salesManager.name = encryption.decrypt(process.sale.salesManager.name);
+    }
+
+    // Decrypt customer name and website
+    if (process.sale && process.sale.customer) {
+      if (process.sale.customer.name) {
+        process.sale.customer.name = encryption.decrypt(process.sale.customer.name);
+      }
+      if (process.sale.customer.website) {
+        process.sale.customer.website = encryption.decrypt(process.sale.customer.website);
+      }
+    }
+
+    // Decrypt processUsers names
+    if (process.processUsers && process.processUsers.length > 0) {
+      process.processUsers = process.processUsers.map(pu => ({
+        ...pu,
+        user: pu.user && pu.user.name ? {
+          ...pu.user,
+          name: encryption.decrypt(pu.user.name)
+        } : pu.user
+      }));
+    }
+
     res.json(process);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in getProcessById:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -117,7 +163,8 @@ async function updateProcess(req, res) {
     });
     res.json(process);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in updateProcess:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -126,7 +173,8 @@ async function deleteProcess(req, res) {
     await prisma.process.delete({ where: { id: parseInt(req.params.id) } });
     res.status(204).send();
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in deleteProcess:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -187,8 +235,8 @@ async function getFilterOptions(req, res) {
       fanTypes,
     });
   } catch (error) {
-    console.error("Filter options error:", error);
-    res.status(500).json({ error: error.message });
+    console.error('Error in getFilterOptions:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 

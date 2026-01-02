@@ -14,7 +14,8 @@ async function getAllReferences(req, res) {
 
     res.json(references);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in getAllReferences:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -30,7 +31,8 @@ async function getReferenceById(req, res) {
 
     res.json(reference);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in getReferenceById:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -44,7 +46,8 @@ async function createReference(req, res) {
 
     res.status(201).json(reference);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in createReference:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -59,7 +62,8 @@ async function updateReference(req, res) {
 
     res.json(reference);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in updateReference:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -68,7 +72,8 @@ async function deleteReference(req, res) {
     await prisma.reference.delete({ where: { id: parseInt(req.params.id) } });
     res.status(204).send();
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in deleteReference:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 

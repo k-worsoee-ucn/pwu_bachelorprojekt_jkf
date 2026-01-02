@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const path = require("path");
@@ -58,6 +59,8 @@ app.use(
 
 app.use(express.json());
 
+app.use(cookieParser());
+
 // Serve static files from uploads directory
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
@@ -85,12 +88,8 @@ app.use("/api", imageRoutes);
 app.use((err, req, res, next) => {
   console.error("Global error:", err);
 
-  // Don't leak error details in production
-  if (process.env.NODE_ENV === "production") {
-    res.status(500).json({ error: "Internal server error" });
-  } else {
-    res.status(500).json({ error: err.message, stack: err.stack });
-  }
+  // Always return generic message to client, don't expose details
+  res.status(500).json({ error: "An error occurred processing your request" });
 });
 
 // 404 handler

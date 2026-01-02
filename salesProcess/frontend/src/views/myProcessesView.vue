@@ -5,7 +5,7 @@ import ProcessCard from "@/components/ProcessCard.vue";
 import FilterModal from "@/components/FilterModal.vue";
 import { useAuth } from "@/composables/useAuth";
 
-const { getAuthHeader, user } = useAuth();
+const { user } = useAuth();
 const route = useRoute();
 const router = useRouter();
 const searchQuery = ref("");
@@ -36,9 +36,7 @@ const activeFilters = ref({
 const fetchProcesses = async () => {
   try {
     const response = await fetch("/api/processes", {
-      headers: {
-        ...getAuthHeader(),
-      },
+      credentials: 'include',
     });
     const data = await response.json();
     allProcesses.value = data;

@@ -1,4 +1,5 @@
 const { PrismaClient } = require('@prisma/client')
+const encryption = require('../../utils/encryption')
 
 const prisma = new PrismaClient()
 
@@ -13,8 +14,8 @@ async function seedCustomers(salesManagers) {
       where: { name: 'Customer 1' },
       update: {},
       create: {
-        name: 'Customer 1',
-        website: 'https://www.Customer1.com',
+        name: encryption.encrypt('Customer 1'),
+        website: encryption.encrypt('https://www.Customer1.com'),
         salesManagerId: salesManagers[0].id
       }
     }),
@@ -22,8 +23,8 @@ async function seedCustomers(salesManagers) {
       where: { name: 'Customer 2' },
       update: {},
       create: {
-        name: 'Customer 2',
-        website: 'https://www.Customer2.com',
+        name: encryption.encrypt('Customer 2'),
+        website: encryption.encrypt('https://www.Customer2.com'),
         salesManagerId: salesManagers[0].id
       }
     }),
@@ -31,8 +32,8 @@ async function seedCustomers(salesManagers) {
       where: { name: 'Customer 3' },
       update: {},
       create: {
-        name: 'Customer 3',
-        website: 'https://www.Customer3.com',
+        name: encryption.encrypt('Customer 3'),
+        website: encryption.encrypt('https://www.Customer3.com'),
         salesManagerId: salesManagers[0].id
       }
     }),
@@ -40,8 +41,8 @@ async function seedCustomers(salesManagers) {
       where: { name: 'Customer 4' },
       update: {},
       create: {
-        name: 'Customer 4',
-        website: 'https://www.Customer4.com',
+        name: encryption.encrypt('Customer 4'),
+        website: encryption.encrypt('https://www.Customer4.com'),
         salesManagerId: salesManagers[0].id
       }
     }),
@@ -49,8 +50,8 @@ async function seedCustomers(salesManagers) {
       where: { name: 'Customer 5' },
       update: {},
       create: {
-        name: 'Customer 5',
-        website: 'https://www.Customer5.com',
+        name: encryption.encrypt('Customer 5'),
+        website: encryption.encrypt('https://www.Customer5.com'),
         salesManagerId: salesManagers[0].id
       }
     }),
@@ -58,8 +59,8 @@ async function seedCustomers(salesManagers) {
       where: { name: 'Customer 6' },
       update: {},
       create: {
-        name: 'Customer 6',
-        website: 'https://www.Customer6.com',
+        name: encryption.encrypt('Customer 6'),
+        website: encryption.encrypt('https://www.Customer6.com'),
         salesManagerId: salesManagers[0].id
       }
     }),
@@ -67,8 +68,8 @@ async function seedCustomers(salesManagers) {
       where: { name: 'Customer 7' },
       update: {},
       create: {
-        name: 'Customer 7',
-        website: 'https://www.Customer7.com',
+        name: encryption.encrypt('Customer 7'),
+        website: encryption.encrypt('https://www.Customer7.com'),
         salesManagerId: salesManagers[0].id
       }
     }),
@@ -76,8 +77,8 @@ async function seedCustomers(salesManagers) {
       where: { name: 'Customer 8' },
       update: {},
       create: {
-        name: 'Customer 8',
-        website: 'https://www.Customer8.com',
+        name: encryption.encrypt('Customer 8'),
+        website: encryption.encrypt('https://www.Customer8.com'),
         salesManagerId: salesManagers[0].id
       }
     }),
@@ -85,8 +86,8 @@ async function seedCustomers(salesManagers) {
       where: { name: 'Customer 9' },
       update: {},
       create: {
-        name: 'Customer 9',
-        website: 'https://www.Customer9.com',
+        name: encryption.encrypt('Customer 9'),
+        website: encryption.encrypt('https://www.Customer9.com'),
         salesManagerId: salesManagers[0].id
       }
     }),
@@ -94,8 +95,8 @@ async function seedCustomers(salesManagers) {
       where: { name: 'Customer 10' },
       update: {},
       create: {
-        name: 'Customer 10',
-        website: 'https://www.Customer10.com',
+        name: encryption.encrypt('Customer 10'),
+        website: encryption.encrypt('https://www.Customer10.com'),
         salesManagerId: salesManagers[0].id
       }
     })

@@ -1,4 +1,5 @@
 const prisma = require("./prisma");
+const encryption = require("../utils/encryption");
 
 async function getAllSales(req, res) {
   try {
@@ -20,10 +21,19 @@ async function getAllSales(req, res) {
         },
       },
     });
-    res.json(sales);
+    // Decrypt endUser field and salesManager name
+    const decryptedSales = sales.map(sale => ({
+      ...sale,
+      endUser: sale.endUser ? encryption.decrypt(sale.endUser) : null,
+      salesManager: sale.salesManager && sale.salesManager.name ? {
+        ...sale.salesManager,
+        name: encryption.decrypt(sale.salesManager.name)
+      } : sale.salesManager
+    }));
+    res.json(decryptedSales);
   } catch (error) {
-    console.error("Error fetching sales:", error);
-    res.status(500).json({ error: error.message });
+    console.error('Error in getAllSales:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -53,10 +63,20 @@ async function getSaleById(req, res) {
       return res.status(404).json({ error: "Sale not found" });
     }
 
+    // Decrypt endUser field
+    if (sale.endUser) {
+      sale.endUser = encryption.decrypt(sale.endUser);
+    }
+
+    // Decrypt salesManager name
+    if (sale.salesManager && sale.salesManager.name) {
+      sale.salesManager.name = encryption.decrypt(sale.salesManager.name);
+    }
+
     res.json(sale);
   } catch (error) {
-    console.error("Error fetching sale:", error);
-    res.status(500).json({ error: error.message });
+    console.error('Error in getSaleById:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -134,11 +154,12 @@ async function createSale(req, res) {
         },
       });
 
+      const encryptedEndUser = encryption.encrypt(endUser);
       const sale = await prisma.sale.create({
         data: {
           title: title,
           description: description || null,
-          endUser,
+          endUser: encryptedEndUser,
           phoneNumber: phoneNumber || null,
           country,
           industry,
@@ -194,8 +215,8 @@ async function createSale(req, res) {
     console.log(`Created sale and process: ${title} (Case #${nextCaseNo})`);
     res.status(201).json(result);
   } catch (error) {
-    console.error("Error creating sale:", error);
-    res.status(500).json({ error: error.message });
+    console.error('Error in createSale:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -270,8 +291,8 @@ async function updateSale(req, res) {
 
     res.json(sale);
   } catch (error) {
-    console.error("Error updating sale:", error);
-    res.status(500).json({ error: error.message });
+    console.error('Error in updateSale:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -291,8 +312,8 @@ async function deleteSale(req, res) {
 
     res.status(204).send();
   } catch (error) {
-    console.error("Error deleting sale:", error);
-    res.status(500).json({ error: error.message });
+    console.error('Error in deleteSale:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 

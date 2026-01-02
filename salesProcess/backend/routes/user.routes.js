@@ -23,6 +23,7 @@ router.post("/register", registrationLimiter, validateUserRegistration, userCont
 
 // Protected routes
 router.get("/me", verifyToken, userController.getCurrentUser);
+router.post("/logout", verifyToken, userController.logoutUser);
 router.get("/:id", verifyToken, validateId, userController.getUserById);
 router.get("/", verifyToken, userController.getAllUsers);
 router.put("/me", verifyToken, userController.updateCurrentUser);

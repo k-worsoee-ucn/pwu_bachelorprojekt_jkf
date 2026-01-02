@@ -1,6 +1,7 @@
 const prisma = require("./prisma");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const encryption = require("../utils/encryption");
 
 async function getAllUsers(req, res) {
   try {
@@ -20,9 +21,16 @@ async function getAllUsers(req, res) {
       },
     });
 
-    res.json(users);
+    // Decrypt names
+    const decryptedUsers = users.map(user => ({
+      ...user,
+      name: user.name ? encryption.decrypt(user.name) : null
+    }));
+
+    res.json(decryptedUsers);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in getAllUsers:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -44,9 +52,16 @@ async function getUserById(req, res) {
     });
 
     if (!user) return res.status(404).json({ error: "User not found" });
+    
+    // Decrypt name
+    if (user.name) {
+      user.name = encryption.decrypt(user.name);
+    }
+    
     res.json(user);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in getUserById:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -57,7 +72,7 @@ async function updateCurrentUser(req, res) {
 
     let updateData = {};
     if (email) updateData.email = email;
-    if (name) updateData.name = name;
+    if (name) updateData.name = encryption.encrypt(name);
     if (role) updateData.role = role;
 
     if (password) {
@@ -65,6 +80,14 @@ async function updateCurrentUser(req, res) {
         console.log('Access code missing or invalid for password update');
         return res.status(403).json({ error: 'Valid access code required to change password' });
       }
+
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[a-zA-Z\d@$!%*?&]{8,}$/;
+      if (!passwordRegex.test(password)) {
+        return res.status(400).json({ 
+          error: 'Password must be at least 8 characters long and contain uppercase, lowercase, number, and special character (@$!%*?&)' 
+        });
+      }
+
       const bcrypt = require('bcrypt');
       updateData.password = await bcrypt.hash(password, 10);
       console.log('Password will be updated for user:', userId);
@@ -82,10 +105,15 @@ async function updateCurrentUser(req, res) {
       },
     });
 
+    // Decrypt name before returning
+    if (user.name) {
+      user.name = encryption.decrypt(user.name);
+    }
+
     res.json(user);
   } catch (error) {
     console.error('Error in updateCurrentUser:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -98,7 +126,8 @@ async function getUserProcesses(req, res) {
 
     res.json(processUsers);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in getUserProcesses:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -111,7 +140,8 @@ async function getUserCustomers(req, res) {
 
     res.json(customers);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in getUserCustomers:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -128,7 +158,8 @@ async function getUserSales(req, res) {
 
     res.json(sales);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in getUserSales:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -154,14 +185,23 @@ async function registerUser(req, res) {
       });
     }
 
+    // Validate password complexity
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[a-zA-Z\d@$!%*?&]{8,}$/;
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({ 
+        error: 'Password must be at least 8 characters long and contain uppercase, lowercase, number, and special character (@$!%*?&)' 
+      });
+    }
+
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
+    const encryptedName = encryption.encrypt(name);
 
     const user = await prisma.user.create({
       data: { 
         email, 
         password: hashedPassword, 
-        name, 
+        name: encryptedName, 
         role: role || "viewer" 
       },
       select: {
@@ -180,9 +220,24 @@ async function registerUser(req, res) {
       { expiresIn: '24h' }
     );
 
-    res.status(201).json({ user, token });
+    // Decrypt name for response
+    const responseUser = { ...user };
+    if (responseUser.name) {
+      responseUser.name = encryption.decrypt(responseUser.name);
+    }
+
+    // Set token in httpOnly cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    });
+
+    res.status(201).json({ user: responseUser });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in registerUser:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -214,23 +269,50 @@ async function loginUser(req, res) {
       { expiresIn: '24h' }
     );
 
+    // Set token in httpOnly cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    });
+
     res.json({ 
       user: {
         id: user.id,
         email: user.email,
-        email: user.email,
-        name: user.name,
+        name: user.name ? encryption.decrypt(user.name) : null,
         role: user.role
-      }, 
-      token 
+      }
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in loginUser:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
 async function getCurrentUser(req, res) {
-  res.json({ user: req.user });
+  const user = req.user;
+  if (user && user.name) {
+    user.name = encryption.decrypt(user.name);
+  }
+  res.json({ user });
+}
+
+async function logoutUser(req, res) {
+  try {
+    // Clear the token cookie
+    res.clearCookie('token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict'
+    });
+    
+    res.json({ message: 'Logged out successfully' });
+  } catch (error) {
+    console.error('Error in logoutUser:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
+  }
 }
 
 module.exports = {
@@ -243,4 +325,5 @@ module.exports = {
   registerUser,
   loginUser,
   getCurrentUser,
+  logoutUser,
 };

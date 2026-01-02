@@ -26,8 +26,8 @@ async function getAllProducts(req, res) {
 
     res.json(products);
   } catch (error) {
-    console.error('Error fetching products:', error);
-    res.status(500).json({ error: error.message });
+    console.error('Error in getAllProducts:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -58,7 +58,8 @@ async function getProductById(req, res) {
 
     res.json(product);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in getProductById:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -93,8 +94,8 @@ async function createProduct(req, res) {
 
     res.status(201).json(product);
   } catch (error) {
-    console.error('Error creating product:', error);
-    res.status(500).json({ error: error.message });
+    console.error('Error in createProduct:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -119,7 +120,8 @@ async function updateProduct(req, res) {
 
     res.json(product);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in updateProduct:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -128,7 +130,8 @@ async function deleteProduct(req, res) {
     await prisma.product.delete({ where: { id: parseInt(req.params.id) } });
     res.status(204).send();
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in deleteProduct:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
