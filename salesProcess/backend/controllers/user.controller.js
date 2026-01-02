@@ -1,6 +1,7 @@
 const prisma = require("./prisma");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const encryption = require("../utils/encryption");
 
 async function getAllUsers(req, res) {
   try {
@@ -20,7 +21,13 @@ async function getAllUsers(req, res) {
       },
     });
 
-    res.json(users);
+    // Decrypt names
+    const decryptedUsers = users.map(user => ({
+      ...user,
+      name: user.name ? encryption.decrypt(user.name) : null
+    }));
+
+    res.json(decryptedUsers);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -44,6 +51,12 @@ async function getUserById(req, res) {
     });
 
     if (!user) return res.status(404).json({ error: "User not found" });
+    
+    // Decrypt name
+    if (user.name) {
+      user.name = encryption.decrypt(user.name);
+    }
+    
     res.json(user);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -57,7 +70,7 @@ async function updateCurrentUser(req, res) {
 
     let updateData = {};
     if (email) updateData.email = email;
-    if (name) updateData.name = name;
+    if (name) updateData.name = encryption.encrypt(name);
     if (role) updateData.role = role;
 
     if (password) {
@@ -89,6 +102,11 @@ async function updateCurrentUser(req, res) {
         updatedAt: true,
       },
     });
+
+    // Decrypt name before returning
+    if (user.name) {
+      user.name = encryption.decrypt(user.name);
+    }
 
     res.json(user);
   } catch (error) {
@@ -172,12 +190,13 @@ async function registerUser(req, res) {
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
+    const encryptedName = encryption.encrypt(name);
 
     const user = await prisma.user.create({
       data: { 
         email, 
         password: hashedPassword, 
-        name, 
+        name: encryptedName, 
         role: role || "viewer" 
       },
       select: {
@@ -196,7 +215,13 @@ async function registerUser(req, res) {
       { expiresIn: '24h' }
     );
 
-    res.status(201).json({ user, token });
+    // Decrypt name for response
+    const responseUser = { ...user };
+    if (responseUser.name) {
+      responseUser.name = encryption.decrypt(responseUser.name);
+    }
+
+    res.status(201).json({ user: responseUser, token });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -234,8 +259,7 @@ async function loginUser(req, res) {
       user: {
         id: user.id,
         email: user.email,
-        email: user.email,
-        name: user.name,
+        name: user.name ? encryption.decrypt(user.name) : null,
         role: user.role
       }, 
       token 
@@ -246,7 +270,11 @@ async function loginUser(req, res) {
 }
 
 async function getCurrentUser(req, res) {
-  res.json({ user: req.user });
+  const user = req.user;
+  if (user && user.name) {
+    user.name = encryption.decrypt(user.name);
+  }
+  res.json({ user });
 }
 
 module.exports = {

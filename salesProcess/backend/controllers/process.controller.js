@@ -1,4 +1,5 @@
 const prisma = require("./prisma");
+const encryption = require("../utils/encryption");
 
 async function getAllProcesses(req, res) {
   try {
@@ -65,10 +66,53 @@ async function getProcessById(req, res) {
             },
           },
         },
+        processUsers: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+              },
+            },
+          },
+        },
       },
     });
 
     if (!process) return res.status(404).json({ error: "Process not found" });
+
+    // Decrypt endUser from sale
+    if (process.sale && process.sale.endUser) {
+      process.sale.endUser = encryption.decrypt(process.sale.endUser);
+    }
+
+    // Decrypt salesManager name
+    if (process.sale && process.sale.salesManager && process.sale.salesManager.name) {
+      process.sale.salesManager.name = encryption.decrypt(process.sale.salesManager.name);
+    }
+
+    // Decrypt customer name and website
+    if (process.sale && process.sale.customer) {
+      if (process.sale.customer.name) {
+        process.sale.customer.name = encryption.decrypt(process.sale.customer.name);
+      }
+      if (process.sale.customer.website) {
+        process.sale.customer.website = encryption.decrypt(process.sale.customer.website);
+      }
+    }
+
+    // Decrypt processUsers names
+    if (process.processUsers && process.processUsers.length > 0) {
+      process.processUsers = process.processUsers.map(pu => ({
+        ...pu,
+        user: pu.user && pu.user.name ? {
+          ...pu.user,
+          name: encryption.decrypt(pu.user.name)
+        } : pu.user
+      }));
+    }
 
     res.json(process);
   } catch (error) {

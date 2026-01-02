@@ -1,5 +1,6 @@
 const { PrismaClient } = require('@prisma/client')
 const bcrypt = require('bcrypt')
+const encryption = require('../../utils/encryption')
 
 const prisma = new PrismaClient()
 
@@ -21,7 +22,7 @@ async function seedUsers() {
       create: {
         email: 'sally@sales.com',
         password: hashedPassword,
-        name: 'Sally Sales',
+        name: encryption.encrypt('Sally Sales'),
         role: 'salesManager'
       }
     }),
@@ -31,7 +32,7 @@ async function seedUsers() {
       create: {
         email: 'mark@marketing.com',
         password: hashedPassword,
-        name: 'Mark Marketing',
+        name: encryption.encrypt('Mark Marketing'),
         role: 'marketingManager'
       }
     }),
@@ -41,7 +42,7 @@ async function seedUsers() {
       create: {
         email: 'viggo@viewer.com',
         password: hashedPassword,
-        name: 'Viggo Viewer',
+        name: encryption.encrypt('Viggo Viewer'),
         role: 'viewer'
       }
     })

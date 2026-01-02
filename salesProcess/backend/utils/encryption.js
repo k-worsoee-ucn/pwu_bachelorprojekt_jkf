@@ -1,21 +1,14 @@
 const crypto = require('crypto');
-
-// AES-256-GCM encryption for sensitive data
-// Uses environment variable ENCRYPTION_KEY for key derivation
+require('dotenv').config();
 
 class EncryptionUtil {
   constructor() {
-    // Derive a 256-bit key from JWT_SECRET using PBKDF2
-    // In production, use a dedicated ENCRYPTION_KEY environment variable
-    const keyMaterial = process.env.ENCRYPTION_KEY || process.env.JWT_SECRET;
-    this.key = crypto.pbkdf2Sync(keyMaterial, 'salesprocess-salt', 100000, 32, 'sha256');
+    if (!process.env.ENCRYPTION_KEY) {
+      throw new Error('ENCRYPTION_KEY environment variable is required');
+    }
+    this.key = crypto.pbkdf2Sync(process.env.ENCRYPTION_KEY, 'salesprocess-salt', 100000, 32, 'sha256');
   }
 
-  /**
-   * Encrypt sensitive data using AES-256-GCM
-   * @param {string} plaintext - Data to encrypt
-   * @returns {string} Base64 encoded IV:authTag:ciphertext
-   */
   encrypt(plaintext) {
     try {
       const iv = crypto.randomBytes(16);
@@ -34,11 +27,6 @@ class EncryptionUtil {
     }
   }
 
-  /**
-   * Decrypt AES-256-GCM encrypted data
-   * @param {string} encryptedData - Base64 encoded IV:authTag:ciphertext
-   * @returns {string} Decrypted plaintext
-   */
   decrypt(encryptedData) {
     try {
       const parts = encryptedData.split(':');
