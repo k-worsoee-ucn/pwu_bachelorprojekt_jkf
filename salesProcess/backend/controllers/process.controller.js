@@ -181,11 +181,15 @@ async function deleteProcess(req, res) {
 async function getFilterOptions(req, res) {
   try {
     // Get all sales managers
-    const salesManagers = await prisma.user.findMany({
+    const salesManagersRaw = await prisma.user.findMany({
       where: { role: "salesManager" },
       select: { id: true, name: true },
       orderBy: { name: "asc" },
     });
+    const salesManagers = salesManagersRaw.map((user) => ({
+      id: user.id,
+      name: encryption.decrypt(user.name),
+    }));
 
     // Industry enum values (must match the enum in schema)
     const industries = [
@@ -208,7 +212,7 @@ async function getFilterOptions(req, res) {
       select: { name: true },
       orderBy: { name: "asc" },
     });
-    const customers = customersRaw.map((c) => c.name);
+    const customers = [...new Set(customersRaw.map((c) => encryption.decrypt(c.name)))].sort();
 
     // Get distinct product categories for filters (filtersAndSeparators)
     const filterProductsRaw = await prisma.product.findMany({
