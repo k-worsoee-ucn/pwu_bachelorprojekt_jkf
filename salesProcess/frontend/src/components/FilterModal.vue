@@ -21,6 +21,19 @@ watch(
   () => props.isOpen,
   (isOpen) => {
     document.body.style.overflow = isOpen ? "hidden" : "";
+    if (!isOpen) {
+      openDropdownKey.value = null;
+    }
+  }
+);
+
+// Reset internal state when modal opens (to sync with parent's state)
+watch(
+  () => props.isOpen,
+  (isOpen) => {
+    if (isOpen) {
+      resetFilters();
+    }
   }
 );
 
@@ -299,7 +312,7 @@ function closeModal() {
             <div class="filter-group">
               <div class="dropdown-container">
                 <button
-                  class=" dropdown-button btn-no-fill"
+                  class="dropdown-button btn-no-fill"
                   @click="toggleDropdown('month')"
                 >
                   Month
@@ -713,7 +726,6 @@ function closeModal() {
   display: flex;
   flex-direction: column;
   gap: 2rem;
-  
 }
 
 .filter-section {

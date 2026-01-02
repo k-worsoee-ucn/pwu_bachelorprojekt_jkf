@@ -8,331 +8,371 @@
       class="form-grid"
     >
       <!-- Basic Information -->
-      <div class="form-section">
-        <h3>Basic Information</h3>
-        <div class="form-group">
-          <label for="title">Process Title *</label>
-          <div class="input-with-checkbox">
-            <input
-              id="title"
-              v-model="formData.title"
-              type="text"
-              placeholder="Enter a descriptive title for this process"
-              :disabled="props.disabled"
-              required
-            />
-            <label class="privacy-checkbox">
-              <input type="checkbox" v-model="privacyFlags.title" />
-              <span>Private</span>
-            </label>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="description">Description</label>
-          <div class="input-with-checkbox">
-            <textarea
-              id="description"
-              v-model="formData.description"
-              placeholder="Enter a detailed description of the project"
-              :disabled="props.disabled"
-              rows="3"
-            ></textarea>
-            <label class="privacy-checkbox">
-              <input type="checkbox" v-model="privacyFlags.description" />
-              <span>Private</span>
-            </label>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="customerId">Plant Manufacturer *</label>
-          <div class="input-with-checkbox">
-            <div class="checkboxRel">
-              <select
-                id="customerId"
-                :disabled="props.disabled"
-                v-model="formData.customerId"
-                required
-                @change="onCustomerChange"
-              >
-                <option value="">Select Plant Manufacturer</option>
-                <option
-                  v-for="customer in customers"
-                  :key="customer.id"
-                  :value="customer.id"
-                >
-                  {{ customer.name }}
-                </option>
-              </select>
-              <i class="fa-solid fa-chevron-down"></i>
-            </div>
-            <label class="privacy-checkbox">
-              <input type="checkbox" v-model="privacyFlags.customerId" />
-              <span>Private</span>
-            </label>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="manufacturerWebsite">Manufacturer Website</label>
-          <div class="input-with-checkbox">
-            <input
-              id="manufacturerWebsite"
-              :value="selectedCustomerWebsite"
-              type="url"
-              placeholder="Auto-filled from selected manufacturer"
-              disabled
-              class="disabled-field"
-            />
-            <label class="privacy-checkbox">
+      <div
+        class="form-section"
+        @click="accordionState.basicInfo = !accordionState.basicInfo"
+        style="cursor: pointer"
+      >
+        <h3>
+          Basic Information
+          <i
+            class="fa-solid fa-chevron-down accordion-arrow"
+            :class="{ open: accordionState.basicInfo }"
+          ></i>
+        </h3>
+        <div v-show="accordionState.basicInfo">
+          <div class="form-group">
+            <label for="title">Process Title *</label>
+            <div class="input-with-checkbox">
               <input
-                type="checkbox"
-                v-model="privacyFlags.manufacturerWebsite"
-              />
-              <span>Private</span>
-            </label>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="endUser">End User *</label>
-          <div class="input-with-checkbox">
-            <input
-              id="endUser"
-              v-model="formData.endUser"
-              type="text"
-              :disabled="props.disabled"
-              placeholder="Name of the end user company"
-              required
-            />
-            <label class="privacy-checkbox">
-              <input type="checkbox" v-model="privacyFlags.endUser" />
-              <span>Private</span>
-            </label>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="phoneNumber">Phone Number</label>
-          <div class="input-with-checkbox">
-            <input
-              id="phoneNumber"
-              v-model="formData.phoneNumber"
-              type="tel"
-              placeholder="e.g., +45 12 34 56 78"
-              :disabled="props.disabled"
-            />
-            <label class="privacy-checkbox">
-              <input type="checkbox" v-model="privacyFlags.phoneNumber" />
-              <span>Private</span>
-            </label>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="country">Country *</label>
-          <div class="input-with-checkbox">
-            <div class="country-dropdown-container" @click.stop>
-              <input
-                id="country"
-                v-model="formData.country"
+                id="title"
+                v-model="formData.title"
                 type="text"
-                placeholder="Search and select a country..."
-                @focus="handleCountryInputFocus"
-                @input="
-                  countryQuery = formData.country;
-                  showCountryDropdown = true;
-                "
+                placeholder="Enter a descriptive title for this process"
                 :disabled="props.disabled"
                 required
               />
-              <div
-                v-if="showCountryDropdown && filteredCountries.length > 0"
-                class="country-dropdown"
-              >
-                <div
-                  v-for="country in filteredCountries"
-                  :key="country.code"
-                  class="country-option"
-                  @mousedown.prevent="selectCountry(country.name)"
+              <label class="privacy-checkbox">
+                <input type="checkbox" v-model="privacyFlags.title" />
+                <span>Private</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="description">Description</label>
+            <div class="input-with-checkbox">
+              <textarea
+                id="description"
+                v-model="formData.description"
+                placeholder="Enter a detailed description of the project"
+                :disabled="props.disabled"
+                rows="3"
+              ></textarea>
+              <label class="privacy-checkbox">
+                <input type="checkbox" v-model="privacyFlags.description" />
+                <span>Private</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="customerId">Plant Manufacturer *</label>
+            <div class="input-with-checkbox">
+              <div class="checkboxRel">
+                <select
+                  id="customerId"
+                  :disabled="props.disabled"
+                  v-model="formData.customerId"
+                  required
+                  @change="onCustomerChange"
                 >
-                  {{ country.name }}
+                  <option value="">Select Plant Manufacturer</option>
+                  <option
+                    v-for="customer in customers"
+                    :key="customer.id"
+                    :value="customer.id"
+                  >
+                    {{ customer.name }}
+                  </option>
+                </select>
+                <i class="fa-solid fa-chevron-down"></i>
+              </div>
+              <label class="privacy-checkbox">
+                <input type="checkbox" v-model="privacyFlags.customerId" />
+                <span>Private</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="manufacturerWebsite">Manufacturer Website</label>
+            <div class="input-with-checkbox">
+              <input
+                id="manufacturerWebsite"
+                :value="selectedCustomerWebsite"
+                type="url"
+                placeholder="Auto-filled from selected manufacturer"
+                disabled
+                class="disabled-field"
+              />
+              <label class="privacy-checkbox">
+                <input
+                  type="checkbox"
+                  v-model="privacyFlags.manufacturerWebsite"
+                />
+                <span>Private</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="endUser">End User *</label>
+            <div class="input-with-checkbox">
+              <input
+                id="endUser"
+                v-model="formData.endUser"
+                type="text"
+                :disabled="props.disabled"
+                placeholder="Name of the end user company"
+                required
+              />
+              <label class="privacy-checkbox">
+                <input type="checkbox" v-model="privacyFlags.endUser" />
+                <span>Private</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="phoneNumber">Phone Number</label>
+            <div class="input-with-checkbox">
+              <input
+                id="phoneNumber"
+                v-model="formData.phoneNumber"
+                type="tel"
+                placeholder="e.g., +45 12 34 56 78"
+                :disabled="props.disabled"
+              />
+              <label class="privacy-checkbox">
+                <input type="checkbox" v-model="privacyFlags.phoneNumber" />
+                <span>Private</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="country">Country *</label>
+            <div class="input-with-checkbox">
+              <div class="country-dropdown-container" @click.stop>
+                <input
+                  id="country"
+                  v-model="formData.country"
+                  type="text"
+                  placeholder="Search and select a country..."
+                  @focus="handleCountryInputFocus"
+                  @input="
+                    countryQuery = formData.country;
+                    showCountryDropdown = true;
+                  "
+                  :disabled="props.disabled"
+                  required
+                />
+                <div
+                  v-if="showCountryDropdown && filteredCountries.length > 0"
+                  class="country-dropdown"
+                >
+                  <div
+                    v-for="country in filteredCountries"
+                    :key="country.code"
+                    class="country-option"
+                    @mousedown.prevent="selectCountry(country.name)"
+                  >
+                    {{ country.name }}
+                  </div>
+                </div>
+                <div
+                  v-if="showCountryDropdown && filteredCountries.length === 0"
+                  class="country-dropdown"
+                >
+                  <div class="no-results">No countries found</div>
                 </div>
               </div>
-              <div
-                v-if="showCountryDropdown && filteredCountries.length === 0"
-                class="country-dropdown"
-              >
-                <div class="no-results">No countries found</div>
+              <label class="privacy-checkbox">
+                <input type="checkbox" v-model="privacyFlags.country" />
+                <span>Private</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="industry">Industry *</label>
+            <div class="input-with-checkbox">
+              <div class="checkboxRel">
+                <select
+                  id="industry"
+                  v-model="formData.industry"
+                  :disabled="props.disabled"
+                  required
+                >
+                  <option value="">Select Industry</option>
+                  <option value="woodworking">Woodworking</option>
+                  <option value="agroAndMilling">Agro- and Milling</option>
+                  <option value="recycling">Recycling</option>
+                  <option value="metalworking">Metalworking</option>
+                  <option value="paper">Paper</option>
+                  <option value="other">Other</option>
+                </select>
+                <i class="fa-solid fa-chevron-down"></i>
               </div>
+              <label class="privacy-checkbox">
+                <input type="checkbox" v-model="privacyFlags.industry" />
+                <span>Private</span>
+              </label>
             </div>
-            <label class="privacy-checkbox">
-              <input type="checkbox" v-model="privacyFlags.country" />
-              <span>Private</span>
-            </label>
           </div>
-        </div>
 
-        <div class="form-group">
-          <label for="industry">Industry *</label>
-          <div class="input-with-checkbox">
-            <div class="checkboxRel">
-              <select id="industry" v-model="formData.industry" :disabled="props.disabled" required>
-                <option value="">Select Industry</option>
-                <option value="woodworking">Woodworking</option>
-                <option value="agroAndMilling">Agro- and Milling</option>
-                <option value="recycling">Recycling</option>
-                <option value="metalworking">Metalworking</option>
-                <option value="paper">Paper</option>
-                <option value="other">Other</option>
-              </select>
-              <i class="fa-solid fa-chevron-down"></i>
+          <div v-if="formData.industry === 'other'" class="form-group">
+            <label for="customIndustry">Specify Industry *</label>
+            <div class="input-with-checkbox">
+              <input
+                id="customIndustry"
+                v-model="formData.customIndustry"
+                type="text"
+                placeholder="Enter custom industry"
+                :disabled="props.disabled"
+                required
+              />
+              <label class="privacy-checkbox">
+                <input type="checkbox" v-model="privacyFlags.customIndustry" />
+                <span>Private</span>
+              </label>
             </div>
-            <label class="privacy-checkbox">
-              <input type="checkbox" v-model="privacyFlags.industry" />
-              <span>Private</span>
-            </label>
-          </div>
-        </div>
-
-        <div v-if="formData.industry === 'other'" class="form-group">
-          <label for="customIndustry">Specify Industry *</label>
-          <div class="input-with-checkbox">
-            <input
-              id="customIndustry"
-              v-model="formData.customIndustry"
-              type="text"
-              placeholder="Enter custom industry"
-              :disabled="props.disabled"
-              required
-            />
-            <label class="privacy-checkbox">
-              <input type="checkbox" v-model="privacyFlags.customIndustry" />
-              <span>Private</span>
-            </label>
           </div>
         </div>
       </div>
 
       <!-- Product Selection -->
-      <div class="form-section product-selection">
-        <h3>Product Selection</h3>
-
-        <div class="form-group">
-          <label for="filtersAndSeparators">Filters & Separators</label>
-          <div class="input-with-checkbox">
-            <div style="flex: 1">
-              <select
-                id="filtersAndSeparators"
-                v-model="formData.selectedFilters"
-                :disabled="props.disabled"
-                multiple
-                class="multi-select"
-              >
-                <option
-                  v-for="product in filterProducts"
-                  :key="product.id"
-                  :value="product.id"
+      <div
+        class="form-section product-selection"
+        @click="
+          accordionState.productSelection = !accordionState.productSelection
+        "
+        style="cursor: pointer"
+      >
+        <h3>
+          Product Selection
+          <i
+            class="fa-solid fa-chevron-down accordion-arrow"
+            :class="{ open: accordionState.productSelection }"
+          ></i>
+        </h3>
+        <div v-show="accordionState.productSelection">
+          <div class="form-group">
+            <label for="filtersAndSeparators">Filters & Separators</label>
+            <div class="input-with-checkbox">
+              <div style="flex: 1">
+                <select
+                  id="filtersAndSeparators"
+                  v-model="formData.selectedFilters"
+                  :disabled="props.disabled"
+                  multiple
+                  class="multi-select"
                 >
-                  {{ product.title }}
-                </option>
-              </select>
-              <small class="help-text"
-                >Hold Ctrl/Cmd to select multiple items</small
-              >
+                  <option
+                    v-for="product in filterProducts"
+                    :key="product.id"
+                    :value="product.id"
+                  >
+                    {{ product.title }}
+                  </option>
+                </select>
+                <small class="help-text"
+                  >Hold Ctrl/Cmd to select multiple items</small
+                >
+              </div>
+              <label class="privacy-checkbox">
+                <input type="checkbox" v-model="privacyFlags.selectedFilters" />
+                <span>Private</span>
+              </label>
             </div>
-            <label class="privacy-checkbox">
-              <input type="checkbox" v-model="privacyFlags.selectedFilters" />
-              <span>Private</span>
-            </label>
           </div>
-        </div>
 
-        <div class="form-group">
-          <label for="fanSystems">Fan Systems</label>
-          <div class="input-with-checkbox">
-            <div style="flex: 1">
-              <select
-                id="fanSystems"
-                :disabled="props.disabled"
-                v-model="formData.selectedFans"
-                multiple
-                class="multi-select"
-              >
-                <option
-                  v-for="product in fanProducts"
-                  :key="product.id"
-                  :value="product.id"
+          <div class="form-group">
+            <label for="fanSystems">Fan Systems</label>
+            <div class="input-with-checkbox">
+              <div style="flex: 1">
+                <select
+                  id="fanSystems"
+                  :disabled="props.disabled"
+                  v-model="formData.selectedFans"
+                  multiple
+                  class="multi-select"
                 >
-                  {{ product.title }}
-                </option>
-              </select>
-              <small class="help-text"
-                >Hold Ctrl/Cmd to select multiple items</small
-              >
+                  <option
+                    v-for="product in fanProducts"
+                    :key="product.id"
+                    :value="product.id"
+                  >
+                    {{ product.title }}
+                  </option>
+                </select>
+                <small class="help-text"
+                  >Hold Ctrl/Cmd to select multiple items</small
+                >
+              </div>
+              <label class="privacy-checkbox">
+                <input type="checkbox" v-model="privacyFlags.selectedFans" />
+                <span>Private</span>
+              </label>
             </div>
-            <label class="privacy-checkbox">
-              <input type="checkbox" v-model="privacyFlags.selectedFans" />
-              <span>Private</span>
-            </label>
           </div>
-        </div>
 
-        <div class="form-group">
-          <label for="ductSystems">Duct Systems</label>
-          <div class="input-with-checkbox">
-            <div style="flex: 1">
-              <select
-                id="ductSystems"
-                :disabled="props.disabled"
-                v-model="formData.selectedDucts"
-                multiple
-                class="multi-select"
-              >
-                <option
-                  v-for="product in ductProducts"
-                  :key="product.id"
-                  :value="product.id"
+          <div class="form-group">
+            <label for="ductSystems">Duct Systems</label>
+            <div class="input-with-checkbox">
+              <div style="flex: 1">
+                <select
+                  id="ductSystems"
+                  :disabled="props.disabled"
+                  v-model="formData.selectedDucts"
+                  multiple
+                  class="multi-select"
                 >
-                  {{ product.title }}
-                </option>
-              </select>
-              <small class="help-text"
-                >Hold Ctrl/Cmd to select multiple items</small
-              >
+                  <option
+                    v-for="product in ductProducts"
+                    :key="product.id"
+                    :value="product.id"
+                  >
+                    {{ product.title }}
+                  </option>
+                </select>
+                <small class="help-text"
+                  >Hold Ctrl/Cmd to select multiple items</small
+                >
+              </div>
+              <label class="privacy-checkbox">
+                <input type="checkbox" v-model="privacyFlags.selectedDucts" />
+                <span>Private</span>
+              </label>
             </div>
-            <label class="privacy-checkbox">
-              <input type="checkbox" v-model="privacyFlags.selectedDucts" />
-              <span>Private</span>
-            </label>
           </div>
         </div>
       </div>
 
       <!-- Technical Specifications -->
-      <div class="form-section">
-        <h3>Technical Specifications</h3>
-
-        <div class="form-group">
-          <label for="plantType">Plant Type *</label>
-          <div class="input-with-checkbox">
-            <input
-              id="plantType"
-              :disabled="props.disabled"
-              v-model="formData.plantType"
-              type="text"
-              placeholder="e.g., Wooden furniture manufacturer..."
-              required
-            />
-            <label class="privacy-checkbox">
-              <input type="checkbox" v-model="privacyFlags.plantType" />
-              <span>Private</span>
-            </label>
+      <div
+        class="form-section"
+        @click="accordionState.technicalSpecs = !accordionState.technicalSpecs"
+        style="cursor: pointer"
+      >
+        <h3>
+          Technical Specifications
+          <i
+            class="fa-solid fa-chevron-down accordion-arrow"
+            :class="{ open: accordionState.technicalSpecs }"
+          ></i>
+        </h3>
+        <div v-show="accordionState.technicalSpecs">
+          <div class="form-group">
+            <label for="plantType">Plant Type *</label>
+            <div class="input-with-checkbox">
+              <input
+                id="plantType"
+                :disabled="props.disabled"
+                v-model="formData.plantType"
+                type="text"
+                placeholder="e.g., Wooden furniture manufacturer..."
+                required
+              />
+              <label class="privacy-checkbox">
+                <input type="checkbox" v-model="privacyFlags.plantType" />
+                <span>Private</span>
+              </label>
+            </div>
           </div>
-        </div>
 
-        <!-- <div class="form-group">
+          <!-- <div class="form-group">
           <label for="filterType">Filter Type *</label>
           <div class="input-with-checkbox">
             <input
@@ -349,7 +389,7 @@
           </div>
         </div> -->
 
-        <!-- <div class="form-group">
+          <!-- <div class="form-group">
           <label for="fanType">Fan Type *</label>
           <div class="input-with-checkbox">
             <input
@@ -366,25 +406,25 @@
           </div>
         </div> -->
 
-        <div class="form-group">
-          <label for="dustType">Dust Type *</label>
-          <div class="input-with-checkbox">
-            <input
-              id="dustType"
-              :disabled="props.disabled"
-              v-model="formData.dustType"
-              type="text"
-              placeholder="e.g., Mixed wood..."
-              required
-            />
-            <label class="privacy-checkbox">
-              <input type="checkbox" v-model="privacyFlags.dustType" />
-              <span>Private</span>
-            </label>
+          <div class="form-group">
+            <label for="dustType">Dust Type *</label>
+            <div class="input-with-checkbox">
+              <input
+                id="dustType"
+                :disabled="props.disabled"
+                v-model="formData.dustType"
+                type="text"
+                placeholder="e.g., Mixed wood..."
+                required
+              />
+              <label class="privacy-checkbox">
+                <input type="checkbox" v-model="privacyFlags.dustType" />
+                <span>Private</span>
+              </label>
+            </div>
           </div>
-        </div>
 
-        <!-- <div class="form-group">
+          <!-- <div class="form-group">
           <label for="ductSystem">Duct System *</label>
           <div class="input-with-checkbox">
             <input
@@ -401,84 +441,94 @@
           </div>
         </div> -->
 
-        <div class="form-group">
-          <label for="totalExtractionVolume"
-            >Total Extraction Volume (m³) *</label
-          >
-          <div class="input-with-checkbox">
-            <input
-              id="totalExtractionVolume"
-              v-model.number="formData.totalExtractionVolume"
-              type="number"
-              :disabled="props.disabled"
-              min="0"
-              step="0.1"
-              placeholder="e.g., 75.000 m3/hr"
-              required
-            />
-            <label class="privacy-checkbox">
+          <div class="form-group">
+            <label for="totalExtractionVolume"
+              >Total Extraction Volume (m³) *</label
+            >
+            <div class="input-with-checkbox">
               <input
-                type="checkbox"
-                v-model="privacyFlags.totalExtractionVolume"
+                id="totalExtractionVolume"
+                v-model.number="formData.totalExtractionVolume"
+                type="number"
+                :disabled="props.disabled"
+                min="0"
+                step="0.1"
+                placeholder="e.g., 75.000 m3/hr"
+                required
               />
-              <span>Private</span>
-            </label>
+              <label class="privacy-checkbox">
+                <input
+                  type="checkbox"
+                  v-model="privacyFlags.totalExtractionVolume"
+                />
+                <span>Private</span>
+              </label>
+            </div>
           </div>
-        </div>
 
-        <div class="form-group">
-          <label for="pressure">Pressure (Pa) *</label>
-          <div class="input-with-checkbox">
-            <input
-              id="pressure"
-              v-model.number="formData.pressure"
-              :disabled="props.disabled"
-              type="number"
-              min="0"
-              step="1"
-              placeholder="e.g., +/- 5000 Pa"
-              required
-            />
-            <label class="privacy-checkbox">
-              <input type="checkbox" v-model="privacyFlags.pressure" />
-              <span>Private</span>
-            </label>
+          <div class="form-group">
+            <label for="pressure">Pressure (Pa) *</label>
+            <div class="input-with-checkbox">
+              <input
+                id="pressure"
+                v-model.number="formData.pressure"
+                :disabled="props.disabled"
+                type="number"
+                min="0"
+                step="1"
+                placeholder="e.g., +/- 5000 Pa"
+                required
+              />
+              <label class="privacy-checkbox">
+                <input type="checkbox" v-model="privacyFlags.pressure" />
+                <span>Private</span>
+              </label>
+            </div>
           </div>
-        </div>
 
-        <div class="form-group">
-          <label for="volumeFlow">Volume Flow (m³/h) *</label>
-          <div class="input-with-checkbox">
-            <input
-              id="volumeFlow"
-              v-model.number="formData.volumeFlow"
-              type="number"
-              min="0"
-              step="0.1"
-              placeholder="e.g., 75.000 m3/hr"
-              :disabled="props.disabled"
-              required
-            />
-            <label class="privacy-checkbox">
-              <input type="checkbox" v-model="privacyFlags.volumeFlow" />
-              <span>Private</span>
-            </label>
+          <div class="form-group">
+            <label for="volumeFlow">Volume Flow (m³/h) *</label>
+            <div class="input-with-checkbox">
+              <input
+                id="volumeFlow"
+                v-model.number="formData.volumeFlow"
+                type="number"
+                min="0"
+                step="0.1"
+                placeholder="e.g., 75.000 m3/hr"
+                :disabled="props.disabled"
+                required
+              />
+              <label class="privacy-checkbox">
+                <input type="checkbox" v-model="privacyFlags.volumeFlow" />
+                <span>Private</span>
+              </label>
+            </div>
           </div>
         </div>
       </div>
       <hr />
       <div class="form-actions">
-        <button type="button" @click="resetForm" class="btn-no-fill" :disabled="props.disabled">
+        <button
+          type="button"
+          @click="resetForm"
+          class="btn-no-fill"
+          :disabled="props.disabled"
+        >
           Reset
         </button>
-        <button type="submit" class="btn" :disabled="isSubmitting || props.disabled">
+        <button
+          type="submit"
+          class="btn"
+          :disabled="isSubmitting || props.disabled"
+        >
           {{ isEdit ? "Update Sale" : "Create Sale" }}
         </button>
       </div>
       <div v-if="errorMessage" class="error-message">
         {{ errorMessage }}
       </div>
-  
+
       <div v-if="successMessage" class="success-message">
         {{ successMessage }}
       </div>
@@ -557,6 +607,12 @@ const privacyFlags = reactive({
   volumeFlow: false,
   customerId: false,
   manufacturerWebsite: false,
+});
+
+const accordionState = reactive({
+  basicInfo: true,
+  productSelection: false,
+  technicalSpecs: false,
 });
 
 const customers = ref([]);
@@ -829,17 +885,34 @@ watch(
     @include default-border;
     padding: 2rem;
     background: $neutral-100-light;
+    width: 611px;
 
     display: flex;
     flex-direction: column;
     gap: 2rem;
 
-    select{
+    h3 {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 0;
+    }
+
+    .accordion-arrow {
+      transition: transform 0.3s ease;
+      font-size: 1.2rem;
+
+      &.open {
+        transform: rotate(-180deg);
+      }
+    }
+
+    select {
       appearance: none;
     }
   }
 
-  .product-selection{
+  .product-selection {
     option:hover {
       background-color: $secondary-hover-blue;
       color: $jkf-hover-blue;
@@ -856,7 +929,7 @@ watch(
     textarea {
       width: 100%;
       padding: 0.75rem;
-      
+
       @include default-border;
 
       transition: border-color 0.2s;
@@ -892,14 +965,14 @@ watch(
     .country-dropdown-container {
       flex: 1;
     }
-    
-    .checkboxRel{
+
+    .checkboxRel {
       position: relative;
       flex: 1;
 
       .fa-chevron-down {
         position: absolute;
-        right: .75rem;
+        right: 0.75rem;
         top: 50%;
         transform: translateY(-50%);
         font-size: 1rem;
