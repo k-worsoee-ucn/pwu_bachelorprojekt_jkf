@@ -39,7 +39,8 @@ async function getAllProcesses(req, res) {
     });
     res.json(processes);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in getAllProcesses:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -116,7 +117,8 @@ async function getProcessById(req, res) {
 
     res.json(process);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in getProcessById:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -161,7 +163,8 @@ async function updateProcess(req, res) {
     });
     res.json(process);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in updateProcess:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -170,7 +173,8 @@ async function deleteProcess(req, res) {
     await prisma.process.delete({ where: { id: parseInt(req.params.id) } });
     res.status(204).send();
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in deleteProcess:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -231,8 +235,8 @@ async function getFilterOptions(req, res) {
       fanTypes,
     });
   } catch (error) {
-    console.error("Filter options error:", error);
-    res.status(500).json({ error: error.message });
+    console.error('Error in getFilterOptions:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 

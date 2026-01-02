@@ -32,8 +32,8 @@ async function getAllSales(req, res) {
     }));
     res.json(decryptedSales);
   } catch (error) {
-    console.error("Error fetching sales:", error);
-    res.status(500).json({ error: error.message });
+    console.error('Error in getAllSales:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -75,8 +75,8 @@ async function getSaleById(req, res) {
 
     res.json(sale);
   } catch (error) {
-    console.error("Error fetching sale:", error);
-    res.status(500).json({ error: error.message });
+    console.error('Error in getSaleById:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -215,8 +215,8 @@ async function createSale(req, res) {
     console.log(`Created sale and process: ${title} (Case #${nextCaseNo})`);
     res.status(201).json(result);
   } catch (error) {
-    console.error("Error creating sale:", error);
-    res.status(500).json({ error: error.message });
+    console.error('Error in createSale:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -291,8 +291,8 @@ async function updateSale(req, res) {
 
     res.json(sale);
   } catch (error) {
-    console.error("Error updating sale:", error);
-    res.status(500).json({ error: error.message });
+    console.error('Error in updateSale:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -312,8 +312,8 @@ async function deleteSale(req, res) {
 
     res.status(204).send();
   } catch (error) {
-    console.error("Error deleting sale:", error);
-    res.status(500).json({ error: error.message });
+    console.error('Error in deleteSale:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 

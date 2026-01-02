@@ -19,7 +19,8 @@ async function getAllCases(req, res) {
 
     res.json(cases);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in getAllCases:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -34,7 +35,8 @@ async function getCaseById(req, res) {
 
     res.json(caseItem);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in getCaseById:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -56,7 +58,8 @@ async function getCasesByProcessId(req, res) {
 
     res.json(cases);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in getCasesByProcessId:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -88,8 +91,8 @@ async function createCase(req, res) {
 
     res.status(201).json(caseItem);
   } catch (error) {
-    console.error("Error creating case:", error);
-    res.status(500).json({ error: error.message });
+    console.error('Error in createCase:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -111,8 +114,8 @@ async function updateCase(req, res) {
 
     res.json(caseItem);
   } catch (error) {
-    console.error("Error updating case:", error);
-    res.status(500).json({ error: error.message });
+    console.error('Error in updateCase:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -121,7 +124,8 @@ async function deleteCase(req, res) {
     await prisma.case.delete({ where: { id: parseInt(req.params.id) } });
     res.status(204).send();
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in deleteCase:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 

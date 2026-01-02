@@ -27,7 +27,8 @@ async function getAllCustomers(req, res) {
 
     res.json(decryptedCustomers);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in getAllCustomers:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -57,7 +58,8 @@ async function getCustomerById(req, res) {
     
     res.json(customer);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in getCustomerById:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -92,7 +94,8 @@ async function createCustomer(req, res) {
 
     res.status(201).json(customer);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in createCustomer:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -122,7 +125,8 @@ async function updateCustomer(req, res) {
 
     res.json(customer);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in updateCustomer:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -131,7 +135,8 @@ async function deleteCustomer(req, res) {
     await prisma.customer.delete({ where: { id: parseInt(req.params.id) } });
     res.status(204).send();
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in deleteCustomer:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -148,7 +153,8 @@ async function getCustomerSales(req, res) {
 
     res.json(sales);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in getCustomerSales:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 

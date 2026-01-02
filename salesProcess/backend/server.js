@@ -88,12 +88,8 @@ app.use("/api", imageRoutes);
 app.use((err, req, res, next) => {
   console.error("Global error:", err);
 
-  // Don't leak error details in production
-  if (process.env.NODE_ENV === "production") {
-    res.status(500).json({ error: "Internal server error" });
-  } else {
-    res.status(500).json({ error: err.message, stack: err.stack });
-  }
+  // Always return generic message to client, don't expose details
+  res.status(500).json({ error: "An error occurred processing your request" });
 });
 
 // 404 handler

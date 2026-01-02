@@ -29,7 +29,8 @@ async function getAllUsers(req, res) {
 
     res.json(decryptedUsers);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in getAllUsers:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -59,7 +60,8 @@ async function getUserById(req, res) {
     
     res.json(user);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in getUserById:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -111,7 +113,7 @@ async function updateCurrentUser(req, res) {
     res.json(user);
   } catch (error) {
     console.error('Error in updateCurrentUser:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -124,7 +126,8 @@ async function getUserProcesses(req, res) {
 
     res.json(processUsers);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in getUserProcesses:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -137,7 +140,8 @@ async function getUserCustomers(req, res) {
 
     res.json(customers);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in getUserCustomers:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -154,7 +158,8 @@ async function getUserSales(req, res) {
 
     res.json(sales);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in getUserSales:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -231,7 +236,8 @@ async function registerUser(req, res) {
 
     res.status(201).json({ user: responseUser });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in registerUser:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -280,7 +286,8 @@ async function loginUser(req, res) {
       }
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in loginUser:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
@@ -303,7 +310,8 @@ async function logoutUser(req, res) {
     
     res.json({ message: 'Logged out successfully' });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error in logoutUser:', error);
+    res.status(500).json({ error: 'An error occurred processing your request' });
   }
 }
 
