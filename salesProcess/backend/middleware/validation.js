@@ -11,6 +11,18 @@ const handleValidationErrors = (req, res, next) => {
   next();
 };
 
+const passwordComplexityValidator = body('password')
+  .isLength({ min: 8 })
+  .withMessage('Password must be at least 8 characters long')
+  .matches(/[A-Z]/)
+  .withMessage('Password must contain at least one uppercase letter')
+  .matches(/[a-z]/)
+  .withMessage('Password must contain at least one lowercase letter')
+  .matches(/[0-9]/)
+  .withMessage('Password must contain at least one number')
+  .matches(/[@$!%*?&]/)
+  .withMessage('Password must contain at least one special character (@$!%*?&)');
+
 const validateUserLogin = [
   body('email').trim().isEmail().withMessage('Valid email is required'),
   body('password').notEmpty().withMessage('Password is required'),
@@ -18,10 +30,10 @@ const validateUserLogin = [
 ];
 
 const validateUserRegistration = [
-  body('accessCode').trim().notEmpty().withMessage('Access code is required'),
+  body('accessCode').trim().notEmpty().escape().withMessage('Access code is required'),
   body('email').trim().isEmail().withMessage('Valid email is required'),
-  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
-  body('name').trim().notEmpty().withMessage('Name is required'),
+  passwordComplexityValidator,
+  body('name').trim().notEmpty().escape().withMessage('Name is required'),
   handleValidationErrors
 ];
 
@@ -33,5 +45,6 @@ const validateId = [
 module.exports = {
   validateUserLogin,
   validateUserRegistration,
-  validateId
+  validateId,
+  passwordComplexityValidator
 };

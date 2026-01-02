@@ -65,6 +65,14 @@ async function updateCurrentUser(req, res) {
         console.log('Access code missing or invalid for password update');
         return res.status(403).json({ error: 'Valid access code required to change password' });
       }
+
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[a-zA-Z\d@$!%*?&]{8,}$/;
+      if (!passwordRegex.test(password)) {
+        return res.status(400).json({ 
+          error: 'Password must be at least 8 characters long and contain uppercase, lowercase, number, and special character (@$!%*?&)' 
+        });
+      }
+
       const bcrypt = require('bcrypt');
       updateData.password = await bcrypt.hash(password, 10);
       console.log('Password will be updated for user:', userId);
@@ -151,6 +159,14 @@ async function registerUser(req, res) {
     if (existingUser) {
       return res.status(409).json({ 
         error: 'User with this email already exists' 
+      });
+    }
+
+    // Validate password complexity
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[a-zA-Z\d@$!%*?&]{8,}$/;
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({ 
+        error: 'Password must be at least 8 characters long and contain uppercase, lowercase, number, and special character (@$!%*?&)' 
       });
     }
 
