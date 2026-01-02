@@ -41,7 +41,7 @@ import { jsPDF } from "jspdf";
 import JSZip from "jszip";
 import { useAuth } from "../composables/useAuth";
 
-const { getAuthHeader } = useAuth();
+const { } = useAuth();
 
 const props = defineProps({
   processId: {
@@ -75,9 +75,7 @@ const fetchImages = async (type) => {
     const response = await fetch(
       `http://localhost:3000/api/processes/${props.processId}/images?type=${type}`,
       {
-        headers: {
-          ...getAuthHeader(),
-        },
+        credentials: 'include',
       }
     );
 
@@ -345,9 +343,7 @@ const downloadImages = async () => {
           const response = await fetch(
             `http://localhost:3000${productionImages[i].url}`,
             {
-              headers: {
-                ...getAuthHeader(),
-              },
+              credentials: 'include',
             }
           );
           const blob = await response.blob();
@@ -366,9 +362,7 @@ const downloadImages = async () => {
           const response = await fetch(
             `http://localhost:3000${installationImages[i].url}`,
             {
-              headers: {
-                ...getAuthHeader(),
-              },
+              credentials: 'include',
             }
           );
           const blob = await response.blob();

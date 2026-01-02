@@ -2,12 +2,11 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 const user = ref(null)
-const token = ref(localStorage.getItem('token'))
 
 export function useAuth() {
   const router = useRouter()
 
-  const isAuthenticated = computed(() => !!token.value && !!user.value)
+  const isAuthenticated = computed(() => !!user.value)
   
   const isSalesManager = computed(() => user.value?.role === 'salesManager')
   const isMarketingManager = computed(() => user.value?.role === 'marketingManager')
@@ -19,6 +18,7 @@ export function useAuth() {
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
       body: JSON.stringify({ email, password })
     })
 
@@ -29,35 +29,50 @@ export function useAuth() {
     }
 
     user.value = data.user
-    token.value = data.token
-
-    localStorage.setItem('token', data.token)
     localStorage.setItem('user', JSON.stringify(data.user))
     
     return data
   }
 
-  const logout = () => {
+  const logout = async () => {
     user.value = null
-    token.value = null
-    localStorage.removeItem('token')
     localStorage.removeItem('user')
+    
+    // Clear cookie on backend
+    try {
+      await fetch('/api/users/logout', {
+        method: 'POST',
+        credentials: 'include'
+      })
+    } catch (error) {
+      console.error('Logout error:', error)
+    }
+    
     router.push('/login')
   }
 
-  const initAuth = () => {
+  const initAuth = async () => {
     const savedUser = localStorage.getItem('user')
-    if (savedUser && token.value) {
+    if (savedUser) {
       try {
         user.value = JSON.parse(savedUser)
+        
+        // Verify token is still valid by checking current user
+        const response = await fetch('/api/users/me', {
+          credentials: 'include'
+        })
+        
+        if (response.ok) {
+          const data = await response.json()
+          user.value = data.user
+        } else {
+          // Token expired or invalid
+          logout()
+        }
       } catch (error) {
         logout()
       }
     }
-  }
-
-  const getAuthHeader = () => {
-    return token.value ? { Authorization: `Bearer ${token.value}` } : {}
   }
   
   // Add setUser method to update user info and localStorage
@@ -68,17 +83,13 @@ export function useAuth() {
 
   return {
     user: computed(() => user.value),
-    token: computed(() => token.value),
-
     isAuthenticated,
     isSalesManager,
     isMarketingManager, 
     isViewer,
-
     login,
     logout,
     initAuth,
-    getAuthHeader,
     setUser
   }
 }

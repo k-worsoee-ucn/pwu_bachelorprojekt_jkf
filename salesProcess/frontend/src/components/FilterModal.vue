@@ -14,7 +14,7 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["close", "apply-filter"]);
-const { getAuthHeader } = useAuth();
+const { } = useAuth();
 
 // Prevent page scroll when modal is open
 watch(
@@ -66,7 +66,7 @@ const volumeFlowTo = ref("");
 onMounted(async () => {
   try {
     const response = await fetch("/api/processes/filter-options", {
-      headers: getAuthHeader(),
+      credentials: 'include',
     });
     if (response.ok) {
       filterOptionsData.value = await response.json();

@@ -221,7 +221,15 @@ async function registerUser(req, res) {
       responseUser.name = encryption.decrypt(responseUser.name);
     }
 
-    res.status(201).json({ user: responseUser, token });
+    // Set token in httpOnly cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    });
+
+    res.status(201).json({ user: responseUser });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -255,14 +263,21 @@ async function loginUser(req, res) {
       { expiresIn: '24h' }
     );
 
+    // Set token in httpOnly cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    });
+
     res.json({ 
       user: {
         id: user.id,
         email: user.email,
         name: user.name ? encryption.decrypt(user.name) : null,
         role: user.role
-      }, 
-      token 
+      }
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -277,6 +292,21 @@ async function getCurrentUser(req, res) {
   res.json({ user });
 }
 
+async function logoutUser(req, res) {
+  try {
+    // Clear the token cookie
+    res.clearCookie('token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict'
+    });
+    
+    res.json({ message: 'Logged out successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
+
 module.exports = {
   getAllUsers,
   getUserById,
@@ -287,4 +317,5 @@ module.exports = {
   registerUser,
   loginUser,
   getCurrentUser,
+  logoutUser,
 };

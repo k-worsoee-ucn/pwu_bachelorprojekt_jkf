@@ -10,7 +10,7 @@ import CaseUploadStep from "@/components/CaseUploadStep.vue";
 
 const route = useRoute();
 const router = useRouter();
-const { getAuthHeader, user, isViewer } = useAuth();
+const { user, isViewer } = useAuth();
 const processId = computed(() => route.params.id);
 
 const process = ref(null);
@@ -152,9 +152,7 @@ const fetchProcess = async () => {
     try {
       console.log("Fetching process:", processId.value);
       const response = await fetch(`/api/processes/${processId.value}`, {
-        headers: {
-          ...getAuthHeader(),
-        },
+        credentials: 'include',
       });
       console.log("Response status:", response.status);
       const data = await response.json();
@@ -200,8 +198,8 @@ const startShippingDateTimer = () => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          ...getAuthHeader(),
         },
+        credentials: 'include',
         body: JSON.stringify({
           shippingDate: shippingDate.value,
         }),
@@ -238,8 +236,8 @@ const advanceToNextStep = async () => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          ...getAuthHeader(),
         },
+        credentials: 'include',
         body: JSON.stringify({
           currentStep: 6,
           status: "completed",
@@ -271,8 +269,8 @@ const advanceToNextStep = async () => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          ...getAuthHeader(),
         },
+        credentials: 'include',
         body: JSON.stringify({
           currentStep: 5,
           status: "completed",
@@ -310,8 +308,8 @@ const advanceToNextStep = async () => {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        ...getAuthHeader(),
       },
+      credentials: 'include',
       body: JSON.stringify({ currentStep: nextStep }),
     });
 

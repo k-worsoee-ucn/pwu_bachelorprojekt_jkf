@@ -109,9 +109,6 @@
 
 <script setup>
 import { ref, onMounted, computed, watch } from "vue";
-import { useAuth } from "@/composables/useAuth";
-
-const { getAuthHeader } = useAuth();
 
 const props = defineProps({
   processId: {
@@ -165,8 +162,8 @@ const updateConsent = async () => {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          ...getAuthHeader(),
         },
+        credentials: 'include',
         body: JSON.stringify({ consent: consentValue.value }),
       }
     );
@@ -268,9 +265,7 @@ const uploadImages = async () => {
       `http://localhost:3000/api/processes/${props.processId}/images`,
       {
         method: "POST",
-        headers: {
-          ...getAuthHeader(),
-        },
+        credentials: 'include',
         body: formData,
       }
     );
@@ -309,9 +304,7 @@ const fetchUploadedImages = async () => {
     const response = await fetch(
       `http://localhost:3000/api/processes/${props.processId}/images?type=installation`,
       {
-        headers: {
-          ...getAuthHeader(),
-        },
+        credentials: 'include',
       }
     );
 
@@ -335,9 +328,7 @@ const deleteImage = async (imageId) => {
       `http://localhost:3000/api/images/${imageId}`,
       {
         method: "DELETE",
-        headers: {
-          ...getAuthHeader(),
-        },
+        credentials: 'include',
       }
     );
 

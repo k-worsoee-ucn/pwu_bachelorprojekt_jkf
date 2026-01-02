@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const path = require("path");
@@ -57,6 +58,8 @@ app.use(
 );
 
 app.use(express.json());
+
+app.use(cookieParser());
 
 // Serve static files from uploads directory
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));

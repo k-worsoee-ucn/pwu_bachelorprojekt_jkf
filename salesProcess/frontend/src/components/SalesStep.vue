@@ -681,9 +681,7 @@ const loadFormData = () => {
 const loadCustomers = async () => {
   try {
     const response = await fetch("/api/customers", {
-      headers: {
-        ...getAuthHeader(),
-      },
+      credentials: 'include',
     });
     if (response.ok) {
       customers.value = await response.json();
@@ -696,9 +694,7 @@ const loadCustomers = async () => {
 const loadProducts = async () => {
   try {
     const response = await fetch("/api/products", {
-      headers: {
-        ...getAuthHeader(),
-      },
+      credentials: 'include',
     });
     if (response.ok) {
       products.value = await response.json();
@@ -754,8 +750,8 @@ const submitForm = async () => {
       method,
       headers: {
         "Content-Type": "application/json",
-        ...getAuthHeader(),
       },
+      credentials: 'include',
       body: JSON.stringify(saleData),
     });
 

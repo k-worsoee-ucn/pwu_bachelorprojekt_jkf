@@ -5,7 +5,7 @@ import { useRoute } from "vue-router";
 import Header from "./components/Header.vue";
 import TabHeader from "./components/TabHeader.vue";
 
-const { initAuth, getAuthHeader, user, isSalesManager, isMarketingManager } =
+const { initAuth, user, isSalesManager, isMarketingManager } =
   useAuth();
 const route = useRoute();
 const salesManagerCount = ref(0);
@@ -17,9 +17,7 @@ provide("marketingManagerCount", marketingManagerCount);
 const updateBadgeCounts = async () => {
   try {
     const response = await fetch("/api/processes", {
-      headers: {
-        ...getAuthHeader(),
-      },
+      credentials: 'include',
     });
     const data = await response.json();
 
