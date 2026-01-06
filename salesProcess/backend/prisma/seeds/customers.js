@@ -9,6 +9,9 @@ async function seedCustomers(salesManagers) {
     throw new Error('Sales managers must be created before customers')
   }
 
+  // Clear existing sales records first (they have FK to customers)
+  await prisma.sale.deleteMany({})
+  
   // Clear existing customers to avoid duplicates when seeding with encrypted names
   await prisma.customer.deleteMany({})
 

@@ -1,131 +1,70 @@
-const prisma = require("./prisma");
+const caseService = require("../services/case.service");
 
 async function getAllCases(req, res) {
   try {
     const { processId, referenceId } = req.query;
-
-    const whereClause = {};
-    if (processId) whereClause.processId = parseInt(processId);
-    if (referenceId) whereClause.referenceId = parseInt(referenceId);
-
-    const cases = await prisma.case.findMany({
-      where: whereClause,
-      include: {
-        process: true,
-        reference: true,
-        products: true,
-      },
-    });
-
+    const cases = await caseService.getAllCases(processId, referenceId);
     res.json(cases);
   } catch (error) {
-    console.error('Error in getAllCases:', error);
-    res.status(500).json({ error: 'An error occurred processing your request' });
+    console.error("Error in getAllCases:", error);
+    res.status(500).json({ error: "An error occurred processing your request" });
   }
 }
 
 async function getCaseById(req, res) {
   try {
-    const caseItem = await prisma.case.findUnique({
-      where: { id: parseInt(req.params.id) },
-      include: { process: true, reference: true, products: true },
-    });
-
-    if (!caseItem) return res.status(404).json({ error: "Case not found" });
-
+    const caseItem = await caseService.getCaseById(req.params.id);
     res.json(caseItem);
   } catch (error) {
-    console.error('Error in getCaseById:', error);
-    res.status(500).json({ error: 'An error occurred processing your request' });
+    if (error.status === 404) {
+      return res.status(404).json({ error: error.message });
+    }
+    console.error("Error in getCaseById:", error);
+    res.status(500).json({ error: "An error occurred processing your request" });
   }
 }
 
 async function getCasesByProcessId(req, res) {
   try {
     const { processId } = req.params;
-
-    const cases = await prisma.case.findMany({
-      where: { processId: parseInt(processId) },
-      include: {
-        process: true,
-        reference: true,
-        products: true,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-    });
-
+    const cases = await caseService.getCasesByProcessId(processId);
     res.json(cases);
   } catch (error) {
-    console.error('Error in getCasesByProcessId:', error);
-    res.status(500).json({ error: 'An error occurred processing your request' });
+    console.error("Error in getCasesByProcessId:", error);
+    res.status(500).json({ error: "An error occurred processing your request" });
   }
 }
 
 async function createCase(req, res) {
   try {
-    console.log("Creating case with body:", req.body);
-    const { content, processId, referenceId } = req.body;
-
-    if (!content) return res.status(400).json({ error: "content is required" });
-
-    const dataToCreate = {
-      content,
-    };
-
-    if (processId) {
-      dataToCreate.processId = parseInt(processId);
-    }
-
-    if (referenceId) {
-      dataToCreate.referenceId = parseInt(referenceId);
-    }
-
-    console.log("Data to create:", dataToCreate);
-
-    const caseItem = await prisma.case.create({
-      data: dataToCreate,
-      include: { process: true, reference: true },
-    });
-
+    const caseItem = await caseService.createCase(req.body);
     res.status(201).json(caseItem);
   } catch (error) {
-    console.error('Error in createCase:', error);
-    res.status(500).json({ error: 'An error occurred processing your request' });
+    if (error.status) {
+      return res.status(error.status).json({ error: error.message });
+    }
+    console.error("Error in createCase:", error);
+    res.status(500).json({ error: "An error occurred processing your request" });
   }
 }
 
 async function updateCase(req, res) {
   try {
-    const { content, processId, referenceId } = req.body;
-
-    const caseItem = await prisma.case.update({
-      where: { id: parseInt(req.params.id) },
-      data: {
-        ...(content && { content }),
-        ...(processId !== undefined && { processId: parseInt(processId) }),
-        ...(referenceId !== undefined && {
-          referenceId: parseInt(referenceId),
-        }),
-      },
-      include: { process: true, reference: true },
-    });
-
+    const caseItem = await caseService.updateCase(req.params.id, req.body);
     res.json(caseItem);
   } catch (error) {
-    console.error('Error in updateCase:', error);
-    res.status(500).json({ error: 'An error occurred processing your request' });
+    console.error("Error in updateCase:", error);
+    res.status(500).json({ error: "An error occurred processing your request" });
   }
 }
 
 async function deleteCase(req, res) {
   try {
-    await prisma.case.delete({ where: { id: parseInt(req.params.id) } });
+    await caseService.deleteCase(req.params.id);
     res.status(204).send();
   } catch (error) {
-    console.error('Error in deleteCase:', error);
-    res.status(500).json({ error: 'An error occurred processing your request' });
+    console.error("Error in deleteCase:", error);
+    res.status(500).json({ error: "An error occurred processing your request" });
   }
 }
 
