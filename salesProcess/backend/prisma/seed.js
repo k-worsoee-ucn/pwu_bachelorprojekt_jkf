@@ -26,7 +26,7 @@ async function main() {
     const products = await seedProducts();
 
     // Seed sales (which auto-creates processes via business logic)
-    await seedSales(prisma);
+    await seedSales(prisma, customers);
 
     // Seed process users (depends on auto-created processes from sales)
     await seedProcessUsers(prisma);

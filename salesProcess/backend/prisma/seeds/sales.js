@@ -1,7 +1,7 @@
 const { PrismaClient } = require("@prisma/client");
 const encryption = require("../../utils/encryption");
 
-async function seedSales(prisma) {
+async function seedSales(prisma, customers = []) {
   console.log("Seeding sales (which auto-creates processes)...");
 
   const filterProducts = await prisma.product.findMany({
@@ -34,7 +34,7 @@ async function seedSales(prisma) {
       totalExtractionVolume: 15000,
       pressure: 1200,
       volumeFlow: 25000,
-      customerId: 1,
+      customerId: customers[0]?.id || 1,
       salesManagerId: 2,
       selectedFilters: [filterProducts[0]?.id, filterProducts[1]?.id].filter(
         (id) => id
@@ -58,7 +58,7 @@ async function seedSales(prisma) {
       totalExtractionVolume: 50000,
       pressure: 1500,
       volumeFlow: 75000,
-      customerId: 2,
+      customerId: customers[1]?.id || 2,
       salesManagerId: 2,
       selectedFilters: [filterProducts[2]?.id].filter((id) => id),
       selectedFans: [fanProducts[1]?.id, fanProducts[2]?.id].filter((id) => id),
@@ -82,7 +82,7 @@ async function seedSales(prisma) {
       totalExtractionVolume: 80000,
       pressure: 1800,
       volumeFlow: 120000,
-      customerId: 3,
+      customerId: customers[2]?.id || 3,
       salesManagerId: 2,
       selectedFilters: [filterProducts[0]?.id, filterProducts[2]?.id].filter(
         (id) => id
@@ -106,7 +106,7 @@ async function seedSales(prisma) {
       totalExtractionVolume: 30000,
       pressure: 1300,
       volumeFlow: 45000,
-      customerId: 4,
+      customerId: customers[3]?.id || 4,
       salesManagerId: 2,
       selectedFilters: [filterProducts[1]?.id, filterProducts[2]?.id].filter(
         (id) => id
@@ -132,7 +132,7 @@ async function seedSales(prisma) {
       totalExtractionVolume: 100000,
       pressure: 2000,
       volumeFlow: 150000,
-      customerId: 5,
+      customerId: customers[4]?.id || 5,
       salesManagerId: 2,
       selectedFilters: [filterProducts[0]?.id].filter((id) => id),
       selectedFans: [fanProducts[0]?.id, fanProducts[2]?.id].filter((id) => id),

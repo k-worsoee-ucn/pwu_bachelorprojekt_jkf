@@ -8,12 +8,8 @@
       class="form-grid"
     >
       <!-- Basic Information -->
-      <div
-        class="form-section"
-        @click="accordionState.basicInfo = !accordionState.basicInfo"
-        style="cursor: pointer"
-      >
-        <h3>
+      <div class="form-section">
+        <h3 @click="accordionState.basicInfo = !accordionState.basicInfo" style="cursor: pointer">
           Basic Information
           <i
             class="fa-solid fa-chevron-down accordion-arrow"
@@ -233,14 +229,10 @@
       </div>
 
       <!-- Product Selection -->
-      <div
-        class="form-section product-selection"
-        @click="
+      <div class="form-section product-selection">
+        <h3 @click="
           accordionState.productSelection = !accordionState.productSelection
-        "
-        style="cursor: pointer"
-      >
-        <h3>
+        " style="cursor: pointer">
           Product Selection
           <i
             class="fa-solid fa-chevron-down accordion-arrow"
@@ -341,12 +333,8 @@
       </div>
 
       <!-- Technical Specifications -->
-      <div
-        class="form-section"
-        @click="accordionState.technicalSpecs = !accordionState.technicalSpecs"
-        style="cursor: pointer"
-      >
-        <h3>
+      <div class="form-section">
+        <h3 @click="accordionState.technicalSpecs = !accordionState.technicalSpecs" style="cursor: pointer">
           Technical Specifications
           <i
             class="fa-solid fa-chevron-down accordion-arrow"
@@ -621,6 +609,7 @@ const errorMessage = ref("");
 const successMessage = ref("");
 const countryQuery = ref("");
 const showCountryDropdown = ref(false);
+const isSubmitting = ref(false);
 
 const isEdit = computed(() => props.sale !== null);
 
