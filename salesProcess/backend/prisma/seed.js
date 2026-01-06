@@ -4,23 +4,11 @@ const { seedCustomers } = require("./seeds/customers");
 const { seedProducts } = require("./seeds/products");
 const { seedSales } = require("./seeds/sales");
 const { seedProcessUsers } = require("./seeds/processUsers");
-const { seedReferences } = require("./seeds/references");
-const { seedCases } = require("./seeds/cases");
 
 const prisma = new PrismaClient();
 
 async function resetSequences(prisma) {
   console.log("Resetting database sequences...");
-
-  // Reset sequence for cases table
-  await prisma.$executeRaw`
-    SELECT setval('cases_id_seq', (SELECT COALESCE(MAX(id), 0) FROM cases));
-  `;
-
-  // Reset other sequences if they use hardcoded IDs
-  await prisma.$executeRaw`
-    SELECT setval('references_id_seq', (SELECT COALESCE(MAX(id), 0) FROM "references"));
-  `;
 
   console.log("Database sequences reset successfully");
 }
@@ -43,12 +31,6 @@ async function main() {
     // Seed process users (depends on auto-created processes from sales)
     await seedProcessUsers(prisma);
 
-    // Seed references (depends on processes)
-    await seedReferences(prisma);
-
-    // Seed cases (depends on processes and references)
-    await seedCases(prisma);
-
     // Reset sequences to prevent ID conflicts
     await resetSequences(prisma);
 
@@ -61,8 +43,6 @@ async function main() {
     console.log(
       "- Process User Assignments: Auto-assigned based on sales + marketing managers"
     );
-    console.log("- References: 5");
-    console.log("- Cases: 7");
   } catch (error) {
     console.error("Seed process failed:", error);
     throw error;
