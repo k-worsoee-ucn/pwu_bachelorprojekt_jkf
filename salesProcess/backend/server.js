@@ -1,11 +1,13 @@
 const express = require("express");
-const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const path = require("path");
 const { PrismaClient } = require("@prisma/client");
 require("dotenv").config();
+
+// Import middleware
+const corsMiddleware = require("./middleware/cors");
 
 // Import routes
 const processRoutes = require("./routes/process.routes");
@@ -36,26 +38,7 @@ const limiter = rateLimit({
 
 app.use("/api/", limiter);
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      const allowedOrigins = [
-        "http://localhost:5173",
-        "http://localhost:5174",
-        "http://localhost:5175",
-        "http://localhost:5176",
-        process.env.CORS_ORIGIN
-      ];
-      
-      if (process.env.NODE_ENV === "development" || !origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-  })
-);
+app.use(corsMiddleware);
 
 app.use(express.json());
 
