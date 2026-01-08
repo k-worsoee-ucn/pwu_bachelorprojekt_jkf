@@ -3,7 +3,7 @@ const prisma = require("../controllers/prisma");
 // Define which roles can access which steps
 const STEP_PERMISSIONS = {
   1: { role: "salesManager", requiresCreator: true },
-  2: { role: null }, // Automatic, nobody can edit
+  2: { role: null },
   3: { role: "marketingManager", requiresCreator: false },
   4: { role: "salesManager", requiresCreator: true },
   5: { role: "marketingManager", requiresCreator: false },
