@@ -4,6 +4,18 @@ const encryption = require("../../utils/encryption");
 async function seedSales(prisma, customers = []) {
   console.log("Seeding sales (which auto-creates processes)...");
 
+  // Get a sales manager by role to ensure we always use the correct user
+  const salesManager = await prisma.user.findFirst({
+    where: { role: 'salesManager' },
+    select: { id: true }
+  });
+
+  if (!salesManager) {
+    throw new Error("At least one sales manager is required to seed sales");
+  }
+
+  const salesManagerId = salesManager.id;
+
   const filterProducts = await prisma.product.findMany({
     where: { category: "filtersAndSeparators" },
     select: { id: true },
@@ -35,7 +47,7 @@ async function seedSales(prisma, customers = []) {
       pressure: 1200,
       volumeFlow: 25000,
       customerId: customers[0]?.id || 1,
-      salesManagerId: 2,
+      salesManagerId: salesManagerId,
       selectedFilters: [filterProducts[0]?.id, filterProducts[1]?.id].filter(
         (id) => id
       ),
@@ -59,7 +71,7 @@ async function seedSales(prisma, customers = []) {
       pressure: 1500,
       volumeFlow: 75000,
       customerId: customers[1]?.id || 2,
-      salesManagerId: 2,
+      salesManagerId: salesManagerId,
       selectedFilters: [filterProducts[2]?.id].filter((id) => id),
       selectedFans: [fanProducts[1]?.id, fanProducts[2]?.id].filter((id) => id),
       selectedDucts: [ductProducts[1]?.id, ductProducts[2]?.id].filter(
@@ -83,7 +95,7 @@ async function seedSales(prisma, customers = []) {
       pressure: 1800,
       volumeFlow: 120000,
       customerId: customers[2]?.id || 3,
-      salesManagerId: 2,
+      salesManagerId: salesManagerId,
       selectedFilters: [filterProducts[0]?.id, filterProducts[2]?.id].filter(
         (id) => id
       ),
@@ -107,7 +119,7 @@ async function seedSales(prisma, customers = []) {
       pressure: 1300,
       volumeFlow: 45000,
       customerId: customers[3]?.id || 4,
-      salesManagerId: 2,
+      salesManagerId: salesManagerId,
       selectedFilters: [filterProducts[1]?.id, filterProducts[2]?.id].filter(
         (id) => id
       ),
@@ -133,7 +145,7 @@ async function seedSales(prisma, customers = []) {
       pressure: 2000,
       volumeFlow: 150000,
       customerId: customers[4]?.id || 5,
-      salesManagerId: 2,
+      salesManagerId: salesManagerId,
       selectedFilters: [filterProducts[0]?.id].filter((id) => id),
       selectedFans: [fanProducts[0]?.id, fanProducts[2]?.id].filter((id) => id),
       selectedDucts: [ductProducts[1]?.id, ductProducts[2]?.id].filter(

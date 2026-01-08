@@ -1,4 +1,4 @@
-const prisma = require("./prisma");
+const imageService = require("../services/image.service");
 
 // Upload images for a process
 const uploadImages = async (req, res) => {
@@ -7,31 +7,10 @@ const uploadImages = async (req, res) => {
     const files = req.files;
     const { type } = req.body;
 
-    if (!files || files.length === 0) {
-      return res.status(400).json({ error: "No files uploaded" });
-    }
-
-    // Check if process exists
-    const process = await prisma.process.findUnique({
-      where: { id: parseInt(processId) },
-    });
-
-    if (!process) {
-      return res.status(404).json({ error: "Process not found" });
-    }
-
-    // Create image records in database
-    const imageRecords = await Promise.all(
-      files.map((file) =>
-        prisma.image.create({
-          data: {
-            url: `/uploads/${file.filename}`,
-            filename: file.filename,
-            processId: parseInt(processId),
-            type: type || "production",
-          },
-        })
-      )
+    const imageRecords = await imageService.uploadImages(
+      processId,
+      files,
+      type
     );
 
     res.status(201).json({
@@ -40,7 +19,9 @@ const uploadImages = async (req, res) => {
     });
   } catch (error) {
     console.error("Error uploading images:", error);
-    res.status(500).json({ error: "Failed to upload images" });
+    const statusCode = error.status || 500;
+    const message = error.message || "Failed to upload images";
+    res.status(statusCode).json({ error: message });
   }
 };
 
@@ -50,23 +31,14 @@ const getProcessImages = async (req, res) => {
     const { processId } = req.params;
     const { type } = req.query;
 
-    const where = {
-      processId: parseInt(processId),
-    };
-
-    if (type) {
-      where.type = type;
-    }
-
-    const images = await prisma.image.findMany({
-      where,
-      orderBy: { createdAt: "desc" },
-    });
+    const images = await imageService.getProcessImages(processId, type);
 
     res.json({ images });
   } catch (error) {
     console.error("Error fetching images:", error);
-    res.status(500).json({ error: "Failed to fetch images" });
+    const statusCode = error.status || 500;
+    const message = error.message || "Failed to fetch images";
+    res.status(statusCode).json({ error: message });
   }
 };
 
@@ -74,33 +46,15 @@ const getProcessImages = async (req, res) => {
 const deleteImage = async (req, res) => {
   try {
     const { id } = req.params;
-    const fs = require("fs");
-    const path = require("path");
 
-    // Get image from database
-    const image = await prisma.image.findUnique({
-      where: { id: parseInt(id) },
-    });
+    const result = await imageService.deleteImage(id);
 
-    if (!image) {
-      return res.status(404).json({ error: "Image not found" });
-    }
-
-    // Delete file from filesystem
-    const filePath = path.join(__dirname, "..", "uploads", image.filename);
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
-
-    // Delete from database
-    await prisma.image.delete({
-      where: { id: parseInt(id) },
-    });
-
-    res.json({ message: "Image deleted successfully" });
+    res.json(result);
   } catch (error) {
     console.error("Error deleting image:", error);
-    res.status(500).json({ error: "Failed to delete image" });
+    const statusCode = error.status || 500;
+    const message = error.message || "Failed to delete image";
+    res.status(statusCode).json({ error: message });
   }
 };
 
