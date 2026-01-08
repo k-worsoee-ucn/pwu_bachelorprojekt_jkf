@@ -58,7 +58,6 @@ model Process {
 
   // One-to-many relationships
   references Reference[]
-  products   Product[]
   cases      Case[]
   images     Image[]
 
@@ -154,17 +153,11 @@ model Customer {
 }
 
 model Product {
-  id          Int             @id @default(autoincrement())
-  title       String
+  id    Int             @id @default(autoincrement())
+  title String
   category    ProductCategory
-  processId   Int?            @map("process_id")
-  referenceId Int?            @map("reference_id")
-  caseId      Int?            @map("case_id")
 
   // Relationships
-  process      Process?      @relation(fields: [processId], references: [id])
-  reference    Reference?    @relation(fields: [referenceId], references: [id])
-  case         Case?         @relation(fields: [caseId], references: [id])
   saleProducts SaleProduct[]
 
   @@map("products")
@@ -192,7 +185,6 @@ model Reference {
 
   // Relationships
   process  Process?  @relation(fields: [processId], references: [id])
-  products Product[]
   cases    Case[]
 
   @@map("references")
@@ -209,7 +201,6 @@ model Case {
   // Relationships
   process   Process?   @relation(fields: [processId], references: [id])
   reference Reference? @relation(fields: [referenceId], references: [id])
-  products  Product[]
 
   @@map("cases")
 }

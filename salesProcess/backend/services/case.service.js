@@ -10,7 +10,6 @@ async function getAllCases(processId = null, referenceId = null) {
     include: {
       process: true,
       reference: true,
-      products: true,
     },
   });
 
@@ -20,7 +19,7 @@ async function getAllCases(processId = null, referenceId = null) {
 async function getCaseById(caseId) {
   const caseItem = await prisma.case.findUnique({
     where: { id: parseInt(caseId) },
-    include: { process: true, reference: true, products: true },
+    include: { process: true, reference: true },
   });
 
   if (!caseItem) {
@@ -36,7 +35,6 @@ async function getCasesByProcessId(processId) {
     include: {
       process: true,
       reference: true,
-      products: true,
     },
     orderBy: {
       createdAt: "desc",

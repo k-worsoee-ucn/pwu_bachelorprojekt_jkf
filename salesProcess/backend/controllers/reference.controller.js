@@ -1,16 +1,10 @@
-const prisma = require("./prisma");
+const referenceService = require("../services/reference.service");
 
 async function getAllReferences(req, res) {
   try {
     const { processId } = req.query;
 
-    const whereClause = {};
-    if (processId) whereClause.processId = parseInt(processId);
-
-    const references = await prisma.reference.findMany({
-      where: whereClause,
-      include: { process: true, products: true, cases: true },
-    });
+    const references = await referenceService.getAllReferences({ processId });
 
     res.json(references);
   } catch (error) {
@@ -21,59 +15,52 @@ async function getAllReferences(req, res) {
 
 async function getReferenceById(req, res) {
   try {
-    const reference = await prisma.reference.findUnique({
-      where: { id: parseInt(req.params.id) },
-      include: { process: true, products: true, cases: true },
-    });
-
-    if (!reference)
-      return res.status(404).json({ error: "Reference not found" });
-
+    const reference = await referenceService.getReferenceById(req.params.id);
     res.json(reference);
   } catch (error) {
     console.error('Error in getReferenceById:', error);
-    res.status(500).json({ error: 'An error occurred processing your request' });
+    const statusCode = error.status || 500;
+    const message = error.message || 'An error occurred processing your request';
+    res.status(statusCode).json({ error: message });
   }
 }
 
 async function createReference(req, res) {
   try {
     const { processId } = req.body;
-    const reference = await prisma.reference.create({
-      data: { ...(processId && { processId }) },
-      include: { process: true },
-    });
+    const reference = await referenceService.createReference({ processId });
 
     res.status(201).json(reference);
   } catch (error) {
     console.error('Error in createReference:', error);
-    res.status(500).json({ error: 'An error occurred processing your request' });
+    const statusCode = error.status || 500;
+    const message = error.message || 'An error occurred processing your request';
+    res.status(statusCode).json({ error: message });
   }
 }
 
 async function updateReference(req, res) {
   try {
     const { processId } = req.body;
-    const reference = await prisma.reference.update({
-      where: { id: parseInt(req.params.id) },
-      data: { ...(processId !== undefined && { processId }) },
-      include: { process: true },
-    });
-
+    const reference = await referenceService.updateReference(req.params.id, { processId });
     res.json(reference);
   } catch (error) {
     console.error('Error in updateReference:', error);
-    res.status(500).json({ error: 'An error occurred processing your request' });
+    const statusCode = error.status || 500;
+    const message = error.message || 'An error occurred processing your request';
+    res.status(statusCode).json({ error: message });
   }
 }
 
 async function deleteReference(req, res) {
   try {
-    await prisma.reference.delete({ where: { id: parseInt(req.params.id) } });
+    await referenceService.deleteReference(req.params.id);
     res.status(204).send();
   } catch (error) {
     console.error('Error in deleteReference:', error);
-    res.status(500).json({ error: 'An error occurred processing your request' });
+    const statusCode = error.status || 500;
+    const message = error.message || 'An error occurred processing your request';
+    res.status(statusCode).json({ error: message });
   }
 }
 
