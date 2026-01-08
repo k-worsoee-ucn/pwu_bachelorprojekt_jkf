@@ -1,7 +1,7 @@
 const prisma = require("./prisma");
-const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const encryption = require("../utils/encryption");
+const { validatePasswordComplexity, getPasswordValidationError, hashPassword, verifyPassword } = require("../utils/password");
 
 async function getAllUsers(req, res) {
   try {
@@ -81,15 +81,13 @@ async function updateCurrentUser(req, res) {
         return res.status(403).json({ error: 'Valid access code required to change password' });
       }
 
-      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[a-zA-Z\d@$!%*?&]{8,}$/;
-      if (!passwordRegex.test(password)) {
+      if (!validatePasswordComplexity(password)) {
         return res.status(400).json({ 
-          error: 'Password must be at least 8 characters long and contain uppercase, lowercase, number, and special character (@$!%*?&)' 
+          error: getPasswordValidationError()
         });
       }
 
-      const bcrypt = require('bcrypt');
-      updateData.password = await bcrypt.hash(password, 10);
+      updateData.password = await hashPassword(password);
       console.log('Password will be updated for user:', userId);
     }
 
@@ -186,15 +184,14 @@ async function registerUser(req, res) {
     }
 
     // Validate password complexity
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[a-zA-Z\d@$!%*?&]{8,}$/;
-    if (!passwordRegex.test(password)) {
+    if (!validatePasswordComplexity(password)) {
       return res.status(400).json({ 
-        error: 'Password must be at least 8 characters long and contain uppercase, lowercase, number, and special character (@$!%*?&)' 
+        error: getPasswordValidationError()
       });
     }
 
     // Hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await hashPassword(password);
     const encryptedName = encryption.encrypt(name);
 
     const user = await prisma.user.create({
@@ -258,7 +255,7 @@ async function loginUser(req, res) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
-    const validPassword = await bcrypt.compare(password, user.password);
+    const validPassword = await verifyPassword(password, user.password);
     if (!validPassword) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
