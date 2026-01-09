@@ -27,6 +27,19 @@ const prisma = new PrismaClient();
 app.use(
   helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" },
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://fonts.googleapis.com"],
+        fontSrc: ["'self'", "https://cdnjs.cloudflare.com", "https://fonts.gstatic.com"],
+        imgSrc: ["'self'", "data:", "blob:", "http://localhost:*"],
+        connectSrc: ["'self'", "http://localhost:*"],
+      },
+    },
+    noSniff: true,
+    frameguard: { action: 'deny' },
+    xssFilter: true,
   })
 );
 
