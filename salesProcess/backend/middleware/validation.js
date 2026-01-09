@@ -21,14 +21,14 @@ const passwordComplexityValidator = body('password')
   });
 
 const validateUserLogin = [
-  body('email').trim().isEmail().withMessage('Valid email is required'),
+  body('email').trim().isEmail().escape().withMessage('Valid email is required'),
   body('password').notEmpty().withMessage('Password is required'),
   handleValidationErrors
 ];
 
 const validateUserRegistration = [
   body('accessCode').trim().notEmpty().escape().withMessage('Access code is required'),
-  body('email').trim().isEmail().withMessage('Valid email is required'),
+  body('email').trim().isEmail().escape().withMessage('Valid email is required'),
   passwordComplexityValidator,
   body('name').trim().notEmpty().escape().withMessage('Name is required'),
   handleValidationErrors
