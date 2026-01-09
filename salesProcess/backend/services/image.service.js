@@ -1,4 +1,4 @@
-const prisma = require("../controllers/prisma");
+const prisma = require("../utils/prisma");
 const fs = require("fs");
 const path = require("path");
 

@@ -1,4 +1,4 @@
-const prisma = require("../controllers/prisma");
+const prisma = require("../utils/prisma");
 
 async function getAllCases(processId = null, referenceId = null) {
   const whereClause = {};

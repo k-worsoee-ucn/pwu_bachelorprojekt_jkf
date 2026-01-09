@@ -1,4 +1,4 @@
-const prisma = require("../controllers/prisma");
+const prisma = require("../utils/prisma");
 const encryption = require("../utils/encryption");
 
 // Helper function to decrypt sale data

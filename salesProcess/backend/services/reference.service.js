@@ -1,4 +1,4 @@
-const prisma = require("../controllers/prisma");
+const prisma = require("../utils/prisma");
 
 async function getAllReferences(queryParams = {}) {
   const { processId } = queryParams;

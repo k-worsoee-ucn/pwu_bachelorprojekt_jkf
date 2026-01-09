@@ -23,7 +23,7 @@ describe('Authentication Middleware - Critical Tests', () => {
     beforeEach(() => {
       jest.resetModules();
       
-      jest.doMock('../controllers/prisma', () => ({
+      jest.doMock('../utils/prisma', () => ({
         user: {
           findUnique: jest.fn()
         }
@@ -31,7 +31,7 @@ describe('Authentication Middleware - Critical Tests', () => {
     });
 
     afterEach(() => {
-      jest.dontMock('../controllers/prisma');
+      jest.dontMock('../utils/prisma');
     });
 
     test('should reject requests without authorization header', async () => {

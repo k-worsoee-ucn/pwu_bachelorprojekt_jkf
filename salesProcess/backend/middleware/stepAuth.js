@@ -1,4 +1,4 @@
-const prisma = require("../controllers/prisma");
+const prisma = require("../utils/prisma");
 
 // Define which roles can access which steps
 const STEP_PERMISSIONS = {

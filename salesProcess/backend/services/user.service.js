@@ -1,4 +1,4 @@
-const prisma = require("../controllers/prisma");
+const prisma = require("../utils/prisma");
 const jwt = require('jsonwebtoken');
 const encryption = require("../utils/encryption");
 const { validatePasswordComplexity, getPasswordValidationError, hashPassword, verifyPassword } = require("../utils/password");
