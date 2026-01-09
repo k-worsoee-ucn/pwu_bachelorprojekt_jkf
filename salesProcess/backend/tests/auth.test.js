@@ -6,6 +6,7 @@ describe('Authentication Middleware - Critical Tests', () => {
   beforeEach(() => {
     mockReq = {
       headers: {},
+      cookies: {},
       user: null
     };
     mockRes = {
@@ -46,7 +47,7 @@ describe('Authentication Middleware - Critical Tests', () => {
 
     test('should reject invalid JWT tokens', async () => {
       const { verifyToken } = require('../middleware/auth');
-      mockReq.headers['authorization'] = 'Bearer invalid_token_here';
+      mockReq.cookies.token = 'invalid_token_here';
       
       await verifyToken(mockReq, mockRes, mockNext);
 
@@ -55,9 +56,9 @@ describe('Authentication Middleware - Critical Tests', () => {
       expect(mockNext).not.toHaveBeenCalled();
     });
 
-    test('should reject malformed authorization header', async () => {
+    test('should reject requests with empty cookie token', async () => {
       const { verifyToken } = require('../middleware/auth');
-      mockReq.headers['authorization'] = 'Bearer '; // Empty token
+      mockReq.cookies.token = ''; // Empty token
       
       await verifyToken(mockReq, mockRes, mockNext);
 
