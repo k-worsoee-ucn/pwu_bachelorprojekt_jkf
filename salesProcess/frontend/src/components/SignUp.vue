@@ -4,7 +4,6 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
-// Form data
 const formData = ref({
   accessCode: '',
   email: '',
@@ -14,15 +13,9 @@ const formData = ref({
   role: 'viewer'
 })
 
-// Form state
-const isLoading = ref(false)
 const errorMessage = ref('')
 const successMessage = ref('')
 
-// Password regex pattern: at least 8 characters, 1 uppercase, 1 lowercase, 1 number, 1 special character
-const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/
-
-// Validate password strength
 const validatePassword = (password) => {
   if (password.length < 8) {
     return 'Password must be at least 8 characters long'
@@ -42,31 +35,25 @@ const validatePassword = (password) => {
   return null
 }
 
-// Handle form submission
 const handleSubmit = async () => {
   errorMessage.value = ''
   successMessage.value = ''
-  
-  // Basic validation
+
   if (!formData.value.accessCode || !formData.value.email || !formData.value.password || !formData.value.passwordConfirm || !formData.value.name) {
     errorMessage.value = 'All fields are required'
     return
   }
 
-  // Validate password strength
   const passwordError = validatePassword(formData.value.password)
   if (passwordError) {
     errorMessage.value = passwordError
     return
   }
 
-  // Check if passwords match
   if (formData.value.password !== formData.value.passwordConfirm) {
     errorMessage.value = 'Passwords do not match'
     return
   }
-
-  isLoading.value = true
 
   try {
     const response = await fetch('/api/users/register', {
@@ -88,7 +75,6 @@ const handleSubmit = async () => {
 
     if (response.ok) {
       successMessage.value = 'Registration successful!'
-      // Reset form
       formData.value = {
         accessCode: '',
         email: '',
@@ -106,8 +92,6 @@ const handleSubmit = async () => {
     }
   } catch (error) {
     errorMessage.value = 'Network error. Please try again.'
-  } finally {
-    isLoading.value = false
   }
 }
 
@@ -202,8 +186,8 @@ const handleSubmit = async () => {
       </div>
 
       <!-- Submit Button -->
-      <button type="submit" :disabled="isLoading" class="btn">
-        {{ isLoading ? 'Registering...' : 'Sign Up' }}
+      <button type="submit" class="btn">
+        Sign Up
       </button>
     </form>
   </div>

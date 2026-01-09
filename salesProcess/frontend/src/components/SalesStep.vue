@@ -527,7 +527,6 @@
 <script setup>
 import { ref, reactive, onMounted, computed, watch } from "vue";
 import { countries } from "countries-list";
-import { useAuth } from "@/composables/useAuth";
 
 const props = defineProps({
   sale: {
@@ -549,8 +548,6 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["sale-created", "sale-updated", "cancel"]);
-
-const { getAuthHeader } = useAuth();
 
 const formData = reactive({
   title: "",
@@ -613,9 +610,9 @@ const isSubmitting = ref(false);
 
 const isEdit = computed(() => props.sale !== null);
 
+// Countries-list library
 const allCountries = computed(() => {
   const countryList = Object.entries(countries).map(([code, data]) => {
-    // Handle both string values and object values
     const name = typeof data === "string" ? data : data.name || data;
     return { code, name: String(name).trim() };
   });
@@ -652,7 +649,6 @@ const ductProducts = computed(() => {
   return products.value.filter((p) => p.category === "ductSystems");
 });
 
-// Methods
 const resetForm = () => {
   Object.assign(formData, {
     title: "",
@@ -680,9 +676,8 @@ const resetForm = () => {
 };
 
 const loadFormData = () => {
-  console.log("loadFormData called, props.sale:", props.sale);
+  
   if (props.sale) {
-    console.log("props.sale.saleProducts:", props.sale.saleProducts);
     Object.assign(formData, {
       title: props.sale.title || "",
       description: props.sale.description || "",
@@ -714,12 +709,9 @@ const loadFormData = () => {
           .map((sp) => sp.productId) || [],
     });
 
-    // Load privacy settings
     if (props.sale.privacySettings) {
       Object.assign(privacyFlags, props.sale.privacySettings);
     }
-
-    console.log("formData after loading:", formData);
   }
 };
 
@@ -765,7 +757,6 @@ const handleCountryInputFocus = () => {
 };
 
 const closeCountryDropdown = (event) => {
-  // Only close if clicking outside the country container
   const countryContainer = event.target.closest(".country-dropdown-container");
   if (!countryContainer) {
     showCountryDropdown.value = false;
@@ -822,14 +813,13 @@ const submitForm = async () => {
   }
 };
 
-// Lifecycle
 onMounted(() => {
   loadCustomers();
   loadProducts();
   loadFormData();
 });
 
-// Watch for sale prop changes to reload privacy flags
+// Watch to retain privacy settings
 watch(
   () => props.sale,
   (newSale) => {

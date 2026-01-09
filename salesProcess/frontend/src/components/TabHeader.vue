@@ -15,7 +15,6 @@ defineProps({
   }
 });
 
-// Watch route changes to update active tab
 watch(() => route.query.tab, (newTab) => {
   if (newTab) {
     activeTab.value = newTab;

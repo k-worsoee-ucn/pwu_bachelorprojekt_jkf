@@ -27,7 +27,7 @@ watch(
   }
 );
 
-// Reset internal state when modal opens (to sync with parent's state)
+// Reset filters when modal opens
 watch(
   () => props.isOpen,
   (isOpen) => {
@@ -37,7 +37,7 @@ watch(
   }
 );
 
-// Filter dropdown data from backend
+// Filter dropdown data
 const filterOptionsData = ref({
   salesManagers: [],
   industries: [],
@@ -54,9 +54,7 @@ const selectedYear = ref([]);
 const selectedMonth = ref([]);
 const selectedConsent = ref([]);
 
-// Dropdown state: only one open at a time
-
-const openDropdownKey = ref(null); // null or string key of open dropdown
+const openDropdownKey = ref(null);
 
 function toggleDropdown(key) {
   openDropdownKey.value = openDropdownKey.value === key ? null : key;
@@ -75,7 +73,7 @@ const extractionVolumeTo = ref("");
 const volumeFlowFrom = ref("");
 const volumeFlowTo = ref("");
 
-// Fetch filter options from backend
+// Fetch filter options from process.service.js
 onMounted(async () => {
   try {
     const response = await fetch("/api/processes/filter-options", {
@@ -89,7 +87,7 @@ onMounted(async () => {
   }
 });
 
-// Computed properties for dropdowns
+// Properties for dropdowns
 const steps = computed(() => [1, 2, 3, 4, 5, 6]);
 
 const salesManagers = computed(() => filterOptionsData.value.salesManagers);
@@ -128,7 +126,6 @@ const filters = computed(() => filterOptionsData.value.filterTypes);
 
 const ventilations = computed(() => filterOptionsData.value.fanTypes);
 
-// Industry labels mapping
 const industryLabels = {
   woodworking: "Woodworking",
   agroAndMilling: "Agro- and Milling",

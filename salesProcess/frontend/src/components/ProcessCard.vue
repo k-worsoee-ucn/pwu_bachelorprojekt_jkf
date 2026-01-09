@@ -46,12 +46,12 @@ const props = defineProps({
     type: Array,
     required: false,
     default: () => [
-      "Salg - Sag oprettelse",
-      "Under produktion",
-      "Produktbilleder",
-      "Installationsbilleder",
-      "Referencer",
-      "Afslutning/upload",
+      "Sale Information",
+      "Production",
+      "Product Images",
+      "Case Consent & Installation Images",
+      "Case & Reference Creation",
+      "Case Upload",
     ],
   },
   status: {

@@ -73,6 +73,7 @@ const saving = ref(false);
 const saveMessage = ref(null);
 const currentCaseId = ref(null);
 
+// Quill library WYSIWYG
 const editorOptions = {
   modules: {
     toolbar: [
