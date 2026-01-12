@@ -85,7 +85,7 @@ const handleSubmit = async () => {
       }
       // Redirect to login after successful registration
       setTimeout(() => {
-        router.push('/login')
+        router.push('/login?signup=false')
       }, 1500)
     } else {
       errorMessage.value = data.error || 'Registration failed'
