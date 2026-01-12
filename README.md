@@ -63,7 +63,7 @@ salesProcess/
 
 #### Option 1: Docker Compose (Recommended)
 
-The easiest way to get started is using Docker Compose, which sets up the entire stack automatically.
+The easiest way to get started is using Docker Compose, which sets up the entire stack automatically with persistent image storage.
 
 1. **Clone the repository**
    ```bash
@@ -89,6 +89,10 @@ The easiest way to get started is using Docker Compose, which sets up the entire
    - **Frontend**: http://localhost:5173
    - **Backend API**: http://localhost:3000
    - **Prisma Studio**: http://localhost:5555
+
+   **Data Persistence**: 
+   - Database data persists in the `postgres_data` Docker volume
+   - Uploaded images persist in the `backend_uploads` Docker volume
 
 #### Option 2: Local Development
 
@@ -132,8 +136,7 @@ The backend provides RESTful API endpoints organized by entity:
 - **Customers** (`/api/customers`) - Customer information
 - **Products** (`/api/products`) - Product catalog
 - **Cases** (`/api/cases`) - Case management
-- **References** (`/api/references`) - Reference data
-- **Images** (`/api/images`) - Image upload and management
+- **Images** (`/api/processes/:processId/images`) - Image upload and management
 
 All API endpoints require authentication via JWT token in the `Authorization` header.
 
