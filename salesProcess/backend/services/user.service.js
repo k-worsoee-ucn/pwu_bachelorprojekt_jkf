@@ -50,8 +50,7 @@ async function registerUser(registrationData) {
   if (accessCode !== process.env.REGISTRATION_ACCESS_CODE) {
     throw { status: 403, message: 'Invalid access code' };
   }
-  
-  // Check if user already exists
+
   const existingUser = await prisma.user.findUnique({
     where: { email }
   });

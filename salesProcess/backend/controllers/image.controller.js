@@ -1,6 +1,5 @@
 const imageService = require("../services/image.service");
 
-// Upload images for a process
 const uploadImages = async (req, res) => {
   try {
     const { processId } = req.params;
@@ -25,7 +24,6 @@ const uploadImages = async (req, res) => {
   }
 };
 
-// Get all images for a process
 const getProcessImages = async (req, res) => {
   try {
     const { processId } = req.params;
@@ -42,7 +40,6 @@ const getProcessImages = async (req, res) => {
   }
 };
 
-// Delete an image
 const deleteImage = async (req, res) => {
   try {
     const { id } = req.params;

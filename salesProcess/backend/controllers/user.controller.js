@@ -16,7 +16,6 @@ async function registerUser(req, res) {
   try {
     const user = await userService.registerUser(req.body);
 
-    // Generate JWT token
     const token = await userService.generateToken(user);
 
     // Set token in httpOnly cookie
@@ -73,7 +72,6 @@ async function getCurrentUser(req, res) {
 
 async function logoutUser(req, res) {
   try {
-    // Clear the token cookie
     res.clearCookie('token', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',

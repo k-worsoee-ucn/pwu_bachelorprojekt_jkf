@@ -4,7 +4,7 @@ describe("Process Authorization Middleware", () => {
   let mockPrisma;
 
   beforeAll(() => {
-    // Setup mock Prisma before requiring middleware
+    // Setup mock Prisma
     mockPrisma = {
       process: {
         findUnique: jest.fn(),
@@ -13,7 +13,6 @@ describe("Process Authorization Middleware", () => {
 
     jest.doMock("../utils/prisma", () => mockPrisma);
 
-    // Now require the middleware
     canUpdateProcess = require("../middleware/stepAuth").canUpdateProcess;
   });
 

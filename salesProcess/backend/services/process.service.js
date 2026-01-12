@@ -1,7 +1,7 @@
 const prisma = require("../utils/prisma");
 const encryption = require("../utils/encryption");
 
-// Helper function to decrypt process data
+// Decrypt process data
 function decryptProcess(process) {
   if (!process) return process;
 
@@ -125,7 +125,6 @@ async function getProcessById(processId) {
 async function updateProcess(processId, updateFields) {
   const { title, caseNo, status, consent, currentStep, shippingDate } = updateFields;
 
-  // Build update data object, only including fields that are provided
   const updateData = {};
   if (title !== undefined) updateData.title = title;
   if (caseNo !== undefined) updateData.caseNo = caseNo;
@@ -163,7 +162,6 @@ async function updateProcess(processId, updateFields) {
 }
 
 async function getFilterOptions() {
-  // Get all sales managers
   const salesManagersRaw = await prisma.user.findMany({
     where: { role: "salesManager" },
     select: { id: true, name: true },
@@ -174,7 +172,7 @@ async function getFilterOptions() {
     name: encryption.decrypt(user.name),
   }));
 
-  // Industry enum values (must match the enum in schema)
+  // Industry enum values
   const industries = [
     "woodworking",
     "agroAndMilling",
@@ -184,20 +182,17 @@ async function getFilterOptions() {
     "other",
   ];
 
-  // Get distinct countries from Sales
   const countriesRaw = await prisma.sale.findMany({
     select: { country: true },
   });
   const countries = [...new Set(countriesRaw.map((s) => s.country))].sort();
 
-  // Get distinct customers
   const customersRaw = await prisma.customer.findMany({
     select: { name: true },
     orderBy: { name: "asc" },
   });
   const customers = [...new Set(customersRaw.map((c) => encryption.decrypt(c.name)))].sort();
 
-  // Get distinct product categories for filters (filtersAndSeparators)
   const filterProductsRaw = await prisma.product.findMany({
     where: { category: "filtersAndSeparators" },
     select: { title: true },
@@ -205,7 +200,6 @@ async function getFilterOptions() {
   });
   const filterTypes = [...new Set(filterProductsRaw.map((p) => p.title))];
 
-  // Get distinct product categories for ventilation (fanSystems)
   const fanProductsRaw = await prisma.product.findMany({
     where: { category: "fanSystems" },
     select: { title: true },

@@ -9,8 +9,6 @@ const {
   deleteImage,
 } = require("../controllers/image.controller");
 
-// Upload multiple images for a process
-// Step 3 (production) or Step 4 (installation) - checked in middleware based on image type
 router.post(
   "/processes/:processId/images",
   verifyToken,
@@ -19,10 +17,8 @@ router.post(
   uploadImages
 );
 
-// Get all images for a process
 router.get("/processes/:processId/images", verifyToken, getProcessImages);
 
-// Delete an image
 router.delete("/images/:id", verifyToken, canManageImages, deleteImage);
 
 module.exports = router;

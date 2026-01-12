@@ -7,7 +7,6 @@ async function uploadImages(processId, files, type = "production") {
     throw { status: 400, message: "No files uploaded" };
   }
 
-  // Check if process exists
   const process = await prisma.process.findUnique({
     where: { id: parseInt(processId) },
   });
@@ -16,7 +15,6 @@ async function uploadImages(processId, files, type = "production") {
     throw { status: 404, message: "Process not found" };
   }
 
-  // Create image records in database
   const imageRecords = await Promise.all(
     files.map((file) =>
       prisma.image.create({
@@ -51,7 +49,6 @@ async function getProcessImages(processId, type = null) {
 }
 
 async function deleteImage(imageId) {
-  // Get image from database
   const image = await prisma.image.findUnique({
     where: { id: parseInt(imageId) },
   });
@@ -60,7 +57,6 @@ async function deleteImage(imageId) {
     throw { status: 404, message: "Image not found" };
   }
 
-  // Delete file from filesystem
   const filePath = path.join(
     __dirname,
     "..",
@@ -71,7 +67,6 @@ async function deleteImage(imageId) {
     fs.unlinkSync(filePath);
   }
 
-  // Delete from database
   await prisma.image.delete({
     where: { id: parseInt(imageId) },
   });

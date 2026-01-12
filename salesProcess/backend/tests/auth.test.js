@@ -58,7 +58,7 @@ describe('Authentication Middleware - Critical Tests', () => {
 
     test('should reject requests with empty cookie token', async () => {
       const { verifyToken } = require('../middleware/auth');
-      mockReq.cookies.token = ''; // Empty token
+      mockReq.cookies.token = '';
       
       await verifyToken(mockReq, mockRes, mockNext);
 

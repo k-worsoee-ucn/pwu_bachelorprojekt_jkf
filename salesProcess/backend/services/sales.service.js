@@ -1,7 +1,7 @@
 const prisma = require("../utils/prisma");
 const encryption = require("../utils/encryption");
 
-// Helper function to decrypt sale data
+// Decrypt sale data
 function decryptSale(sale) {
   if (!sale) return sale;
 
@@ -49,7 +49,6 @@ async function createSale(saleData) {
     privacySettings,
   } = saleData;
 
-  // Validation
   if (!title || !endUser || !country || !industry || !customerId || !salesManagerId) {
     throw {
       status: 400,
@@ -57,7 +56,6 @@ async function createSale(saleData) {
     };
   }
 
-  // Verify customer exists
   const customer = await prisma.customer.findUnique({
     where: { id: customerId },
     select: { name: true },
@@ -67,7 +65,6 @@ async function createSale(saleData) {
     throw { status: 400, message: "Customer not found" };
   }
 
-  // Verify sales manager exists
   const salesManager = await prisma.user.findUnique({
     where: { id: salesManagerId },
     select: { id: true },
@@ -77,21 +74,18 @@ async function createSale(saleData) {
     throw { status: 400, message: "Sales manager not found" };
   }
 
-  // Get next case number
   const lastProcess = await prisma.process.findFirst({
     orderBy: { caseNo: "desc" },
     select: { caseNo: true },
   });
   const nextCaseNo = (lastProcess?.caseNo || 0) + 1;
 
-  // Prepare products array
   const allSelectedProducts = [
     ...selectedFilters,
     ...selectedFans,
     ...selectedDucts,
   ].filter((id) => id);
 
-  // Create sale and process in transaction
   const result = await prisma.$transaction(async (prisma) => {
     const process = await prisma.process.create({
       data: {
@@ -127,7 +121,6 @@ async function createSale(saleData) {
       },
     });
 
-    // Create sale products
     if (allSelectedProducts.length > 0) {
       const saleProductData = allSelectedProducts.map((productId) => ({
         saleId: sale.id,
@@ -140,7 +133,6 @@ async function createSale(saleData) {
       });
     }
 
-    // Return complete sale with relations
     return await prisma.sale.findUnique({
       where: { id: sale.id },
       include: {
@@ -162,12 +154,10 @@ async function createSale(saleData) {
     });
   });
 
-  console.log(`Created sale and process: ${title} (Case #${nextCaseNo})`);
   return decryptSale(result);
 }
 
 async function updateSale(saleId, updateData) {
-  // Extract UI-only fields that shouldn't go to database
   const {
     selectedFilters = [],
     selectedFans = [],
@@ -177,14 +167,12 @@ async function updateSale(saleId, updateData) {
     ...dbUpdateData
   } = updateData;
 
-  // Prepare products array
   const allSelectedProducts = [
     ...selectedFilters,
     ...selectedFans,
     ...selectedDucts,
   ].filter((id) => id);
 
-  // Verify sale exists
   const existingSale = await prisma.sale.findUnique({
     where: { id: parseInt(saleId) },
   });
@@ -193,20 +181,16 @@ async function updateSale(saleId, updateData) {
     throw { status: 404, message: "Sale not found" };
   }
 
-  // Update sale and products in transaction
   const sale = await prisma.$transaction(async (prisma) => {
-    // Update the sale
     await prisma.sale.update({
       where: { id: parseInt(saleId) },
       data: dbUpdateData,
     });
 
-    // Delete existing sale products
     await prisma.saleProduct.deleteMany({
       where: { saleId: parseInt(saleId) },
     });
 
-    // Create new sale products if any are selected
     if (allSelectedProducts.length > 0) {
       const saleProductData = allSelectedProducts.map((productId) => ({
         saleId: parseInt(saleId),
@@ -219,7 +203,6 @@ async function updateSale(saleId, updateData) {
       });
     }
 
-    // Return the updated sale with all relations
     return await prisma.sale.findUnique({
       where: { id: parseInt(saleId) },
       include: {
