@@ -1,7 +1,7 @@
 const prisma = require("../utils/prisma");
 const encryption = require("../utils/encryption");
 
-// Helper function to decrypt customer data
+// Decrypt customer data
 function decryptCustomer(customer) {
   if (!customer) return customer;
 
@@ -28,7 +28,6 @@ async function getAllCustomers(queryParams = {}) {
     },
   });
 
-  // Decrypt all customers
   return customers.map(decryptCustomer);
 }
 
@@ -55,22 +54,11 @@ async function getCustomerById(customerId) {
 async function createCustomer(customerData) {
   const { name, industry, country, salesManagerId, website } = customerData;
 
-  // Validation
   if (!name || !industry || !country || !salesManagerId) {
     throw {
       status: 400,
       message: "name, industry, country, and salesManagerId are required",
     };
-  }
-
-  // Verify sales manager exists
-  const salesManager = await prisma.user.findUnique({
-    where: { id: salesManagerId },
-    select: { id: true },
-  });
-
-  if (!salesManager) {
-    throw { status: 400, message: "Sales manager not found" };
   }
 
   const customer = await prisma.customer.create({
@@ -97,18 +85,6 @@ async function updateCustomer(customerId, updateData) {
 
   if (!existingCustomer) {
     throw { status: 404, message: "Customer not found" };
-  }
-
-  // Verify sales manager exists if provided
-  if (salesManagerId) {
-    const salesManager = await prisma.user.findUnique({
-      where: { id: salesManagerId },
-      select: { id: true },
-    });
-
-    if (!salesManager) {
-      throw { status: 400, message: "Sales manager not found" };
-    }
   }
 
   const customer = await prisma.customer.update({

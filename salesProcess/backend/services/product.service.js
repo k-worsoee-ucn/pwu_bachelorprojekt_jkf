@@ -83,9 +83,19 @@ async function updateProduct(productId, updateFields) {
 }
 
 async function deleteProduct(productId) {
-  await prisma.product.delete({
-    where: { id: parseInt(productId) }
+  const existingProduct = await prisma.product.findUnique({
+    where: { id: parseInt(productId) },
   });
+
+  if (!existingProduct) {
+    throw { status: 404, message: "Product not found" };
+  }
+
+  await prisma.product.delete({
+    where: { id: parseInt(productId) },
+  });
+
+  return { message: "Product deleted successfully" };
 }
 
 module.exports = {

@@ -7,12 +7,6 @@ const { seedProcessUsers } = require("./seeds/processUsers");
 
 const prisma = new PrismaClient();
 
-async function resetSequences(prisma) {
-  console.log("Resetting database sequences...");
-
-  console.log("Database sequences reset successfully");
-}
-
 async function main() {
   try {
     // Seed users first (required for customers and sales)
@@ -30,9 +24,6 @@ async function main() {
 
     // Seed process users (depends on auto-created processes from sales)
     await seedProcessUsers(prisma);
-
-    // Reset sequences to prevent ID conflicts
-    await resetSequences(prisma);
 
     console.log("Seed process completed successfully!");
     console.log("\nCreated data summary:");

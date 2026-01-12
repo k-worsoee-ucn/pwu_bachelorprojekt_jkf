@@ -158,23 +158,13 @@ async function seedSales(prisma, customers = []) {
   let skippedCount = 0;
 
   for (const saleData of salesDataWithRealIds) {
-    // Check if sale already exists by title and customer
-    console.log(
-      `Checking for existing sale: "${saleData.title}" with customerId: ${saleData.customerId}`
-    );
     const existingSale = await prisma.sale.findFirst({
       where: {
         title: saleData.title,
-        customerId: saleData.customerId,
       },
     });
-    console.log(
-      `Found existing sale:`,
-      existingSale ? `Yes (ID: ${existingSale.id})` : "No"
-    );
 
     if (existingSale) {
-      console.log(`Sale already exists: ${saleData.title} - skipping`);
       skippedCount++;
       continue;
     }

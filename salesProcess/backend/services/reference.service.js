@@ -50,14 +50,6 @@ async function createReference(referenceData) {
 async function updateReference(referenceId, updateFields) {
   const { processId } = updateFields;
 
-  const reference = await prisma.reference.findUnique({
-    where: { id: parseInt(referenceId) }
-  });
-
-  if (!reference) {
-    throw { status: 404, message: "Reference not found" };
-  }
-
   if (processId) {
     const process = await prisma.process.findUnique({
       where: { id: parseInt(processId) }
@@ -78,7 +70,7 @@ async function updateReference(referenceId, updateFields) {
 
 async function deleteReference(referenceId) {
   const reference = await prisma.reference.findUnique({
-    where: { id: parseInt(referenceId) }
+    where: { id: parseInt(referenceId) },
   });
 
   if (!reference) {
@@ -86,8 +78,10 @@ async function deleteReference(referenceId) {
   }
 
   await prisma.reference.delete({
-    where: { id: parseInt(referenceId) }
+    where: { id: parseInt(referenceId) },
   });
+
+  return { message: "Reference deleted successfully" };
 }
 
 module.exports = {

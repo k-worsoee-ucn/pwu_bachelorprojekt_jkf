@@ -1,12 +1,7 @@
 const prisma = require("../utils/prisma");
 
-async function getAllCases(processId = null, referenceId = null) {
-  const whereClause = {};
-  if (processId) whereClause.processId = parseInt(processId);
-  if (referenceId) whereClause.referenceId = parseInt(referenceId);
-
+async function getAllCases() {
   const cases = await prisma.case.findMany({
-    where: whereClause,
     include: {
       process: true,
       reference: true,
@@ -63,14 +58,10 @@ async function createCase(caseData) {
     dataToCreate.referenceId = parseInt(referenceId);
   }
 
-  console.log("Creating case with data:", dataToCreate);
-
   const caseItem = await prisma.case.create({
     data: dataToCreate,
     include: { process: true, reference: true },
   });
-
-  console.log(`Created case: ${caseItem.id}`);
 
   return caseItem;
 }
@@ -90,17 +81,23 @@ async function updateCase(caseId, updateData) {
     include: { process: true, reference: true },
   });
 
-  console.log(`Updated case: ${caseId}`);
-
   return caseItem;
 }
 
 async function deleteCase(caseId) {
+  const existingCase = await prisma.case.findUnique({
+    where: { id: parseInt(caseId) },
+  });
+
+  if (!existingCase) {
+    throw { status: 404, message: "Case not found" };
+  }
+
   await prisma.case.delete({
     where: { id: parseInt(caseId) },
   });
 
-  console.log(`Deleted case: ${caseId}`);
+  return { message: "Case deleted successfully" };
 }
 
 module.exports = {

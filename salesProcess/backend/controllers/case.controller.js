@@ -2,8 +2,7 @@ const caseService = require("../services/case.service");
 
 async function getAllCases(req, res) {
   try {
-    const { processId, referenceId } = req.query;
-    const cases = await caseService.getAllCases(processId, referenceId);
+    const cases = await caseService.getAllCases();
     res.json(cases);
   } catch (error) {
     console.error("Error in getAllCases:", error);
