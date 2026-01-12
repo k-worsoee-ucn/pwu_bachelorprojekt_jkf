@@ -24,12 +24,6 @@ router.post("/register", registrationLimiter, validateUserRegistration, userCont
 // Protected routes
 router.get("/me", verifyToken, userController.getCurrentUser);
 router.post("/logout", verifyToken, userController.logoutUser);
-router.get("/:id", verifyToken, validateId, userController.getUserById);
-router.get("/", verifyToken, userController.getAllUsers);
 router.put("/me", verifyToken, userController.updateCurrentUser);
-
-router.get("/:id/processes", verifyToken, validateId, userController.getUserProcesses);
-router.get("/:id/customers", verifyToken, validateId, userController.getUserCustomers);
-router.get("/:id/sales", verifyToken, validateId, userController.getUserSales);
 
 module.exports = router;

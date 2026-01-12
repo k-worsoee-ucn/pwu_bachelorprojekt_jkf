@@ -15,7 +15,6 @@ const salesRoutes = require("./routes/sales.routes");
 const customerRoutes = require("./routes/customer.routes");
 const userRoutes = require("./routes/user.routes");
 const productRoutes = require("./routes/product.routes");
-const referenceRoutes = require("./routes/reference.routes");
 const caseRoutes = require("./routes/case.routes");
 const imageRoutes = require("./routes/image.routes");
 
@@ -76,7 +75,6 @@ app.use("/api/sales", salesRoutes);
 app.use("/api/customers", customerRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);
-app.use("/api/references", referenceRoutes);
 app.use("/api/cases", caseRoutes);
 app.use("/api", imageRoutes);
 

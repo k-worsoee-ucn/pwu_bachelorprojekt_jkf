@@ -1,72 +1,11 @@
 const userService = require("../services/user.service");
 
-async function getAllUsers(req, res) {
-  try {
-    const { role } = req.query;
-    const users = await userService.getAllUsers(role);
-    res.json(users);
-  } catch (error) {
-    console.error('Error in getAllUsers:', error);
-    const statusCode = error.status || 500;
-    const message = error.message || 'An error occurred processing your request';
-    res.status(statusCode).json({ error: message });
-  }
-}
-
-async function getUserById(req, res) {
-  try {
-    const user = await userService.getUserById(req.params.id);
-    res.json(user);
-  } catch (error) {
-    console.error('Error in getUserById:', error);
-    const statusCode = error.status || 500;
-    const message = error.message || 'An error occurred processing your request';
-    res.status(statusCode).json({ error: message });
-  }
-}
-
 async function updateCurrentUser(req, res) {
   try {
     const user = await userService.updateCurrentUser(req.user.id, req.body);
     res.json(user);
   } catch (error) {
     console.error('Error in updateCurrentUser:', error);
-    const statusCode = error.status || 500;
-    const message = error.message || 'An error occurred processing your request';
-    res.status(statusCode).json({ error: message });
-  }
-}
-
-async function getUserProcesses(req, res) {
-  try {
-    const processUsers = await userService.getUserProcesses(req.params.id);
-    res.json(processUsers);
-  } catch (error) {
-    console.error('Error in getUserProcesses:', error);
-    const statusCode = error.status || 500;
-    const message = error.message || 'An error occurred processing your request';
-    res.status(statusCode).json({ error: message });
-  }
-}
-
-async function getUserCustomers(req, res) {
-  try {
-    const customers = await userService.getUserCustomers(req.params.id);
-    res.json(customers);
-  } catch (error) {
-    console.error('Error in getUserCustomers:', error);
-    const statusCode = error.status || 500;
-    const message = error.message || 'An error occurred processing your request';
-    res.status(statusCode).json({ error: message });
-  }
-}
-
-async function getUserSales(req, res) {
-  try {
-    const sales = await userService.getUserSales(req.params.id);
-    res.json(sales);
-  } catch (error) {
-    console.error('Error in getUserSales:', error);
     const statusCode = error.status || 500;
     const message = error.message || 'An error occurred processing your request';
     res.status(statusCode).json({ error: message });
@@ -149,12 +88,7 @@ async function logoutUser(req, res) {
 }
 
 module.exports = {
-  getAllUsers,
-  getUserById,
   updateCurrentUser,
-  getUserProcesses,
-  getUserCustomers,
-  getUserSales,
   registerUser,
   loginUser,
   getCurrentUser,

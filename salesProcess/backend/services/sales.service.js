@@ -21,58 +21,6 @@ function decryptSale(sale) {
   return decrypted;
 }
 
-async function getAllSales() {
-  const sales = await prisma.sale.findMany({
-    include: {
-      process: true,
-      customer: true,
-      salesManager: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-        },
-      },
-      saleProducts: {
-        include: {
-          product: true,
-        },
-      },
-    },
-  });
-
-  // Decrypt all sales
-  return sales.map(decryptSale);
-}
-
-async function getSaleById(saleId) {
-  const sale = await prisma.sale.findUnique({
-    where: { id: parseInt(saleId) },
-    include: {
-      process: true,
-      customer: true,
-      salesManager: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-        },
-      },
-      saleProducts: {
-        include: {
-          product: true,
-        },
-      },
-    },
-  });
-
-  if (!sale) {
-    throw { status: 404, message: "Sale not found" };
-  }
-
-  return decryptSale(sale);
-}
-
 async function createSale(saleData) {
   const {
     // Basic Information
@@ -296,32 +244,7 @@ async function updateSale(saleId, updateData) {
   return decryptSale(sale);
 }
 
-async function deleteSale(saleId) {
-  // Verify sale exists
-  const existingSale = await prisma.sale.findUnique({
-    where: { id: parseInt(saleId) },
-  });
-
-  if (!existingSale) {
-    throw { status: 404, message: "Sale not found" };
-  }
-
-  // Delete sale and products in transaction
-  await prisma.$transaction(async (prisma) => {
-    await prisma.saleProduct.deleteMany({
-      where: { saleId: parseInt(saleId) },
-    });
-
-    await prisma.sale.delete({
-      where: { id: parseInt(saleId) },
-    });
-  });
-}
-
 module.exports = {
-  getAllSales,
-  getSaleById,
   createSale,
   updateSale,
-  deleteSale,
 };

@@ -42,16 +42,6 @@ async function updateProcess(req, res) {
   }
 }
 
-async function deleteProcess(req, res) {
-  try {
-    await processService.deleteProcess(parseInt(req.params.id));
-    res.status(204).send();
-  } catch (error) {
-    console.error('Error in deleteProcess:', error);
-    res.status(500).json({ error: 'An error occurred processing your request' });
-  }
-}
-
 async function getFilterOptions(req, res) {
   try {
     const filterOptions = await processService.getFilterOptions();
@@ -66,6 +56,5 @@ module.exports = {
   getAllProcesses,
   getProcessById,
   updateProcess,
-  deleteProcess,
   getFilterOptions,
 };

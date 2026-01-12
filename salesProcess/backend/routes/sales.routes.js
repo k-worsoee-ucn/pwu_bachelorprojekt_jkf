@@ -4,19 +4,6 @@ const salesController = require("../controllers/sales.controller");
 const { verifyToken, requireRole } = require("../middleware/auth");
 const { canUpdateSale } = require("../middleware/stepAuth");
 
-router.get(
-  "/",
-  verifyToken,
-  requireRole(["salesManager", "marketingManager"]),
-  salesController.getAllSales
-);
-router.get(
-  "/:id",
-  verifyToken,
-  requireRole(["salesManager", "marketingManager"]),
-  salesController.getSaleById
-);
-
 router.post(
   "/",
   verifyToken,
@@ -24,11 +11,5 @@ router.post(
   salesController.createSale
 );
 router.put("/:id", verifyToken, canUpdateSale, salesController.updateSale);
-router.delete(
-  "/:id",
-  verifyToken,
-  requireRole(["salesManager"]),
-  salesController.deleteSale
-);
 
 module.exports = router;

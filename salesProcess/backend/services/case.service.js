@@ -1,35 +1,10 @@
 const prisma = require("../utils/prisma");
 
-async function getAllCases() {
-  const cases = await prisma.case.findMany({
-    include: {
-      process: true,
-      reference: true,
-    },
-  });
-
-  return cases;
-}
-
-async function getCaseById(caseId) {
-  const caseItem = await prisma.case.findUnique({
-    where: { id: parseInt(caseId) },
-    include: { process: true, reference: true },
-  });
-
-  if (!caseItem) {
-    throw { status: 404, message: "Case not found" };
-  }
-
-  return caseItem;
-}
-
 async function getCasesByProcessId(processId) {
   const cases = await prisma.case.findMany({
     where: { processId: parseInt(processId) },
     include: {
       process: true,
-      reference: true,
     },
     orderBy: {
       createdAt: "desc",
@@ -40,7 +15,7 @@ async function getCasesByProcessId(processId) {
 }
 
 async function createCase(caseData) {
-  const { content, processId, referenceId } = caseData;
+  const { content, processId } = caseData;
 
   if (!content) {
     throw { status: 400, message: "content is required" };
@@ -54,31 +29,24 @@ async function createCase(caseData) {
     dataToCreate.processId = parseInt(processId);
   }
 
-  if (referenceId) {
-    dataToCreate.referenceId = parseInt(referenceId);
-  }
-
   const caseItem = await prisma.case.create({
     data: dataToCreate,
-    include: { process: true, reference: true },
+    include: { process: true },
   });
 
   return caseItem;
 }
 
 async function updateCase(caseId, updateData) {
-  const { content, processId, referenceId } = updateData;
+  const { content, processId } = updateData;
 
   const caseItem = await prisma.case.update({
     where: { id: parseInt(caseId) },
     data: {
       ...(content && { content }),
       ...(processId !== undefined && { processId: parseInt(processId) }),
-      ...(referenceId !== undefined && {
-        referenceId: parseInt(referenceId),
-      }),
     },
-    include: { process: true, reference: true },
+    include: { process: true },
   });
 
   return caseItem;
@@ -101,8 +69,6 @@ async function deleteCase(caseId) {
 }
 
 module.exports = {
-  getAllCases,
-  getCaseById,
   getCasesByProcessId,
   createCase,
   updateCase,

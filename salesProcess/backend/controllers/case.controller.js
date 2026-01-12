@@ -1,28 +1,5 @@
 const caseService = require("../services/case.service");
 
-async function getAllCases(req, res) {
-  try {
-    const cases = await caseService.getAllCases();
-    res.json(cases);
-  } catch (error) {
-    console.error("Error in getAllCases:", error);
-    res.status(500).json({ error: "An error occurred processing your request" });
-  }
-}
-
-async function getCaseById(req, res) {
-  try {
-    const caseItem = await caseService.getCaseById(req.params.id);
-    res.json(caseItem);
-  } catch (error) {
-    if (error.status === 404) {
-      return res.status(404).json({ error: error.message });
-    }
-    console.error("Error in getCaseById:", error);
-    res.status(500).json({ error: "An error occurred processing your request" });
-  }
-}
-
 async function getCasesByProcessId(req, res) {
   try {
     const { processId } = req.params;
@@ -57,21 +34,8 @@ async function updateCase(req, res) {
   }
 }
 
-async function deleteCase(req, res) {
-  try {
-    await caseService.deleteCase(req.params.id);
-    res.status(204).send();
-  } catch (error) {
-    console.error("Error in deleteCase:", error);
-    res.status(500).json({ error: "An error occurred processing your request" });
-  }
-}
-
 module.exports = {
-  getAllCases,
-  getCaseById,
   getCasesByProcessId,
   createCase,
   updateCase,
-  deleteCase,
 };

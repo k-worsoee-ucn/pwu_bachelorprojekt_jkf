@@ -3,59 +3,6 @@ const jwt = require('jsonwebtoken');
 const encryption = require("../utils/encryption");
 const { validatePasswordComplexity, getPasswordValidationError, hashPassword, verifyPassword } = require("../utils/password");
 
-async function getAllUsers(role = null) {
-  const whereClause = {};
-  if (role) whereClause.role = role;
-
-  const users = await prisma.user.findMany({
-    where: whereClause,
-    select: {
-      id: true,
-      email: true,
-      name: true,
-      role: true,
-      createdAt: true,
-      updatedAt: true,
-    },
-  });
-
-  // Decrypt names
-  const decryptedUsers = users.map(user => ({
-    ...user,
-    name: user.name ? encryption.decrypt(user.name) : null
-  }));
-
-  return decryptedUsers;
-}
-
-async function getUserById(userId) {
-  const user = await prisma.user.findUnique({
-    where: { id: parseInt(userId) },
-    select: {
-      id: true,
-      email: true,
-      name: true,
-      role: true,
-      createdAt: true,
-      updatedAt: true,
-      processUsers: { include: { process: true } },
-      ownedSales: { include: { customer: true, process: true } },
-      managedCustomers: true,
-    },
-  });
-
-  if (!user) {
-    throw { status: 404, message: "User not found" };
-  }
-  
-  // Decrypt name
-  if (user.name) {
-    user.name = encryption.decrypt(user.name);
-  }
-  
-  return user;
-}
-
 async function updateCurrentUser(userId, updateFields) {
   const { email, name, role, password, accessCode } = updateFields;
 
@@ -94,37 +41,6 @@ async function updateCurrentUser(userId, updateFields) {
   }
 
   return user;
-}
-
-async function getUserProcesses(userId) {
-  const processUsers = await prisma.processUser.findMany({
-    where: { userId: parseInt(userId), isActive: true },
-    include: { process: { include: { sale: true } } },
-  });
-
-  return processUsers;
-}
-
-async function getUserCustomers(userId) {
-  const customers = await prisma.customer.findMany({
-    where: { salesManagerId: parseInt(userId) },
-    include: { sales: true },
-  });
-
-  return customers;
-}
-
-async function getUserSales(userId) {
-  const sales = await prisma.sale.findMany({
-    where: { salesManagerId: parseInt(userId) },
-    include: {
-      customer: true,
-      process: true,
-      saleProducts: { include: { product: true } },
-    },
-  });
-
-  return sales;
 }
 
 async function registerUser(registrationData) {
@@ -225,12 +141,7 @@ async function getCurrentUser(user) {
 }
 
 module.exports = {
-  getAllUsers,
-  getUserById,
   updateCurrentUser,
-  getUserProcesses,
-  getUserCustomers,
-  getUserSales,
   registerUser,
   generateToken,
   loginUser,

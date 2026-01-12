@@ -14,11 +14,5 @@ router.put(
   canUpdateProcess,
   processController.updateProcess
 );
-router.delete(
-  "/:id",
-  verifyToken,
-  requireRole(["salesManager", "marketingManager"]),
-  processController.deleteProcess
-);
 
 module.exports = router;

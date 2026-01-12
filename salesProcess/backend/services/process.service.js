@@ -162,12 +162,6 @@ async function updateProcess(processId, updateFields) {
   return process;
 }
 
-async function deleteProcess(processId) {
-  await prisma.process.delete({
-    where: { id: parseInt(processId) }
-  });
-}
-
 async function getFilterOptions() {
   // Get all sales managers
   const salesManagersRaw = await prisma.user.findMany({
@@ -233,6 +227,5 @@ module.exports = {
   getAllProcesses,
   getProcessById,
   updateProcess,
-  deleteProcess,
   getFilterOptions,
 };
