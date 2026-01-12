@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useAuth } from '@/composables/useAuth'
+import { useAuth } from '@/utils/useAuth'
 
 const { user, setUser } = useAuth()
 const form = ref({ email: '', password: '', name: '', role: '', accessCode: '' })

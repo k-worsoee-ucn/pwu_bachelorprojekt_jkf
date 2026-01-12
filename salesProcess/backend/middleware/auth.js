@@ -1,16 +1,8 @@
 const jwt = require('jsonwebtoken');
-const prisma = require('../controllers/prisma');
+const prisma = require('../utils/prisma');
 
 const verifyToken = async (req, res, next) => {
-  // Try to get token from cookie first, fall back to Authorization header
-  let token = req.cookies?.token;
-  
-  if (!token) {
-    const authHeader = req.headers['authorization'];
-    if (authHeader) {
-      token = authHeader.split(' ')[1];
-    }
-  }
+  const token = req.cookies?.token;
 
   if (!token) {
     return res.status(401).json({ error: "No token provided" });

@@ -1,5 +1,5 @@
 <script setup>
-import { useAuth } from "@/composables/useAuth";
+import { useAuth } from "@/utils/useAuth";
 
 const { user, isAuthenticated, isSalesManager, isMarketingManager, logout } =
   useAuth();
@@ -109,10 +109,6 @@ header {
       display: flex;
       gap: 1rem;
       align-items: center;
-
-      @media (max-width: 536px) {
-        flex-direction: column;
-      }
     }
 
     .nav-btn-badge {
@@ -130,7 +126,7 @@ header {
         padding: 0.2rem;
         background-color: $warning-500-main;
         border-radius: 50%;
-        border: 3px solid white;
+        border: 3px solid $plain-white;
       }
     }
 
@@ -138,10 +134,6 @@ header {
       display: flex;
       gap: 1rem;
       align-items: center;
-
-      @media (max-width: 536px) {
-        flex-direction: column;
-      }
     }
 
     .user-info {

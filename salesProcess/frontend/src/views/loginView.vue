@@ -7,7 +7,7 @@
   const route = useRoute()
   const isSignUp = ref(false)
 
-  // Watch route query to determine which form to show
+  // Sign up component
   watch(
     () => route.query.signup,
     (signup) => {

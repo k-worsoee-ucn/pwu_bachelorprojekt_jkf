@@ -1,47 +1,12 @@
-<template>
-  <div class="case-ref-step">
-    <h3>Case & Reference Creation</h3>
-    <p>Download case data and images separately</p>
-
-    <div class="download-section">
-      <button
-        @click="generatePDF"
-        :disabled="generatingPDF || props.disabled"
-        class="btn"
-      >
-        <span v-if="generatingPDF">Generating PDF...</span>
-        <span v-else>Download Sale Data (PDF)</span>
-      </button>
-
-      <button
-        @click="downloadImages"
-        :disabled="generatingZip || props.disabled"
-        class="btn"
-      >
-        <span v-if="generatingZip">Creating ZIP...</span>
-        <span v-else>Download Images (ZIP)</span>
-      </button>
-    </div>
-
-    <!-- Error Message -->
-    <div v-if="errorMessage" class="error-message">
-      {{ errorMessage }}
-    </div>
-
-    <!-- Success Message -->
-    <div v-if="successMessage" class="success-message">
-      {{ successMessage }}
-    </div>
-  </div>
-</template>
-
 <script setup>
 import { ref } from "vue";
 import { jsPDF } from "jspdf";
 import JSZip from "jszip";
-import { useAuth } from "../composables/useAuth";
+import { useAuth } from "../utils/useAuth";
 
 const { } = useAuth();
+
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
 const props = defineProps({
   processId: {
@@ -64,16 +29,13 @@ const props = defineProps({
   },
 });
 
-const generatingPDF = ref(false);
-const generatingZip = ref(false);
 const errorMessage = ref("");
 const successMessage = ref("");
 
-// Fetch images from server
 const fetchImages = async (type) => {
   try {
     const response = await fetch(
-      `http://localhost:3000/api/processes/${props.processId}/images?type=${type}`,
+      `${apiBaseUrl}/api/processes/${props.processId}/images?type=${type}`,
       {
         credentials: 'include',
       }
@@ -91,27 +53,8 @@ const fetchImages = async (type) => {
   }
 };
 
-// Convert image URL to base64
-const imageUrlToBase64 = async (url) => {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.crossOrigin = "Anonymous";
-    img.onload = () => {
-      const canvas = document.createElement("canvas");
-      canvas.width = img.width;
-      canvas.height = img.height;
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0);
-      resolve(canvas.toDataURL("image/jpeg"));
-    };
-    img.onerror = reject;
-    img.src = `http://localhost:3000${url}`;
-  });
-};
-
-// Generate PDF with sale data only
+// JSPDF library
 const generatePDF = async () => {
-  generatingPDF.value = true;
   errorMessage.value = "";
   successMessage.value = "";
 
@@ -309,22 +252,17 @@ const generatePDF = async () => {
   } catch (error) {
     console.error("Error generating PDF:", error);
     errorMessage.value = "Failed to generate PDF: " + error.message;
-  } finally {
-    generatingPDF.value = false;
   }
 };
 
-// Download images as ZIP
+// JSZIP library
 const downloadImages = async () => {
-  generatingZip.value = true;
   errorMessage.value = "";
   successMessage.value = "";
 
   try {
-    // Fetch production images (step 3)
     const productionImages = await fetchImages("production");
 
-    // Fetch installation images (step 4)
     const installationImages = await fetchImages("installation");
 
     if (productionImages.length === 0 && installationImages.length === 0) {
@@ -332,7 +270,6 @@ const downloadImages = async () => {
       return;
     }
 
-    // Create a new ZIP file
     const zip = new JSZip();
 
     // Add production images
@@ -341,7 +278,7 @@ const downloadImages = async () => {
       for (let i = 0; i < productionImages.length; i++) {
         try {
           const response = await fetch(
-            `http://localhost:3000${productionImages[i].url}`,
+            `${apiBaseUrl}${productionImages[i].url}`,
             {
               credentials: 'include',
             }
@@ -360,7 +297,7 @@ const downloadImages = async () => {
       for (let i = 0; i < installationImages.length; i++) {
         try {
           const response = await fetch(
-            `http://localhost:3000${installationImages[i].url}`,
+            `${apiBaseUrl}${installationImages[i].url}`,
             {
               credentials: 'include',
             }
@@ -388,11 +325,44 @@ const downloadImages = async () => {
   } catch (error) {
     console.error("Error creating ZIP:", error);
     errorMessage.value = "Failed to download images: " + error.message;
-  } finally {
-    generatingZip.value = false;
   }
 };
 </script>
+
+<template>
+  <div class="case-ref-step">
+    <h3>Case & Reference Creation</h3>
+    <p>Download case data and images separately</p>
+
+    <div class="download-section">
+      <button
+        @click="generatePDF"
+        :disabled="props.disabled"
+        class="btn"
+      >
+        Download Sale Data (PDF)
+      </button>
+
+      <button
+        @click="downloadImages"
+        :disabled="props.disabled"
+        class="btn"
+      >
+        Download Images (ZIP)
+      </button>
+    </div>
+
+    <!-- Error Message -->
+    <div v-if="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </div>
+
+    <!-- Success Message -->
+    <div v-if="successMessage" class="success-message">
+      {{ successMessage }}
+    </div>
+  </div>
+</template>
 
 <style scoped lang="scss">
 .case-ref-step {
@@ -404,10 +374,6 @@ const downloadImages = async () => {
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
-
-    .btn span {
-      color: white !important;
-    }
   }
 }
 </style>

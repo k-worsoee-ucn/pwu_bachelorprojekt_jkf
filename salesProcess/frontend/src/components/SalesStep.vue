@@ -1,3 +1,318 @@
+<script setup>
+import { ref, reactive, onMounted, computed, watch } from "vue";
+import { countries } from "countries-list";
+
+const props = defineProps({
+  sale: {
+    type: Object,
+    default: null,
+  },
+  processId: {
+    type: Number,
+    required: true,
+  },
+  currentUserId: {
+    type: Number,
+    required: true,
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+});
+
+const emit = defineEmits(["sale-created", "sale-updated", "cancel"]);
+
+const formData = reactive({
+  title: "",
+  description: "",
+  endUser: "",
+  phoneNumber: "",
+  country: "",
+  industry: "",
+  customIndustry: "",
+  selectedFilters: [],
+  selectedFans: [],
+  selectedDucts: [],
+  plantType: "",
+  filterType: "",
+  fanType: "",
+  dustType: "",
+  ductSystem: "",
+  totalExtractionVolume: 0,
+  pressure: 0,
+  volumeFlow: 0,
+  customerId: "",
+});
+
+const privacyFlags = reactive({
+  title: false,
+  description: false,
+  endUser: false,
+  phoneNumber: false,
+  country: false,
+  industry: false,
+  customIndustry: false,
+  selectedFilters: false,
+  selectedFans: false,
+  selectedDucts: false,
+  plantType: false,
+  filterType: false,
+  fanType: false,
+  dustType: false,
+  ductSystem: false,
+  totalExtractionVolume: false,
+  pressure: false,
+  volumeFlow: false,
+  customerId: false,
+  manufacturerWebsite: false,
+});
+
+const accordionState = reactive({
+  basicInfo: true,
+  productSelection: false,
+  technicalSpecs: false,
+});
+
+const customers = ref([]);
+const products = ref([]);
+const errorMessage = ref("");
+const successMessage = ref("");
+const countryQuery = ref("");
+const showCountryDropdown = ref(false);
+
+const isEdit = computed(() => props.sale !== null);
+
+// Countries-list library
+const allCountries = computed(() => {
+  const countryList = Object.entries(countries).map(([code, data]) => {
+    const name = typeof data === "string" ? data : data.name || data;
+    return { code, name: String(name).trim() };
+  });
+  return countryList.sort((a, b) => a.name.localeCompare(b.name));
+});
+
+const filteredCountries = computed(() => {
+  if (!countryQuery.value.trim()) {
+    return allCountries.value;
+  }
+
+  const query = countryQuery.value.toLowerCase();
+  return allCountries.value.filter((country) =>
+    country.name.toLowerCase().includes(query)
+  );
+});
+
+const selectedCustomerWebsite = computed(() => {
+  const selectedCustomer = customers.value.find(
+    (c) => c.id === formData.customerId
+  );
+  return selectedCustomer?.website || "No website available";
+});
+
+const filterProducts = computed(() => {
+  return products.value.filter((p) => p.category === "filtersAndSeparators");
+});
+
+const fanProducts = computed(() => {
+  return products.value.filter((p) => p.category === "fanSystems");
+});
+
+const ductProducts = computed(() => {
+  return products.value.filter((p) => p.category === "ductSystems");
+});
+
+const resetForm = () => {
+  Object.assign(formData, {
+    title: "",
+    description: "",
+    endUser: "",
+    phoneNumber: "",
+    country: "",
+    industry: "",
+    customIndustry: "",
+    selectedFilters: [],
+    selectedFans: [],
+    selectedDucts: [],
+    plantType: "",
+    filterType: "",
+    fanType: "",
+    dustType: "",
+    ductSystem: "",
+    totalExtractionVolume: 0,
+    pressure: 0,
+    volumeFlow: 0,
+    customerId: "",
+  });
+  errorMessage.value = "";
+  successMessage.value = "";
+};
+
+const loadFormData = () => {
+  
+  if (props.sale) {
+    Object.assign(formData, {
+      title: props.sale.title || "",
+      description: props.sale.description || "",
+      endUser: props.sale.endUser || "",
+      phoneNumber: props.sale.phoneNumber || "",
+      country: props.sale.country || "",
+      industry: props.sale.industry || "",
+      customIndustry: props.sale.customIndustry || "",
+      plantType: props.sale.plantType || "",
+      filterType: props.sale.filterType || "",
+      fanType: props.sale.fanType || "",
+      dustType: props.sale.dustType || "",
+      ductSystem: props.sale.ductSystem || "",
+      totalExtractionVolume: props.sale.totalExtractionVolume || 0,
+      pressure: props.sale.pressure || 0,
+      volumeFlow: props.sale.volumeFlow || 0,
+      customerId: props.sale.customerId || "",
+      selectedFilters:
+        props.sale.saleProducts
+          ?.filter((sp) => sp.product.category === "filtersAndSeparators")
+          .map((sp) => sp.productId) || [],
+      selectedFans:
+        props.sale.saleProducts
+          ?.filter((sp) => sp.product.category === "fanSystems")
+          .map((sp) => sp.productId) || [],
+      selectedDucts:
+        props.sale.saleProducts
+          ?.filter((sp) => sp.product.category === "ductSystems")
+          .map((sp) => sp.productId) || [],
+    });
+
+    if (props.sale.privacySettings) {
+      Object.assign(privacyFlags, props.sale.privacySettings);
+    }
+  }
+};
+
+const loadCustomers = async () => {
+  try {
+    const response = await fetch("/api/customers", {
+      credentials: 'include',
+    });
+    if (response.ok) {
+      customers.value = await response.json();
+    }
+  } catch (error) {
+    console.error("Error loading customers:", error);
+  }
+};
+
+const loadProducts = async () => {
+  try {
+    const response = await fetch("/api/products", {
+      credentials: 'include',
+    });
+    if (response.ok) {
+      products.value = await response.json();
+    }
+  } catch (error) {
+    console.error("Error loading products:", error);
+  }
+};
+
+const onCustomerChange = () => {
+  if (formData.industry !== "other") {
+    formData.customIndustry = "";
+  }
+};
+
+const selectCountry = (countryName) => {
+  formData.country = countryName;
+  showCountryDropdown.value = false;
+};
+
+const handleCountryInputFocus = () => {
+  showCountryDropdown.value = true;
+};
+
+const closeCountryDropdown = (event) => {
+  const countryContainer = event.target.closest(".country-dropdown-container");
+  if (!countryContainer) {
+    showCountryDropdown.value = false;
+  }
+};
+
+const submitForm = async () => {
+  errorMessage.value = "";
+  successMessage.value = "";
+
+  try {
+    const saleData = {
+      ...formData,
+      processId: props.processId,
+      salesManagerId: props.currentUserId,
+      privacySettings: privacyFlags,
+    };
+
+    if (saleData.industry !== "other") {
+      saleData.customIndustry = null;
+    }
+
+    const url = isEdit.value ? `/api/sales/${props.sale.id}` : "/api/sales";
+    const method = isEdit.value ? "PUT" : "POST";
+
+    const response = await fetch(url, {
+      method,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: 'include',
+      body: JSON.stringify(saleData),
+    });
+
+    if (response.ok) {
+      const savedSale = await response.json();
+      successMessage.value = isEdit.value
+        ? "Sale updated successfully!"
+        : "Sale created successfully!";
+
+      emit(isEdit.value ? "sale-updated" : "sale-created", savedSale);
+
+      if (!isEdit.value) {
+        resetForm();
+      }
+    } else {
+      const errorData = await response.json();
+      errorMessage.value =
+        errorData.message || "An error occurred while saving the sale.";
+    }
+  } catch (error) {
+    console.error("Error submitting form:", error);
+    errorMessage.value = "Network error. Please try again.";
+  }
+};
+
+onMounted(() => {
+  loadCustomers();
+  loadProducts();
+  loadFormData();
+});
+
+// Watch to retain privacy settings
+watch(
+  () => props.sale,
+  (newSale) => {
+    if (newSale?.privacySettings) {
+      // Reset all to false first
+      Object.keys(privacyFlags).forEach((key) => {
+        privacyFlags[key] = false;
+      });
+      // Then apply saved settings
+      Object.keys(newSale.privacySettings).forEach((key) => {
+        if (key in privacyFlags) {
+          privacyFlags[key] = newSale.privacySettings[key];
+        }
+      });
+    }
+  },
+  { immediate: true, deep: true }
+);
+</script>
+
 <template>
   <div class="sale-form">
     <h2>Sale Information</h2>
@@ -8,12 +323,8 @@
       class="form-grid"
     >
       <!-- Basic Information -->
-      <div
-        class="form-section"
-        @click="accordionState.basicInfo = !accordionState.basicInfo"
-        style="cursor: pointer"
-      >
-        <h3>
+      <div class="form-section">
+        <h3 @click="accordionState.basicInfo = !accordionState.basicInfo" style="cursor: pointer">
           Basic Information
           <i
             class="fa-solid fa-chevron-down accordion-arrow"
@@ -233,14 +544,10 @@
       </div>
 
       <!-- Product Selection -->
-      <div
-        class="form-section product-selection"
-        @click="
+      <div class="form-section product-selection">
+        <h3 @click="
           accordionState.productSelection = !accordionState.productSelection
-        "
-        style="cursor: pointer"
-      >
-        <h3>
+        " style="cursor: pointer">
           Product Selection
           <i
             class="fa-solid fa-chevron-down accordion-arrow"
@@ -341,12 +648,8 @@
       </div>
 
       <!-- Technical Specifications -->
-      <div
-        class="form-section"
-        @click="accordionState.technicalSpecs = !accordionState.technicalSpecs"
-        style="cursor: pointer"
-      >
-        <h3>
+      <div class="form-section">
+        <h3 @click="accordionState.technicalSpecs = !accordionState.technicalSpecs" style="cursor: pointer">
           Technical Specifications
           <i
             class="fa-solid fa-chevron-down accordion-arrow"
@@ -372,40 +675,6 @@
             </div>
           </div>
 
-          <!-- <div class="form-group">
-          <label for="filterType">Filter Type *</label>
-          <div class="input-with-checkbox">
-            <input
-              id="filterType"
-              v-model="formData.filterType"
-              type="text"
-              placeholder="e.g., SBF220S 4,0 Super Blower Filter..."
-              required
-            />
-            <label class="privacy-checkbox">
-              <input type="checkbox" v-model="privacyFlags.filterType" />
-              <span>Private</span>
-            </label>
-          </div>
-        </div> -->
-
-          <!-- <div class="form-group">
-          <label for="fanType">Fan Type *</label>
-          <div class="input-with-checkbox">
-            <input
-              id="fanType"
-              v-model="formData.fanType"
-              type="text"
-              placeholder="e.g., JK-100MT clean air fan x 1 unit - JK-30D transport fan x 1 unit..."
-              required
-            />
-            <label class="privacy-checkbox">
-              <input type="checkbox" v-model="privacyFlags.fanType" />
-              <span>Private</span>
-            </label>
-          </div>
-        </div> -->
-
           <div class="form-group">
             <label for="dustType">Dust Type *</label>
             <div class="input-with-checkbox">
@@ -423,23 +692,6 @@
               </label>
             </div>
           </div>
-
-          <!-- <div class="form-group">
-          <label for="ductSystem">Duct System *</label>
-          <div class="input-with-checkbox">
-            <input
-              id="ductSystem"
-              v-model="formData.ductSystem"
-              type="text"
-              placeholder="e.g., JKF standard - 40m Optiflow and galvanised duct system..."
-              required
-            />
-            <label class="privacy-checkbox">
-              <input type="checkbox" v-model="privacyFlags.ductSystem" />
-              <span>Private</span>
-            </label>
-          </div>
-        </div> -->
 
           <div class="form-group">
             <label for="totalExtractionVolume"
@@ -520,7 +772,7 @@
         <button
           type="submit"
           class="btn"
-          :disabled="isSubmitting || props.disabled"
+          :disabled="props.disabled"
         >
           {{ isEdit ? "Update Sale" : "Create Sale" }}
         </button>
@@ -535,331 +787,6 @@
     </form>
   </div>
 </template>
-
-<script setup>
-import { ref, reactive, onMounted, computed, watch } from "vue";
-import { countries } from "countries-list";
-import { useAuth } from "@/composables/useAuth";
-
-const props = defineProps({
-  sale: {
-    type: Object,
-    default: null,
-  },
-  processId: {
-    type: Number,
-    required: true,
-  },
-  currentUserId: {
-    type: Number,
-    required: true,
-  },
-  disabled: {
-    type: Boolean,
-    default: false,
-  },
-});
-
-const emit = defineEmits(["sale-created", "sale-updated", "cancel"]);
-
-const { getAuthHeader } = useAuth();
-
-const formData = reactive({
-  title: "",
-  description: "",
-  endUser: "",
-  phoneNumber: "",
-  country: "",
-  industry: "",
-  customIndustry: "",
-  selectedFilters: [],
-  selectedFans: [],
-  selectedDucts: [],
-  plantType: "",
-  filterType: "",
-  fanType: "",
-  dustType: "",
-  ductSystem: "",
-  totalExtractionVolume: 0,
-  pressure: 0,
-  volumeFlow: 0,
-  customerId: "",
-});
-
-const privacyFlags = reactive({
-  title: false,
-  description: false,
-  endUser: false,
-  phoneNumber: false,
-  country: false,
-  industry: false,
-  customIndustry: false,
-  selectedFilters: false,
-  selectedFans: false,
-  selectedDucts: false,
-  plantType: false,
-  filterType: false,
-  fanType: false,
-  dustType: false,
-  ductSystem: false,
-  totalExtractionVolume: false,
-  pressure: false,
-  volumeFlow: false,
-  customerId: false,
-  manufacturerWebsite: false,
-});
-
-const accordionState = reactive({
-  basicInfo: true,
-  productSelection: false,
-  technicalSpecs: false,
-});
-
-const customers = ref([]);
-const products = ref([]);
-const errorMessage = ref("");
-const successMessage = ref("");
-const countryQuery = ref("");
-const showCountryDropdown = ref(false);
-
-const isEdit = computed(() => props.sale !== null);
-
-const allCountries = computed(() => {
-  const countryList = Object.entries(countries).map(([code, data]) => {
-    // Handle both string values and object values
-    const name = typeof data === "string" ? data : data.name || data;
-    return { code, name: String(name).trim() };
-  });
-  return countryList.sort((a, b) => a.name.localeCompare(b.name));
-});
-
-const filteredCountries = computed(() => {
-  if (!countryQuery.value.trim()) {
-    return allCountries.value;
-  }
-
-  const query = countryQuery.value.toLowerCase();
-  return allCountries.value.filter((country) =>
-    country.name.toLowerCase().includes(query)
-  );
-});
-
-const selectedCustomerWebsite = computed(() => {
-  const selectedCustomer = customers.value.find(
-    (c) => c.id === formData.customerId
-  );
-  return selectedCustomer?.website || "No website available";
-});
-
-const filterProducts = computed(() => {
-  return products.value.filter((p) => p.category === "filtersAndSeparators");
-});
-
-const fanProducts = computed(() => {
-  return products.value.filter((p) => p.category === "fanSystems");
-});
-
-const ductProducts = computed(() => {
-  return products.value.filter((p) => p.category === "ductSystems");
-});
-
-// Methods
-const resetForm = () => {
-  Object.assign(formData, {
-    title: "",
-    description: "",
-    endUser: "",
-    phoneNumber: "",
-    country: "",
-    industry: "",
-    customIndustry: "",
-    selectedFilters: [],
-    selectedFans: [],
-    selectedDucts: [],
-    plantType: "",
-    filterType: "",
-    fanType: "",
-    dustType: "",
-    ductSystem: "",
-    totalExtractionVolume: 0,
-    pressure: 0,
-    volumeFlow: 0,
-    customerId: "",
-  });
-  errorMessage.value = "";
-  successMessage.value = "";
-};
-
-const loadFormData = () => {
-  console.log("loadFormData called, props.sale:", props.sale);
-  if (props.sale) {
-    console.log("props.sale.saleProducts:", props.sale.saleProducts);
-    Object.assign(formData, {
-      title: props.sale.title || "",
-      description: props.sale.description || "",
-      endUser: props.sale.endUser || "",
-      phoneNumber: props.sale.phoneNumber || "",
-      country: props.sale.country || "",
-      industry: props.sale.industry || "",
-      customIndustry: props.sale.customIndustry || "",
-      plantType: props.sale.plantType || "",
-      filterType: props.sale.filterType || "",
-      fanType: props.sale.fanType || "",
-      dustType: props.sale.dustType || "",
-      ductSystem: props.sale.ductSystem || "",
-      totalExtractionVolume: props.sale.totalExtractionVolume || 0,
-      pressure: props.sale.pressure || 0,
-      volumeFlow: props.sale.volumeFlow || 0,
-      customerId: props.sale.customerId || "",
-      selectedFilters:
-        props.sale.saleProducts
-          ?.filter((sp) => sp.product.category === "filtersAndSeparators")
-          .map((sp) => sp.productId) || [],
-      selectedFans:
-        props.sale.saleProducts
-          ?.filter((sp) => sp.product.category === "fanSystems")
-          .map((sp) => sp.productId) || [],
-      selectedDucts:
-        props.sale.saleProducts
-          ?.filter((sp) => sp.product.category === "ductSystems")
-          .map((sp) => sp.productId) || [],
-    });
-
-    // Load privacy settings
-    if (props.sale.privacySettings) {
-      Object.assign(privacyFlags, props.sale.privacySettings);
-    }
-
-    console.log("formData after loading:", formData);
-  }
-};
-
-const loadCustomers = async () => {
-  try {
-    const response = await fetch("/api/customers", {
-      credentials: 'include',
-    });
-    if (response.ok) {
-      customers.value = await response.json();
-    }
-  } catch (error) {
-    console.error("Error loading customers:", error);
-  }
-};
-
-const loadProducts = async () => {
-  try {
-    const response = await fetch("/api/products", {
-      credentials: 'include',
-    });
-    if (response.ok) {
-      products.value = await response.json();
-    }
-  } catch (error) {
-    console.error("Error loading products:", error);
-  }
-};
-
-const onCustomerChange = () => {
-  if (formData.industry !== "other") {
-    formData.customIndustry = "";
-  }
-};
-
-const selectCountry = (countryName) => {
-  formData.country = countryName;
-  showCountryDropdown.value = false;
-};
-
-const handleCountryInputFocus = () => {
-  showCountryDropdown.value = true;
-};
-
-const closeCountryDropdown = (event) => {
-  // Only close if clicking outside the country container
-  const countryContainer = event.target.closest(".country-dropdown-container");
-  if (!countryContainer) {
-    showCountryDropdown.value = false;
-  }
-};
-
-const submitForm = async () => {
-  errorMessage.value = "";
-  successMessage.value = "";
-
-  try {
-    const saleData = {
-      ...formData,
-      processId: props.processId,
-      salesManagerId: props.currentUserId,
-      privacySettings: privacyFlags,
-    };
-
-    if (saleData.industry !== "other") {
-      saleData.customIndustry = null;
-    }
-
-    const url = isEdit.value ? `/api/sales/${props.sale.id}` : "/api/sales";
-    const method = isEdit.value ? "PUT" : "POST";
-
-    const response = await fetch(url, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: 'include',
-      body: JSON.stringify(saleData),
-    });
-
-    if (response.ok) {
-      const savedSale = await response.json();
-      successMessage.value = isEdit.value
-        ? "Sale updated successfully!"
-        : "Sale created successfully!";
-
-      emit(isEdit.value ? "sale-updated" : "sale-created", savedSale);
-
-      if (!isEdit.value) {
-        resetForm();
-      }
-    } else {
-      const errorData = await response.json();
-      errorMessage.value =
-        errorData.message || "An error occurred while saving the sale.";
-    }
-  } catch (error) {
-    console.error("Error submitting form:", error);
-    errorMessage.value = "Network error. Please try again.";
-  }
-};
-
-// Lifecycle
-onMounted(() => {
-  loadCustomers();
-  loadProducts();
-  loadFormData();
-});
-
-// Watch for sale prop changes to reload privacy flags
-watch(
-  () => props.sale,
-  (newSale) => {
-    if (newSale?.privacySettings) {
-      // Reset all to false first
-      Object.keys(privacyFlags).forEach((key) => {
-        privacyFlags[key] = false;
-      });
-      // Then apply saved settings
-      Object.keys(newSale.privacySettings).forEach((key) => {
-        if (key in privacyFlags) {
-          privacyFlags[key] = newSale.privacySettings[key];
-        }
-      });
-    }
-  },
-  { immediate: true, deep: true }
-);
-</script>
 
 <style scoped lang="scss">
 .sale-form {
@@ -1020,7 +947,7 @@ watch(
     top: 100%;
     left: 0;
     right: 0;
-    background: white;
+    background: $plain-white;
     border: 1px solid #d1d5db;
     border-top: none;
     border-radius: 0 0 4px 4px;

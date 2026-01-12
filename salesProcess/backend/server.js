@@ -1,5 +1,4 @@
 const express = require("express");
-const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
@@ -7,13 +6,15 @@ const path = require("path");
 const { PrismaClient } = require("@prisma/client");
 require("dotenv").config();
 
+// Import middleware
+const corsMiddleware = require("./middleware/cors");
+
 // Import routes
 const processRoutes = require("./routes/process.routes");
 const salesRoutes = require("./routes/sales.routes");
 const customerRoutes = require("./routes/customer.routes");
 const userRoutes = require("./routes/user.routes");
 const productRoutes = require("./routes/product.routes");
-const referenceRoutes = require("./routes/reference.routes");
 const caseRoutes = require("./routes/case.routes");
 const imageRoutes = require("./routes/image.routes");
 
@@ -25,6 +26,19 @@ const prisma = new PrismaClient();
 app.use(
   helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" },
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com", "https://fonts.googleapis.com"],
+        fontSrc: ["'self'", "https://cdnjs.cloudflare.com", "https://fonts.gstatic.com"],
+        imgSrc: ["'self'", "data:", "blob:", "http://localhost:*"],
+        connectSrc: ["'self'", "http://localhost:*"],
+      },
+    },
+    noSniff: true,
+    frameguard: { action: 'deny' },
+    xssFilter: true,
   })
 );
 
@@ -36,26 +50,7 @@ const limiter = rateLimit({
 
 app.use("/api/", limiter);
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      const allowedOrigins = [
-        "http://localhost:5173",
-        "http://localhost:5174",
-        "http://localhost:5175",
-        "http://localhost:5176",
-        process.env.CORS_ORIGIN
-      ];
-      
-      if (process.env.NODE_ENV === "development" || !origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-  })
-);
+app.use(corsMiddleware);
 
 app.use(express.json());
 
@@ -80,7 +75,6 @@ app.use("/api/sales", salesRoutes);
 app.use("/api/customers", customerRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);
-app.use("/api/references", referenceRoutes);
 app.use("/api/cases", caseRoutes);
 app.use("/api", imageRoutes);
 

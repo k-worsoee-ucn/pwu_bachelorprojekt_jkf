@@ -38,7 +38,6 @@ export function useAuth() {
     user.value = null
     localStorage.removeItem('user')
     
-    // Clear cookie on backend
     try {
       await fetch('/api/users/logout', {
         method: 'POST',
@@ -57,7 +56,6 @@ export function useAuth() {
       try {
         user.value = JSON.parse(savedUser)
         
-        // Verify token is still valid by checking current user
         const response = await fetch('/api/users/me', {
           credentials: 'include'
         })
@@ -66,7 +64,6 @@ export function useAuth() {
           const data = await response.json()
           user.value = data.user
         } else {
-          // Token expired or invalid
           logout()
         }
       } catch (error) {
@@ -75,7 +72,6 @@ export function useAuth() {
     }
   }
   
-  // Add setUser method to update user info and localStorage
   const setUser = (newUser) => {
     user.value = newUser;
     localStorage.setItem('user', JSON.stringify(newUser));

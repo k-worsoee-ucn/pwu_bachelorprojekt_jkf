@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { useAuth } from "@/composables/useAuth";
+import { useAuth } from "@/utils/useAuth";
 import SalesStep from "@/components/SalesStep.vue";
 import ProdImgStep from "@/components/ProdImgStep.vue";
 import InstallImgStep from "@/components/InstallImgStep.vue";
@@ -53,20 +53,14 @@ const steps = [
   },
 ];
 
-const statusLabels = {
-  completed: "Completed",
-  ongoing: "Ongoing",
-  locked: "Locked",
-};
-
 const roleLabels = {
   salesManager: "Sales Manager",
   marketingManager: "Marketing Manager",
   viewer: "Viewer",
 };
 
+// Update visibility of step 6 based on consent
 const visibleSteps = computed(() => {
-  // If no process or consent is false, filter out step 6
   if (!process.value?.consent) {
     return steps.filter((step) => step.id !== 6);
   }
@@ -81,12 +75,12 @@ const getCurrentStep = () => {
 const getStepState = (stepId) => {
   const currentStep = getCurrentStep();
   const isDone =
-    process.value?.status === "done" || process.value?.status === "completed";
+    process.value?.status === "completed";
 
-  // If process is done and we're on step 6, mark it as completed
+  // Step 6 present
   if (isDone && currentStep === 6 && stepId === 6) return "completed";
 
-  // If process is done on step 5 without consent, mark step 5 as completed
+  // Step 6 missing
   if (isDone && currentStep === 5 && !process.value?.consent && stepId === 5)
     return "completed";
 
@@ -104,7 +98,6 @@ const getStepIcon = (stepId) => {
 
 const canToggleStep = (stepId) => {
   const state = getStepState(stepId);
-  // Allow toggling if not locked (allow completed and active steps)
   return state !== "locked";
 };
 
@@ -123,7 +116,7 @@ const toggleStep = (stepId) => {
 const getStatusMessage = computed(() => {
   if (!process.value) return "";
 
-  if (process.value.status === "completed" || process.value.status === "done") {
+  if (process.value.status === "completed") {
     return "Completed";
   }
 
@@ -150,17 +143,12 @@ const getStatusMessage = computed(() => {
 const fetchProcess = async () => {
   if (!isNewSale.value && processId.value && processId.value !== "new") {
     try {
-      console.log("Fetching process:", processId.value);
       const response = await fetch(`/api/processes/${processId.value}`, {
         credentials: 'include',
       });
-      console.log("Response status:", response.status);
       const data = await response.json();
-      console.log("Process data:", data);
       process.value = data;
-      console.log("process.value after assignment:", process.value);
 
-      // Load shipping date if it exists
       if (data.shippingDate) {
         shippingDate.value = data.shippingDate;
       }
@@ -182,7 +170,7 @@ const startShippingDateTimer = () => {
   }
 
   shippingDateTimer = setTimeout(async () => {
-    // Generate a mock shipping date (7 days from now)
+    // Mock shipping date (7 days ahead)
     const futureDate = new Date();
     futureDate.setDate(futureDate.getDate() + 7);
     shippingDate.value = futureDate.toLocaleDateString("en-US", {
@@ -190,9 +178,7 @@ const startShippingDateTimer = () => {
       month: "long",
       day: "numeric",
     });
-    console.log("Mock shipping date set:", shippingDate.value);
 
-    // Save shipping date to database
     try {
       const response = await fetch(`/api/processes/${process.value.id}`, {
         method: "PUT",
@@ -208,14 +194,11 @@ const startShippingDateTimer = () => {
       if (response.ok) {
         const updatedProcess = await response.json();
         process.value = updatedProcess;
-        console.log("Shipping date saved to database");
       }
     } catch (error) {
       console.error("Error saving shipping date:", error);
     }
 
-    // Production step is now complete, advance to next step
-    // Only advance from step 2 to step 3, but step 3 requires manual advancement
     if (process.value.currentStep === 2) {
       await advanceToNextStep();
     }
@@ -228,9 +211,7 @@ const advanceToNextStep = async () => {
   const currentStep = process.value.currentStep;
   const nextStep = currentStep + 1;
 
-  // If on step 6, mark process as complete
   if (currentStep === 6) {
-    console.log("Completing process...");
     try {
       const response = await fetch(`/api/processes/${process.value.id}`, {
         method: "PUT",
@@ -247,9 +228,8 @@ const advanceToNextStep = async () => {
       if (response.ok) {
         const updatedProcess = await response.json();
         process.value = updatedProcess;
-        activeStep.value = null; // Close the accordion
-        console.log("Process marked as complete", updatedProcess);
-        // Force a refresh to ensure all computed properties update
+        activeStep.value = null;
+        
         await fetchProcess();
       } else {
         const error = await response.json();
@@ -261,9 +241,7 @@ const advanceToNextStep = async () => {
     return;
   }
 
-  // If on step 5 and consent is false (no step 6), mark process as complete
   if (currentStep === 5 && !process.value.consent) {
-    console.log("Completing process (no consent, skipping step 6)...");
     try {
       const response = await fetch(`/api/processes/${process.value.id}`, {
         method: "PUT",
@@ -280,9 +258,8 @@ const advanceToNextStep = async () => {
       if (response.ok) {
         const updatedProcess = await response.json();
         process.value = updatedProcess;
-        activeStep.value = null; // Close the accordion
-        console.log("Process marked as complete", updatedProcess);
-        // Force a refresh to ensure all computed properties update
+        activeStep.value = null;
+        
         await fetchProcess();
       }
     } catch (error) {
@@ -291,15 +268,11 @@ const advanceToNextStep = async () => {
     return;
   }
 
-  // If trying to advance from step 5 but consent is false, don't allow it
   if (currentStep === 5 && nextStep === 6 && !process.value.consent) {
-    console.log("Cannot advance to step 6 without consent");
     return;
   }
 
-  // Otherwise, advance to next step
   if (nextStep > 6) {
-    console.log("Process already at final step");
     return;
   }
 
@@ -315,11 +288,7 @@ const advanceToNextStep = async () => {
 
     if (response.ok) {
       const updatedProcess = await response.json();
-      const previousStep = process.value.currentStep;
       process.value = updatedProcess;
-      console.log(
-        `Process advanced from step ${previousStep} to step ${nextStep}`
-      );
     }
   } catch (error) {
     console.error("Error advancing process step:", error);
@@ -329,14 +298,11 @@ const advanceToNextStep = async () => {
 watch(
   () => route.params.id,
   async (newId, oldId) => {
-    console.log("Route ID changed from", oldId, "to", newId);
-    // Clear timer when route changes
     if (shippingDateTimer) {
       clearTimeout(shippingDateTimer);
       shippingDateTimer = null;
     }
     await fetchProcess();
-    // Only open first step if it's a new sale
     activeStep.value = newId === "new" ? 1 : null;
   }
 );
@@ -346,29 +312,20 @@ onMounted(async () => {
     currentUserId.value = user.value.id;
   }
 
-  console.log("Route params:", route.params);
-  console.log("processId:", processId.value);
-  console.log("isNewSale:", isNewSale.value);
-
   await fetchProcess();
 
-  console.log("Final process.value:", process.value);
-  console.log("Final isNewSale.value:", isNewSale.value);
-  // Only open first step if it's a new sale
   activeStep.value = isNewSale.value ? 1 : null;
 });
 
 const handleSaleCreated = (savedSale) => {
-  console.log("Sale created:", savedSale);
   if (savedSale.process?.id) {
     router.push(`/processes/${savedSale.process.id}`);
   }
 };
 
 const handleStepCompleted = async () => {
-  console.log("Step completed, advancing to next step");
   await advanceToNextStep();
-  activeStep.value = null; // Close the accordion after completing the step
+  activeStep.value = null;
 };
 </script>
 
@@ -694,14 +651,14 @@ const handleStepCompleted = async () => {
       &.state-completed {
         .accordion-header {
           background-color: $primary-jkf-blue;
-          color: white;
+          color: $plain-white;
 
           .step-icon,
           .step-text h3,
           .step-text h4,
           .step-status,
           .chevron-icon {
-            color: white;
+            color: $plain-white;
           }
 
           .step-text h4{
@@ -731,13 +688,13 @@ const handleStepCompleted = async () => {
       &.state-locked {
         .accordion-header {
           background-color: $neutral-500;
-          color: white;
+          color: $plain-white;
           cursor: not-allowed;
 
           .step-icon,
           .step-text h3,
           .step-text h4{
-            color: white;
+            color: $plain-white;
           }
 
           .step-text h4{
@@ -794,14 +751,13 @@ const handleStepCompleted = async () => {
         .shipping-date-badge {
           font-size: 1.2rem;
           font-weight: 400;
-          color: white;
+          color: $plain-white;
         }
       }
 
       .accordion-content {
         padding: 1.5rem 1.5rem .5rem 1.5rem;
-        background-color: white;
-        animation: slideDown 0.3s ease;
+        background-color: $plain-white;
         display: flex;
         flex-direction: column;
         gap: 2rem;
@@ -811,17 +767,6 @@ const handleStepCompleted = async () => {
         }
       }
     }
-  }
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
   }
 }
 

@@ -1,5 +1,5 @@
 import { createRouter, createWebHashHistory } from "vue-router";
-import { useAuth } from "../composables/useAuth";
+import { useAuth } from "../utils/useAuth";
 import LoginView from "../views/loginView.vue";
 import MyProcessesView from "../views/myProcessesView.vue";
 import AllProcessesView from "../views/allProcessesView.vue";

@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useAuth } from "@/composables/useAuth";
+import { useAuth } from "@/utils/useAuth";
 
 const { isAuthenticated, isSalesManager, isViewer } = useAuth();
 const route = useRoute();
@@ -15,7 +15,6 @@ defineProps({
   }
 });
 
-// Watch route changes to update active tab
 watch(() => route.query.tab, (newTab) => {
   if (newTab) {
     activeTab.value = newTab;

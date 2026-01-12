@@ -1,6 +1,6 @@
 const { PrismaClient } = require('@prisma/client')
-const bcrypt = require('bcrypt')
 const encryption = require('../../utils/encryption')
+const { hashPassword } = require('../../utils/password')
 
 const prisma = new PrismaClient()
 
@@ -13,7 +13,7 @@ async function seedUsers() {
     throw new Error('SEED_PASSWORD environment variable is required')
   }
 
-  const hashedPassword = await bcrypt.hash(seedPassword, 10)
+  const hashedPassword = await hashPassword(seedPassword)
   
   const users = await Promise.all([
     prisma.user.upsert({

@@ -1,3 +1,166 @@
+<script setup>
+import { ref, onMounted, watch } from "vue";
+import {
+  handleFileSelect,
+  uploadImages,
+  fetchUploadedImages,
+  deleteImage,
+  getImageUrl,
+  formatDate,
+  getFilePreview,
+} from "@/utils/imageUpload";
+
+const props = defineProps({
+  processId: {
+    type: [String, Number],
+    required: true,
+  },
+  sale: {
+    type: Object,
+    required: false,
+    default: null,
+  },
+  process: {
+    type: Object,
+    required: false,
+    default: null,
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+});
+
+const emit = defineEmits(["consent-updated"]);
+
+const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+
+const fileInput = ref(null);
+const selectedFiles = ref([]);
+const uploadedImages = ref([]);
+const uploading = ref(false);
+const errorMessage = ref("");
+const successMessage = ref("");
+const consentValue = ref(props.process?.consent || false);
+
+watch(
+  () => props.process?.consent,
+  (newConsent) => {
+    if (newConsent !== undefined) {
+      consentValue.value = newConsent;
+    }
+  }
+);
+
+const updateConsent = async () => {
+  if (!props.processId) return;
+
+  try {
+    const response = await fetch(
+      `${apiBaseUrl}/api/processes/${props.processId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: 'include',
+        body: JSON.stringify({ consent: consentValue.value }),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to update consent");
+    }
+
+    successMessage.value = consentValue.value
+      ? "Consent granted - Step 6 will be available"
+      : "Consent removed - Step 6 will be skipped";
+
+    emit("consent-updated");
+
+    setTimeout(() => {
+      successMessage.value = "";
+    }, 3000);
+  } catch (error) {
+    errorMessage.value = error.message;
+    consentValue.value = !consentValue.value;
+  }
+};
+
+onMounted(async () => {
+  const images = await fetchUploadedImages(props.processId, "installation");
+  uploadedImages.value = images || [];
+});
+
+const onFileSelect = (event) => {
+  const result = handleFileSelect(event, selectedFiles);
+
+  if (!result.valid) {
+    errorMessage.value = result.error;
+    return;
+  }
+
+  selectedFiles.value = [...selectedFiles.value, ...result.files];
+  errorMessage.value = "";
+};
+
+const removeFile = (index) => {
+  selectedFiles.value.splice(index, 1);
+  if (fileInput.value) {
+    fileInput.value.value = "";
+  }
+};
+
+const uploadImagesToServer = async () => {
+  if (!selectedFiles.value.length) return;
+
+  uploading.value = true;
+  errorMessage.value = "";
+  successMessage.value = "";
+
+  try {
+    const result = await uploadImages(props.processId, selectedFiles.value, "installation");
+
+    successMessage.value = `Successfully uploaded ${result.images.length} image(s)`;
+
+    selectedFiles.value = [];
+    if (fileInput.value) {
+      fileInput.value.value = "";
+    }
+
+    const images = await fetchUploadedImages(props.processId, "installation");
+    uploadedImages.value = images || [];
+
+    setTimeout(() => {
+      successMessage.value = "";
+    }, 3000);
+  } catch (error) {
+    errorMessage.value = error.message;
+  } finally {
+    uploading.value = false;
+  }
+};
+
+const deleteImageHandler = async (imageId) => {
+  if (!confirm("Are you sure you want to delete this image?")) return;
+
+  try {
+    await deleteImage(imageId);
+
+    successMessage.value = "Image deleted successfully";
+
+    const images = await fetchUploadedImages(props.processId, "installation");
+    uploadedImages.value = images || [];
+
+    setTimeout(() => {
+      successMessage.value = "";
+    }, 3000);
+  } catch (error) {
+    errorMessage.value = error.message;
+  }
+};
+</script>
+
 <template>
   <div class="install-img-step">
     <div v-if="sale" class="consent-section">
@@ -32,8 +195,8 @@
         <input
           type="file"
           ref="fileInput"
-          @change="handleFileSelect"
-          accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+          @change="onFileSelect"
+          accept="image/jpeg,image/jpg,image/png,image/webp"
           multiple
           :disabled="props.disabled"
           class="file-input"
@@ -78,7 +241,7 @@
           <div class="gallery-info">
             <p class="gallery-filename">{{ image.filename }}</p>
             <p class="gallery-date">{{ formatDate(image.createdAt) }}</p>
-            <button @click="deleteImage(image.id)" class="error-btn">
+            <button @click="deleteImageHandler(image.id)" class="error-btn">
               Delete
             </button>
           </div>
@@ -89,7 +252,7 @@
   
   <div>
     <button
-    @click="uploadImages"
+    @click="uploadImagesToServer"
     :disabled="!selectedFiles.length || uploading || props.disabled"
     class="success-btn"
     >
@@ -106,268 +269,6 @@
     {{ successMessage }}
   </div>
 </template>
-
-<script setup>
-import { ref, onMounted, computed, watch } from "vue";
-
-const props = defineProps({
-  processId: {
-    type: [String, Number],
-    required: true,
-  },
-  sale: {
-    type: Object,
-    required: false,
-    default: null,
-  },
-  process: {
-    type: Object,
-    required: false,
-    default: null,
-  },
-  disabled: {
-    type: Boolean,
-    default: false,
-  },
-});
-
-const emit = defineEmits(["consent-updated"]);
-
-const fileInput = ref(null);
-const selectedFiles = ref([]);
-const uploadedImages = ref([]);
-const uploading = ref(false);
-const errorMessage = ref("");
-const successMessage = ref("");
-const consentValue = ref(props.process?.consent || false);
-
-// Watch for changes to props.process.consent
-watch(
-  () => props.process?.consent,
-  (newConsent) => {
-    if (newConsent !== undefined) {
-      consentValue.value = newConsent;
-    }
-  }
-);
-
-// Update consent in database
-const updateConsent = async () => {
-  if (!props.processId) return;
-
-  try {
-    const response = await fetch(
-      `http://localhost:3000/api/processes/${props.processId}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: 'include',
-        body: JSON.stringify({ consent: consentValue.value }),
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("Failed to update consent");
-    }
-
-    successMessage.value = consentValue.value
-      ? "Consent granted - Step 6 will be available"
-      : "Consent removed - Step 6 will be skipped";
-
-    // Emit event to parent to refresh process data
-    emit("consent-updated");
-
-    setTimeout(() => {
-      successMessage.value = "";
-    }, 3000);
-  } catch (error) {
-    errorMessage.value = error.message;
-    // Revert checkbox on error
-    consentValue.value = !consentValue.value;
-  }
-};
-
-// Fetch existing images when component mounts
-onMounted(async () => {
-  await fetchUploadedImages();
-});
-
-// Handle file selection
-const handleFileSelect = (event) => {
-  const files = Array.from(event.target.files);
-
-  // Validate file count (max 10)
-  if (files.length + selectedFiles.value.length > 10) {
-    errorMessage.value = "Maximum 10 images can be uploaded at once";
-    return;
-  }
-
-  // Validate file size (10MB each)
-  const invalidFiles = files.filter((file) => file.size > 10 * 1024 * 1024);
-  if (invalidFiles.length > 0) {
-    errorMessage.value = `Some files exceed 10MB limit: ${invalidFiles
-      .map((f) => f.name)
-      .join(", ")}`;
-    return;
-  }
-
-  // Validate file types
-  const validTypes = [
-    "image/jpeg",
-    "image/jpg",
-    "image/png",
-    "image/gif",
-    "image/webp",
-  ];
-  const invalidTypes = files.filter((file) => !validTypes.includes(file.type));
-  if (invalidTypes.length > 0) {
-    errorMessage.value = `Invalid file types: ${invalidTypes
-      .map((f) => f.name)
-      .join(", ")}`;
-    return;
-  }
-
-  selectedFiles.value = [...selectedFiles.value, ...files];
-  errorMessage.value = "";
-};
-
-// Remove file from selection
-const removeFile = (index) => {
-  selectedFiles.value.splice(index, 1);
-  if (fileInput.value) {
-    fileInput.value.value = "";
-  }
-};
-
-// Generate preview URL for file
-const getFilePreview = (file) => {
-  return URL.createObjectURL(file);
-};
-
-// Upload images to server
-const uploadImages = async () => {
-  if (!selectedFiles.value.length) return;
-
-  uploading.value = true;
-  errorMessage.value = "";
-  successMessage.value = "";
-
-  try {
-    const formData = new FormData();
-    selectedFiles.value.forEach((file) => {
-      formData.append("images", file);
-    });
-    formData.append("type", "installation");
-
-    const response = await fetch(
-      `http://localhost:3000/api/processes/${props.processId}/images`,
-      {
-        method: "POST",
-        credentials: 'include',
-        body: formData,
-      }
-    );
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || "Upload failed");
-    }
-
-    const result = await response.json();
-    successMessage.value = `Successfully uploaded ${result.images.length} image(s)`;
-
-    // Clear selected files
-    selectedFiles.value = [];
-    if (fileInput.value) {
-      fileInput.value.value = "";
-    }
-
-    // Refresh uploaded images
-    await fetchUploadedImages();
-
-    // Clear success message after 3 seconds
-    setTimeout(() => {
-      successMessage.value = "";
-    }, 3000);
-  } catch (error) {
-    errorMessage.value = error.message;
-  } finally {
-    uploading.value = false;
-  }
-};
-
-// Fetch uploaded images from server
-const fetchUploadedImages = async () => {
-  try {
-    const response = await fetch(
-      `http://localhost:3000/api/processes/${props.processId}/images?type=installation`,
-      {
-        credentials: 'include',
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch images");
-    }
-
-    const result = await response.json();
-    uploadedImages.value = result.images || [];
-  } catch (error) {
-    console.error("Error fetching images:", error);
-  }
-};
-
-// Delete image
-const deleteImage = async (imageId) => {
-  if (!confirm("Are you sure you want to delete this image?")) return;
-
-  try {
-    const response = await fetch(
-      `http://localhost:3000/api/images/${imageId}`,
-      {
-        method: "DELETE",
-        credentials: 'include',
-      }
-    );
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || "Delete failed");
-    }
-
-    successMessage.value = "Image deleted successfully";
-
-    // Refresh uploaded images
-    await fetchUploadedImages();
-
-    // Clear success message after 3 seconds
-    setTimeout(() => {
-      successMessage.value = "";
-    }, 3000);
-  } catch (error) {
-    errorMessage.value = error.message;
-  }
-};
-
-// Get full image URL
-const getImageUrl = (url) => {
-  return `http://localhost:3000${url}`;
-};
-
-// Format date
-const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-};
-</script>
 
 <style scoped lang="scss">
 .install-img-step {
@@ -493,7 +394,7 @@ const formatDate = (dateString) => {
       width: 30px;
       height: 30px;
       background-color: $error-500-main;
-      color: white;
+      color: $plain-white;
       border: none;
       border-radius: 50%;
       font-size: 20px;
