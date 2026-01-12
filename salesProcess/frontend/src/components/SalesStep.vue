@@ -80,7 +80,6 @@ const errorMessage = ref("");
 const successMessage = ref("");
 const countryQuery = ref("");
 const showCountryDropdown = ref(false);
-const isSubmitting = ref(false);
 
 const isEdit = computed(() => props.sale !== null);
 
@@ -676,40 +675,6 @@ watch(
             </div>
           </div>
 
-          <!-- <div class="form-group">
-          <label for="filterType">Filter Type *</label>
-          <div class="input-with-checkbox">
-            <input
-              id="filterType"
-              v-model="formData.filterType"
-              type="text"
-              placeholder="e.g., SBF220S 4,0 Super Blower Filter..."
-              required
-            />
-            <label class="privacy-checkbox">
-              <input type="checkbox" v-model="privacyFlags.filterType" />
-              <span>Private</span>
-            </label>
-          </div>
-        </div> -->
-
-          <!-- <div class="form-group">
-          <label for="fanType">Fan Type *</label>
-          <div class="input-with-checkbox">
-            <input
-              id="fanType"
-              v-model="formData.fanType"
-              type="text"
-              placeholder="e.g., JK-100MT clean air fan x 1 unit - JK-30D transport fan x 1 unit..."
-              required
-            />
-            <label class="privacy-checkbox">
-              <input type="checkbox" v-model="privacyFlags.fanType" />
-              <span>Private</span>
-            </label>
-          </div>
-        </div> -->
-
           <div class="form-group">
             <label for="dustType">Dust Type *</label>
             <div class="input-with-checkbox">
@@ -727,23 +692,6 @@ watch(
               </label>
             </div>
           </div>
-
-          <!-- <div class="form-group">
-          <label for="ductSystem">Duct System *</label>
-          <div class="input-with-checkbox">
-            <input
-              id="ductSystem"
-              v-model="formData.ductSystem"
-              type="text"
-              placeholder="e.g., JKF standard - 40m Optiflow and galvanised duct system..."
-              required
-            />
-            <label class="privacy-checkbox">
-              <input type="checkbox" v-model="privacyFlags.ductSystem" />
-              <span>Private</span>
-            </label>
-          </div>
-        </div> -->
 
           <div class="form-group">
             <label for="totalExtractionVolume"
@@ -824,7 +772,7 @@ watch(
         <button
           type="submit"
           class="btn"
-          :disabled="isSubmitting || props.disabled"
+          :disabled="props.disabled"
         >
           {{ isEdit ? "Update Sale" : "Create Sale" }}
         </button>
@@ -999,7 +947,7 @@ watch(
     top: 100%;
     left: 0;
     right: 0;
-    background: white;
+    background: $plain-white;
     border: 1px solid #d1d5db;
     border-top: none;
     border-radius: 0 0 4px 4px;

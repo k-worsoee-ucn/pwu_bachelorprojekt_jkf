@@ -374,10 +374,6 @@ const downloadImages = async () => {
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
-
-    .btn span {
-      color: white !important;
-    }
   }
 }
 </style>

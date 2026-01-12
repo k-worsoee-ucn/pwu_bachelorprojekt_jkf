@@ -143,10 +143,6 @@ onMounted(() => {
       Write and format the case content that will be published.
     </p>
 
-    <!-- <div v-if="loading" class="loading">
-      <i class="fa-solid fa-spinner fa-spin"></i> Loading...
-    </div> -->
-
     <div class="editor-container">
       <div class="editor-wrapper">
         <QuillEditor

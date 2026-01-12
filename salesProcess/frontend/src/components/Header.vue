@@ -126,7 +126,7 @@ header {
         padding: 0.2rem;
         background-color: $warning-500-main;
         border-radius: 50%;
-        border: 3px solid white;
+        border: 3px solid $plain-white;
       }
     }
 

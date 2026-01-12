@@ -651,14 +651,14 @@ const handleStepCompleted = async () => {
       &.state-completed {
         .accordion-header {
           background-color: $primary-jkf-blue;
-          color: white;
+          color: $plain-white;
 
           .step-icon,
           .step-text h3,
           .step-text h4,
           .step-status,
           .chevron-icon {
-            color: white;
+            color: $plain-white;
           }
 
           .step-text h4{
@@ -688,13 +688,13 @@ const handleStepCompleted = async () => {
       &.state-locked {
         .accordion-header {
           background-color: $neutral-500;
-          color: white;
+          color: $plain-white;
           cursor: not-allowed;
 
           .step-icon,
           .step-text h3,
           .step-text h4{
-            color: white;
+            color: $plain-white;
           }
 
           .step-text h4{
@@ -751,14 +751,13 @@ const handleStepCompleted = async () => {
         .shipping-date-badge {
           font-size: 1.2rem;
           font-weight: 400;
-          color: white;
+          color: $plain-white;
         }
       }
 
       .accordion-content {
         padding: 1.5rem 1.5rem .5rem 1.5rem;
-        background-color: white;
-        animation: slideDown 0.3s ease;
+        background-color: $plain-white;
         display: flex;
         flex-direction: column;
         gap: 2rem;
@@ -768,17 +767,6 @@ const handleStepCompleted = async () => {
         }
       }
     }
-  }
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
   }
 }
 

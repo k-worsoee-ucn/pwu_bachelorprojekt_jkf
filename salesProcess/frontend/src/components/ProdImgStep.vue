@@ -270,7 +270,7 @@ const deleteImageHandler = async (imageId) => {
       width: 30px;
       height: 30px;
       background-color: $error-500-main;
-      color: white;
+      color: $plain-white;
       border: none;
       border-radius: 50%;
       font-size: 20px;

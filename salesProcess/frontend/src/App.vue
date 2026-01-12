@@ -55,7 +55,6 @@ onMounted(() => {
   updateBadgeCounts();
 });
 
-
 watch(
   () => route.path,
   (newPath) => {
