@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import { jsPDF } from "jspdf";
 import JSZip from "jszip";
-import { useAuth } from "../composables/useAuth";
+import { useAuth } from "../utils/useAuth";
 
 const { } = useAuth();
 

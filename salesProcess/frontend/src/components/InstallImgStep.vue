@@ -1,5 +1,14 @@
 <script setup>
 import { ref, onMounted, watch } from "vue";
+import {
+  handleFileSelect,
+  uploadImages,
+  fetchUploadedImages,
+  deleteImage,
+  getImageUrl,
+  formatDate,
+  getFilePreview,
+} from "@/utils/imageUpload";
 
 const props = defineProps({
   processId: {
@@ -79,40 +88,19 @@ const updateConsent = async () => {
 };
 
 onMounted(async () => {
-  await fetchUploadedImages();
+  const images = await fetchUploadedImages(props.processId, "installation");
+  uploadedImages.value = images || [];
 });
 
-const handleFileSelect = (event) => {
-  const files = Array.from(event.target.files);
+const onFileSelect = (event) => {
+  const result = handleFileSelect(event, selectedFiles);
 
-  if (files.length + selectedFiles.value.length > 20) {
-    errorMessage.value = "Maximum 20 images can be uploaded at once";
+  if (!result.valid) {
+    errorMessage.value = result.error;
     return;
   }
 
-  const invalidFiles = files.filter((file) => file.size > 20 * 1024 * 1024);
-  if (invalidFiles.length > 0) {
-    errorMessage.value = `Some files exceed 20MB limit: ${invalidFiles
-      .map((f) => f.name)
-      .join(", ")}`;
-    return;
-  }
-
-  const validTypes = [
-    "image/jpeg",
-    "image/jpg",
-    "image/png",
-    "image/webp",
-  ];
-  const invalidTypes = files.filter((file) => !validTypes.includes(file.type));
-  if (invalidTypes.length > 0) {
-    errorMessage.value = `Invalid file types: ${invalidTypes
-      .map((f) => f.name)
-      .join(", ")}`;
-    return;
-  }
-
-  selectedFiles.value = [...selectedFiles.value, ...files];
+  selectedFiles.value = [...selectedFiles.value, ...result.files];
   errorMessage.value = "";
 };
 
@@ -123,11 +111,7 @@ const removeFile = (index) => {
   }
 };
 
-const getFilePreview = (file) => {
-  return URL.createObjectURL(file);
-};
-
-const uploadImages = async () => {
+const uploadImagesToServer = async () => {
   if (!selectedFiles.value.length) return;
 
   uploading.value = true;
@@ -135,27 +119,8 @@ const uploadImages = async () => {
   successMessage.value = "";
 
   try {
-    const formData = new FormData();
-    selectedFiles.value.forEach((file) => {
-      formData.append("images", file);
-    });
-    formData.append("type", "installation");
+    const result = await uploadImages(props.processId, selectedFiles.value, "installation");
 
-    const response = await fetch(
-      `${apiBaseUrl}/api/processes/${props.processId}/images`,
-      {
-        method: "POST",
-        credentials: 'include',
-        body: formData,
-      }
-    );
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || "Upload failed");
-    }
-
-    const result = await response.json();
     successMessage.value = `Successfully uploaded ${result.images.length} image(s)`;
 
     selectedFiles.value = [];
@@ -163,7 +128,8 @@ const uploadImages = async () => {
       fileInput.value.value = "";
     }
 
-    await fetchUploadedImages();
+    const images = await fetchUploadedImages(props.processId, "installation");
+    uploadedImages.value = images || [];
 
     setTimeout(() => {
       successMessage.value = "";
@@ -175,46 +141,16 @@ const uploadImages = async () => {
   }
 };
 
-const fetchUploadedImages = async () => {
-  try {
-    const response = await fetch(
-      `${apiBaseUrl}/api/processes/${props.processId}/images?type=installation`,
-      {
-        credentials: 'include',
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch images");
-    }
-
-    const result = await response.json();
-    uploadedImages.value = result.images || [];
-  } catch (error) {
-    console.error("Error fetching images:", error);
-  }
-};
-
-const deleteImage = async (imageId) => {
+const deleteImageHandler = async (imageId) => {
   if (!confirm("Are you sure you want to delete this image?")) return;
 
   try {
-    const response = await fetch(
-      `${apiBaseUrl}/api/images/${imageId}`,
-      {
-        method: "DELETE",
-        credentials: 'include',
-      }
-    );
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || "Delete failed");
-    }
+    await deleteImage(imageId);
 
     successMessage.value = "Image deleted successfully";
 
-    await fetchUploadedImages();
+    const images = await fetchUploadedImages(props.processId, "installation");
+    uploadedImages.value = images || [];
 
     setTimeout(() => {
       successMessage.value = "";
@@ -222,22 +158,6 @@ const deleteImage = async (imageId) => {
   } catch (error) {
     errorMessage.value = error.message;
   }
-};
-
-const getImageUrl = (url) => {
-  return `${apiBaseUrl}${url}`;
-};
-
-// Format date
-const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString("da-DK", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
 };
 </script>
 
@@ -275,7 +195,7 @@ const formatDate = (dateString) => {
         <input
           type="file"
           ref="fileInput"
-          @change="handleFileSelect"
+          @change="onFileSelect"
           accept="image/jpeg,image/jpg,image/png,image/webp"
           multiple
           :disabled="props.disabled"
@@ -321,7 +241,7 @@ const formatDate = (dateString) => {
           <div class="gallery-info">
             <p class="gallery-filename">{{ image.filename }}</p>
             <p class="gallery-date">{{ formatDate(image.createdAt) }}</p>
-            <button @click="deleteImage(image.id)" class="error-btn">
+            <button @click="deleteImageHandler(image.id)" class="error-btn">
               Delete
             </button>
           </div>
@@ -332,7 +252,7 @@ const formatDate = (dateString) => {
   
   <div>
     <button
-    @click="uploadImages"
+    @click="uploadImagesToServer"
     :disabled="!selectedFiles.length || uploading || props.disabled"
     class="success-btn"
     >
