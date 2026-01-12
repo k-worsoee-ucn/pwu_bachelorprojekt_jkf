@@ -77,6 +77,7 @@ The easiest way to get started is using Docker Compose, which sets up the entire
    - Root `.env` - Database and service configuration
    - Backend `backend/.env` - Backend API configuration
    - Backend `backend/.env.test` - Test environment configuration
+   - Frontend `frontend/.env` - Frontend API base URL configuration
    
    > **Note**: The complete content and documentation for each environment file is available in the accompanying report.
 
