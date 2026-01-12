@@ -1,3 +1,319 @@
+<script setup>
+import { ref, reactive, onMounted, computed, watch } from "vue";
+import { countries } from "countries-list";
+
+const props = defineProps({
+  sale: {
+    type: Object,
+    default: null,
+  },
+  processId: {
+    type: Number,
+    required: true,
+  },
+  currentUserId: {
+    type: Number,
+    required: true,
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+});
+
+const emit = defineEmits(["sale-created", "sale-updated", "cancel"]);
+
+const formData = reactive({
+  title: "",
+  description: "",
+  endUser: "",
+  phoneNumber: "",
+  country: "",
+  industry: "",
+  customIndustry: "",
+  selectedFilters: [],
+  selectedFans: [],
+  selectedDucts: [],
+  plantType: "",
+  filterType: "",
+  fanType: "",
+  dustType: "",
+  ductSystem: "",
+  totalExtractionVolume: 0,
+  pressure: 0,
+  volumeFlow: 0,
+  customerId: "",
+});
+
+const privacyFlags = reactive({
+  title: false,
+  description: false,
+  endUser: false,
+  phoneNumber: false,
+  country: false,
+  industry: false,
+  customIndustry: false,
+  selectedFilters: false,
+  selectedFans: false,
+  selectedDucts: false,
+  plantType: false,
+  filterType: false,
+  fanType: false,
+  dustType: false,
+  ductSystem: false,
+  totalExtractionVolume: false,
+  pressure: false,
+  volumeFlow: false,
+  customerId: false,
+  manufacturerWebsite: false,
+});
+
+const accordionState = reactive({
+  basicInfo: true,
+  productSelection: false,
+  technicalSpecs: false,
+});
+
+const customers = ref([]);
+const products = ref([]);
+const errorMessage = ref("");
+const successMessage = ref("");
+const countryQuery = ref("");
+const showCountryDropdown = ref(false);
+const isSubmitting = ref(false);
+
+const isEdit = computed(() => props.sale !== null);
+
+// Countries-list library
+const allCountries = computed(() => {
+  const countryList = Object.entries(countries).map(([code, data]) => {
+    const name = typeof data === "string" ? data : data.name || data;
+    return { code, name: String(name).trim() };
+  });
+  return countryList.sort((a, b) => a.name.localeCompare(b.name));
+});
+
+const filteredCountries = computed(() => {
+  if (!countryQuery.value.trim()) {
+    return allCountries.value;
+  }
+
+  const query = countryQuery.value.toLowerCase();
+  return allCountries.value.filter((country) =>
+    country.name.toLowerCase().includes(query)
+  );
+});
+
+const selectedCustomerWebsite = computed(() => {
+  const selectedCustomer = customers.value.find(
+    (c) => c.id === formData.customerId
+  );
+  return selectedCustomer?.website || "No website available";
+});
+
+const filterProducts = computed(() => {
+  return products.value.filter((p) => p.category === "filtersAndSeparators");
+});
+
+const fanProducts = computed(() => {
+  return products.value.filter((p) => p.category === "fanSystems");
+});
+
+const ductProducts = computed(() => {
+  return products.value.filter((p) => p.category === "ductSystems");
+});
+
+const resetForm = () => {
+  Object.assign(formData, {
+    title: "",
+    description: "",
+    endUser: "",
+    phoneNumber: "",
+    country: "",
+    industry: "",
+    customIndustry: "",
+    selectedFilters: [],
+    selectedFans: [],
+    selectedDucts: [],
+    plantType: "",
+    filterType: "",
+    fanType: "",
+    dustType: "",
+    ductSystem: "",
+    totalExtractionVolume: 0,
+    pressure: 0,
+    volumeFlow: 0,
+    customerId: "",
+  });
+  errorMessage.value = "";
+  successMessage.value = "";
+};
+
+const loadFormData = () => {
+  
+  if (props.sale) {
+    Object.assign(formData, {
+      title: props.sale.title || "",
+      description: props.sale.description || "",
+      endUser: props.sale.endUser || "",
+      phoneNumber: props.sale.phoneNumber || "",
+      country: props.sale.country || "",
+      industry: props.sale.industry || "",
+      customIndustry: props.sale.customIndustry || "",
+      plantType: props.sale.plantType || "",
+      filterType: props.sale.filterType || "",
+      fanType: props.sale.fanType || "",
+      dustType: props.sale.dustType || "",
+      ductSystem: props.sale.ductSystem || "",
+      totalExtractionVolume: props.sale.totalExtractionVolume || 0,
+      pressure: props.sale.pressure || 0,
+      volumeFlow: props.sale.volumeFlow || 0,
+      customerId: props.sale.customerId || "",
+      selectedFilters:
+        props.sale.saleProducts
+          ?.filter((sp) => sp.product.category === "filtersAndSeparators")
+          .map((sp) => sp.productId) || [],
+      selectedFans:
+        props.sale.saleProducts
+          ?.filter((sp) => sp.product.category === "fanSystems")
+          .map((sp) => sp.productId) || [],
+      selectedDucts:
+        props.sale.saleProducts
+          ?.filter((sp) => sp.product.category === "ductSystems")
+          .map((sp) => sp.productId) || [],
+    });
+
+    if (props.sale.privacySettings) {
+      Object.assign(privacyFlags, props.sale.privacySettings);
+    }
+  }
+};
+
+const loadCustomers = async () => {
+  try {
+    const response = await fetch("/api/customers", {
+      credentials: 'include',
+    });
+    if (response.ok) {
+      customers.value = await response.json();
+    }
+  } catch (error) {
+    console.error("Error loading customers:", error);
+  }
+};
+
+const loadProducts = async () => {
+  try {
+    const response = await fetch("/api/products", {
+      credentials: 'include',
+    });
+    if (response.ok) {
+      products.value = await response.json();
+    }
+  } catch (error) {
+    console.error("Error loading products:", error);
+  }
+};
+
+const onCustomerChange = () => {
+  if (formData.industry !== "other") {
+    formData.customIndustry = "";
+  }
+};
+
+const selectCountry = (countryName) => {
+  formData.country = countryName;
+  showCountryDropdown.value = false;
+};
+
+const handleCountryInputFocus = () => {
+  showCountryDropdown.value = true;
+};
+
+const closeCountryDropdown = (event) => {
+  const countryContainer = event.target.closest(".country-dropdown-container");
+  if (!countryContainer) {
+    showCountryDropdown.value = false;
+  }
+};
+
+const submitForm = async () => {
+  errorMessage.value = "";
+  successMessage.value = "";
+
+  try {
+    const saleData = {
+      ...formData,
+      processId: props.processId,
+      salesManagerId: props.currentUserId,
+      privacySettings: privacyFlags,
+    };
+
+    if (saleData.industry !== "other") {
+      saleData.customIndustry = null;
+    }
+
+    const url = isEdit.value ? `/api/sales/${props.sale.id}` : "/api/sales";
+    const method = isEdit.value ? "PUT" : "POST";
+
+    const response = await fetch(url, {
+      method,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: 'include',
+      body: JSON.stringify(saleData),
+    });
+
+    if (response.ok) {
+      const savedSale = await response.json();
+      successMessage.value = isEdit.value
+        ? "Sale updated successfully!"
+        : "Sale created successfully!";
+
+      emit(isEdit.value ? "sale-updated" : "sale-created", savedSale);
+
+      if (!isEdit.value) {
+        resetForm();
+      }
+    } else {
+      const errorData = await response.json();
+      errorMessage.value =
+        errorData.message || "An error occurred while saving the sale.";
+    }
+  } catch (error) {
+    console.error("Error submitting form:", error);
+    errorMessage.value = "Network error. Please try again.";
+  }
+};
+
+onMounted(() => {
+  loadCustomers();
+  loadProducts();
+  loadFormData();
+});
+
+// Watch to retain privacy settings
+watch(
+  () => props.sale,
+  (newSale) => {
+    if (newSale?.privacySettings) {
+      // Reset all to false first
+      Object.keys(privacyFlags).forEach((key) => {
+        privacyFlags[key] = false;
+      });
+      // Then apply saved settings
+      Object.keys(newSale.privacySettings).forEach((key) => {
+        if (key in privacyFlags) {
+          privacyFlags[key] = newSale.privacySettings[key];
+        }
+      });
+    }
+  },
+  { immediate: true, deep: true }
+);
+</script>
+
 <template>
   <div class="sale-form">
     <h2>Sale Information</h2>
@@ -523,322 +839,6 @@
     </form>
   </div>
 </template>
-
-<script setup>
-import { ref, reactive, onMounted, computed, watch } from "vue";
-import { countries } from "countries-list";
-
-const props = defineProps({
-  sale: {
-    type: Object,
-    default: null,
-  },
-  processId: {
-    type: Number,
-    required: true,
-  },
-  currentUserId: {
-    type: Number,
-    required: true,
-  },
-  disabled: {
-    type: Boolean,
-    default: false,
-  },
-});
-
-const emit = defineEmits(["sale-created", "sale-updated", "cancel"]);
-
-const formData = reactive({
-  title: "",
-  description: "",
-  endUser: "",
-  phoneNumber: "",
-  country: "",
-  industry: "",
-  customIndustry: "",
-  selectedFilters: [],
-  selectedFans: [],
-  selectedDucts: [],
-  plantType: "",
-  filterType: "",
-  fanType: "",
-  dustType: "",
-  ductSystem: "",
-  totalExtractionVolume: 0,
-  pressure: 0,
-  volumeFlow: 0,
-  customerId: "",
-});
-
-const privacyFlags = reactive({
-  title: false,
-  description: false,
-  endUser: false,
-  phoneNumber: false,
-  country: false,
-  industry: false,
-  customIndustry: false,
-  selectedFilters: false,
-  selectedFans: false,
-  selectedDucts: false,
-  plantType: false,
-  filterType: false,
-  fanType: false,
-  dustType: false,
-  ductSystem: false,
-  totalExtractionVolume: false,
-  pressure: false,
-  volumeFlow: false,
-  customerId: false,
-  manufacturerWebsite: false,
-});
-
-const accordionState = reactive({
-  basicInfo: true,
-  productSelection: false,
-  technicalSpecs: false,
-});
-
-const customers = ref([]);
-const products = ref([]);
-const errorMessage = ref("");
-const successMessage = ref("");
-const countryQuery = ref("");
-const showCountryDropdown = ref(false);
-const isSubmitting = ref(false);
-
-const isEdit = computed(() => props.sale !== null);
-
-// Countries-list library
-const allCountries = computed(() => {
-  const countryList = Object.entries(countries).map(([code, data]) => {
-    const name = typeof data === "string" ? data : data.name || data;
-    return { code, name: String(name).trim() };
-  });
-  return countryList.sort((a, b) => a.name.localeCompare(b.name));
-});
-
-const filteredCountries = computed(() => {
-  if (!countryQuery.value.trim()) {
-    return allCountries.value;
-  }
-
-  const query = countryQuery.value.toLowerCase();
-  return allCountries.value.filter((country) =>
-    country.name.toLowerCase().includes(query)
-  );
-});
-
-const selectedCustomerWebsite = computed(() => {
-  const selectedCustomer = customers.value.find(
-    (c) => c.id === formData.customerId
-  );
-  return selectedCustomer?.website || "No website available";
-});
-
-const filterProducts = computed(() => {
-  return products.value.filter((p) => p.category === "filtersAndSeparators");
-});
-
-const fanProducts = computed(() => {
-  return products.value.filter((p) => p.category === "fanSystems");
-});
-
-const ductProducts = computed(() => {
-  return products.value.filter((p) => p.category === "ductSystems");
-});
-
-const resetForm = () => {
-  Object.assign(formData, {
-    title: "",
-    description: "",
-    endUser: "",
-    phoneNumber: "",
-    country: "",
-    industry: "",
-    customIndustry: "",
-    selectedFilters: [],
-    selectedFans: [],
-    selectedDucts: [],
-    plantType: "",
-    filterType: "",
-    fanType: "",
-    dustType: "",
-    ductSystem: "",
-    totalExtractionVolume: 0,
-    pressure: 0,
-    volumeFlow: 0,
-    customerId: "",
-  });
-  errorMessage.value = "";
-  successMessage.value = "";
-};
-
-const loadFormData = () => {
-  
-  if (props.sale) {
-    Object.assign(formData, {
-      title: props.sale.title || "",
-      description: props.sale.description || "",
-      endUser: props.sale.endUser || "",
-      phoneNumber: props.sale.phoneNumber || "",
-      country: props.sale.country || "",
-      industry: props.sale.industry || "",
-      customIndustry: props.sale.customIndustry || "",
-      plantType: props.sale.plantType || "",
-      filterType: props.sale.filterType || "",
-      fanType: props.sale.fanType || "",
-      dustType: props.sale.dustType || "",
-      ductSystem: props.sale.ductSystem || "",
-      totalExtractionVolume: props.sale.totalExtractionVolume || 0,
-      pressure: props.sale.pressure || 0,
-      volumeFlow: props.sale.volumeFlow || 0,
-      customerId: props.sale.customerId || "",
-      selectedFilters:
-        props.sale.saleProducts
-          ?.filter((sp) => sp.product.category === "filtersAndSeparators")
-          .map((sp) => sp.productId) || [],
-      selectedFans:
-        props.sale.saleProducts
-          ?.filter((sp) => sp.product.category === "fanSystems")
-          .map((sp) => sp.productId) || [],
-      selectedDucts:
-        props.sale.saleProducts
-          ?.filter((sp) => sp.product.category === "ductSystems")
-          .map((sp) => sp.productId) || [],
-    });
-
-    if (props.sale.privacySettings) {
-      Object.assign(privacyFlags, props.sale.privacySettings);
-    }
-  }
-};
-
-const loadCustomers = async () => {
-  try {
-    const response = await fetch("/api/customers", {
-      credentials: 'include',
-    });
-    if (response.ok) {
-      customers.value = await response.json();
-    }
-  } catch (error) {
-    console.error("Error loading customers:", error);
-  }
-};
-
-const loadProducts = async () => {
-  try {
-    const response = await fetch("/api/products", {
-      credentials: 'include',
-    });
-    if (response.ok) {
-      products.value = await response.json();
-    }
-  } catch (error) {
-    console.error("Error loading products:", error);
-  }
-};
-
-const onCustomerChange = () => {
-  if (formData.industry !== "other") {
-    formData.customIndustry = "";
-  }
-};
-
-const selectCountry = (countryName) => {
-  formData.country = countryName;
-  showCountryDropdown.value = false;
-};
-
-const handleCountryInputFocus = () => {
-  showCountryDropdown.value = true;
-};
-
-const closeCountryDropdown = (event) => {
-  const countryContainer = event.target.closest(".country-dropdown-container");
-  if (!countryContainer) {
-    showCountryDropdown.value = false;
-  }
-};
-
-const submitForm = async () => {
-  errorMessage.value = "";
-  successMessage.value = "";
-
-  try {
-    const saleData = {
-      ...formData,
-      processId: props.processId,
-      salesManagerId: props.currentUserId,
-      privacySettings: privacyFlags,
-    };
-
-    if (saleData.industry !== "other") {
-      saleData.customIndustry = null;
-    }
-
-    const url = isEdit.value ? `/api/sales/${props.sale.id}` : "/api/sales";
-    const method = isEdit.value ? "PUT" : "POST";
-
-    const response = await fetch(url, {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: 'include',
-      body: JSON.stringify(saleData),
-    });
-
-    if (response.ok) {
-      const savedSale = await response.json();
-      successMessage.value = isEdit.value
-        ? "Sale updated successfully!"
-        : "Sale created successfully!";
-
-      emit(isEdit.value ? "sale-updated" : "sale-created", savedSale);
-
-      if (!isEdit.value) {
-        resetForm();
-      }
-    } else {
-      const errorData = await response.json();
-      errorMessage.value =
-        errorData.message || "An error occurred while saving the sale.";
-    }
-  } catch (error) {
-    console.error("Error submitting form:", error);
-    errorMessage.value = "Network error. Please try again.";
-  }
-};
-
-onMounted(() => {
-  loadCustomers();
-  loadProducts();
-  loadFormData();
-});
-
-// Watch to retain privacy settings
-watch(
-  () => props.sale,
-  (newSale) => {
-    if (newSale?.privacySettings) {
-      // Reset all to false first
-      Object.keys(privacyFlags).forEach((key) => {
-        privacyFlags[key] = false;
-      });
-      // Then apply saved settings
-      Object.keys(newSale.privacySettings).forEach((key) => {
-        if (key in privacyFlags) {
-          privacyFlags[key] = newSale.privacySettings[key];
-        }
-      });
-    }
-  },
-  { immediate: true, deep: true }
-);
-</script>
 
 <style scoped lang="scss">
 .sale-form {

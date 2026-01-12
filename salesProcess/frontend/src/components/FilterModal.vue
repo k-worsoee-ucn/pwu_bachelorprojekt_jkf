@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted, watch } from "vue";
-import { useAuth } from "@/composables/useAuth";
+import { useAuth } from "@/utils/useAuth";
 
 const props = defineProps({
   isOpen: {

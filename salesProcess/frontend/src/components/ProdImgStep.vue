@@ -1,88 +1,3 @@
-<template>
-  <div class="prod-img-step">
-    <h3>Production Images</h3>
-    <p>Upload images from the production process</p>
-
-    <!-- Upload Section -->
-    <div class="upload-section">
-      <div class="file-input-wrapper">
-        <input
-          type="file"
-          ref="fileInput"
-          @change="handleFileSelect"
-          accept="image/jpeg,image/jpg,image/png,image/webp"
-          multiple
-          :disabled="props.disabled"
-          class="file-input"
-          id="imageUpload"
-        />
-        <label for="imageUpload" class="file-label">
-          <span class="upload-icon">📁</span>
-          Choose Images
-        </label>
-        <span v-if="selectedFiles.length" class="file-count">
-          {{ selectedFiles.length }} file(s) selected
-        </span>
-      </div>
-    </div>
-
-    <!-- Preview Selected Files -->
-    <div v-if="selectedFiles.length" class="preview-section">
-      <hr />
-      <h4>Selected Files</h4>
-      <div class="preview-grid">
-        <div
-          v-for="(file, index) in selectedFiles"
-          :key="index"
-          class="preview-item"
-        >
-          <img :src="getFilePreview(file)" :alt="file.name" />
-          <p class="file-name">{{ file.name }}</p>
-          <button @click="removeFile(index)" class="remove-button">×</button>
-        </div>
-      </div>
-    </div>
-    <!-- Uploaded Images Gallery -->
-    <div v-if="uploadedImages.length" class="gallery-section">
-      <h4>Uploaded Images</h4>
-      <div class="image-gallery">
-        <div
-          v-for="image in uploadedImages"
-          :key="image.id"
-          class="gallery-item"
-        >
-          <img :src="getImageUrl(image.url)" :alt="image.filename" />
-          <div class="gallery-info">
-            <p class="gallery-filename">{{ image.filename }}</p>
-            <p class="gallery-date">{{ formatDate(image.createdAt) }}</p>
-            <button @click="deleteImage(image.id)" class="error-btn">
-              Delete
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div>
-    <button
-      @click="uploadImages"
-      :disabled="!selectedFiles.length || uploading || props.disabled"
-      class="success-btn"
-    >
-      Upload Images
-    </button>
-  </div>
-  <!-- Error Message -->
-  <div v-if="errorMessage" class="error-message">
-    {{ errorMessage }}
-  </div>
-
-  <!-- Success Message -->
-  <div v-if="successMessage" class="success-message">
-    {{ successMessage }}
-  </div>
-</template>
-
 <script setup>
 import { ref, onMounted } from "vue";
 
@@ -268,6 +183,91 @@ const formatDate = (dateString) => {
   });
 };
 </script>
+
+<template>
+  <div class="prod-img-step">
+    <h3>Production Images</h3>
+    <p>Upload images from the production process</p>
+
+    <!-- Upload Section -->
+    <div class="upload-section">
+      <div class="file-input-wrapper">
+        <input
+          type="file"
+          ref="fileInput"
+          @change="handleFileSelect"
+          accept="image/jpeg,image/jpg,image/png,image/webp"
+          multiple
+          :disabled="props.disabled"
+          class="file-input"
+          id="imageUpload"
+        />
+        <label for="imageUpload" class="file-label">
+          <span class="upload-icon">📁</span>
+          Choose Images
+        </label>
+        <span v-if="selectedFiles.length" class="file-count">
+          {{ selectedFiles.length }} file(s) selected
+        </span>
+      </div>
+    </div>
+
+    <!-- Preview Selected Files -->
+    <div v-if="selectedFiles.length" class="preview-section">
+      <hr />
+      <h4>Selected Files</h4>
+      <div class="preview-grid">
+        <div
+          v-for="(file, index) in selectedFiles"
+          :key="index"
+          class="preview-item"
+        >
+          <img :src="getFilePreview(file)" :alt="file.name" />
+          <p class="file-name">{{ file.name }}</p>
+          <button @click="removeFile(index)" class="remove-button">×</button>
+        </div>
+      </div>
+    </div>
+    <!-- Uploaded Images Gallery -->
+    <div v-if="uploadedImages.length" class="gallery-section">
+      <h4>Uploaded Images</h4>
+      <div class="image-gallery">
+        <div
+          v-for="image in uploadedImages"
+          :key="image.id"
+          class="gallery-item"
+        >
+          <img :src="getImageUrl(image.url)" :alt="image.filename" />
+          <div class="gallery-info">
+            <p class="gallery-filename">{{ image.filename }}</p>
+            <p class="gallery-date">{{ formatDate(image.createdAt) }}</p>
+            <button @click="deleteImage(image.id)" class="error-btn">
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div>
+    <button
+      @click="uploadImages"
+      :disabled="!selectedFiles.length || uploading || props.disabled"
+      class="success-btn"
+    >
+      Upload Images
+    </button>
+  </div>
+  <!-- Error Message -->
+  <div v-if="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Success Message -->
+  <div v-if="successMessage" class="success-message">
+    {{ successMessage }}
+  </div>
+</template>
 
 <style scoped lang="scss">
 .prod-img-step {

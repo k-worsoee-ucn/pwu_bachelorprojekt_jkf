@@ -1,5 +1,5 @@
 <script setup>
-import { useAuth } from "@/composables/useAuth";
+import { useAuth } from "@/utils/useAuth";
 
 const { user, isAuthenticated, isSalesManager, isMarketingManager, logout } =
   useAuth();

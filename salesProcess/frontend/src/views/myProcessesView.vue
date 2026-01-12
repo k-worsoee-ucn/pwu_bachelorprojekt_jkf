@@ -1,21 +1,20 @@
 <script setup>
 import { ref, computed, onMounted, watch, inject } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 import ProcessCard from "@/components/ProcessCard.vue";
 import FilterModal from "@/components/FilterModal.vue";
-import { useAuth } from "@/composables/useAuth";
+import { useAuth } from "@/utils/useAuth";
 
 const { user } = useAuth();
 const route = useRoute();
-const router = useRouter();
 const searchQuery = ref("");
 const searchDisplayText = ref("");
-let debounceTimer = null;
+let delayTimer = null;
 const allProcesses = ref([]);
 const activeTab = ref("ongoing");
 const salesManagerCount = inject("salesManagerCount");
 const isFilterModalOpen = ref(false);
-const displayCount = ref(6); // Number of processes to show initially
+const displayCount = ref(6);
 const activeFilters = ref({
   step: [],
   salesManager: [],
@@ -45,7 +44,6 @@ const fetchProcesses = async () => {
   }
 };
 
-// Watch route query for tab changes
 watch(
   () => route.query.tab,
   (newTab) => {
@@ -56,14 +54,14 @@ watch(
   { immediate: true }
 );
 
-// Debounce search display text
+// Search result text
 watch(searchQuery, (newValue) => {
-  if (debounceTimer) {
-    clearTimeout(debounceTimer);
+  if (delayTimer) {
+    clearTimeout(delayTimer);
   }
   
   if (newValue.trim()) {
-    debounceTimer = setTimeout(() => {
+    delayTimer = setTimeout(() => {
       searchDisplayText.value = newValue;
     }, 1000);
   } else {
@@ -75,7 +73,6 @@ onMounted(() => {
   fetchProcesses();
 });
 
-// Refresh data when returning to the view
 watch(
   () => route.path,
   (newPath) => {
@@ -134,7 +131,7 @@ const filteredProcesses = computed(() => {
     );
   }
 
-  // Apply sales manager filter (though this is my processes, so usually only one)
+  // Apply sales manager filter
   if (
     activeFilters.value.salesManager &&
     activeFilters.value.salesManager.length > 0
@@ -269,7 +266,7 @@ const filteredProcesses = computed(() => {
 });
 
 const actionsRequiredProcesses = computed(() => {
-  // Steps that require salesManager action: 1 (sales creation) and 4 (installation images)
+  // Steps that require salesManagers: 1 (sales creation) and 4 (installation images)
   const salesManagerSteps = [1, 4];
   return filteredProcesses.value.filter(
     (process) =>
@@ -286,7 +283,7 @@ const completedProcesses = computed(() => {
   return filteredProcesses.value.filter((process) => process.currentStep === 6);
 });
 
-// Update the injected count whenever actions required processes change
+// Update marketing manager count
 watch(
   actionsRequiredProcesses,
   (newActionsRequired) => {
@@ -323,7 +320,6 @@ function handleApplyFilter(filters) {
   activeFilters.value = { ...filters };
 }
 
-// function to reset filters
 function resetFilters() {
   activeFilters.value = {
     step: [],

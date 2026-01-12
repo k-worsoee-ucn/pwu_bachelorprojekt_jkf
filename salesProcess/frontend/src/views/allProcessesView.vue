@@ -1,21 +1,20 @@
 <script setup>
 import { ref, computed, onMounted, watch, inject } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 import ProcessCard from "@/components/ProcessCard.vue";
 import FilterModal from "@/components/FilterModal.vue";
-import { useAuth } from "@/composables/useAuth";
+import { useAuth } from "@/utils/useAuth";
 
 const { isMarketingManager } = useAuth();
 const route = useRoute();
-const router = useRouter();
 const searchQuery = ref("");
 const searchDisplayText = ref("");
-let debounceTimer = null;
+let delayTimer = null;
 const allProcesses = ref([]);
 const activeTab = ref("ongoing");
 const marketingManagerCount = inject("marketingManagerCount");
 const isFilterModalOpen = ref(false);
-const displayCount = ref(6); // Number of processes to show initially
+const displayCount = ref(6);
 const activeFilters = ref({
   step: [],
   salesManager: [],
@@ -45,7 +44,6 @@ const fetchProcesses = async () => {
   }
 };
 
-// Watch route query for tab changes
 watch(
   () => route.query.tab,
   (newTab) => {
@@ -56,14 +54,14 @@ watch(
   { immediate: true }
 );
 
-// Debounce search display text
+// Search result text
 watch(searchQuery, (newValue) => {
-  if (debounceTimer) {
-    clearTimeout(debounceTimer);
+  if (delayTimer) {
+    clearTimeout(delayTimer);
   }
 
   if (newValue.trim()) {
-    debounceTimer = setTimeout(() => {
+    delayTimer = setTimeout(() => {
       searchDisplayText.value = newValue;
     }, 1000);
   } else {
@@ -75,7 +73,6 @@ onMounted(() => {
   fetchProcesses();
 });
 
-// Refresh data when returning to the view
 watch(
   () => route.path,
   (newPath) => {
@@ -262,23 +259,22 @@ const filteredProcesses = computed(() => {
 });
 
 const actionsRequiredProcesses = computed(() => {
-  // Steps that require marketingManager action: 3 (product images), 5 (case & references), 6 (case upload)
+  // Steps that require marketingManagers: 3 (product images), 5 (case & references), 6 (case upload)
   const marketingManagerSteps = [3, 5, 6];
   return filteredProcesses.value.filter(
     (process) =>
       marketingManagerSteps.includes(parseInt(process.currentStep)) &&
-      process.status !== "completed" &&
-      process.status !== "done"
+      process.status !== "completed"
   );
 });
 
 const ongoingProcesses = computed(() => {
   return filteredProcesses.value.filter(
-    (process) => process.status !== "completed" && process.status !== "done"
+    (process) => process.status !== "completed"
   );
 });
 
-// Update the injected count for marketing managers whenever actions required processes change
+// Update marketing manager count
 watch(
   actionsRequiredProcesses,
   (newActionsRequired) => {
@@ -291,7 +287,7 @@ watch(
 
 const completedProcesses = computed(() => {
   return filteredProcesses.value.filter(
-    (process) => process.status === "completed" || process.status === "done"
+    (process) => process.status === "completed"
   );
 });
 
@@ -317,7 +313,6 @@ const tabLabel = computed(() => {
   return activeTab.value === "ongoing" ? "Ongoing" : "Completed";
 });
 
-// Helper to get the number of steps for a process
 function getStepCount(process) {
   return process.consent ? 6 : 5;
 }
@@ -326,7 +321,6 @@ function handleApplyFilter(filters) {
   activeFilters.value = { ...filters };
 }
 
-// function to reset filters
 function resetFilters() {
   activeFilters.value = {
     step: [],

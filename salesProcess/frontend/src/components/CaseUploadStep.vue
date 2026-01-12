@@ -1,55 +1,8 @@
-<template>
-  <div class="case-upload-step">
-    <h2>Case Content</h2>
-    <p class="description">
-      Write and format the case content that will be published.
-    </p>
-
-    <!-- <div v-if="loading" class="loading">
-      <i class="fa-solid fa-spinner fa-spin"></i> Loading...
-    </div> -->
-
-    <div class="editor-container">
-      <div class="editor-wrapper">
-        <QuillEditor
-          v-model:content="caseContent"
-          :options="editorOptions"
-          :readOnly="props.disabled"
-          contentType="html"
-          theme="snow"
-        />
-      </div>
-
-      <div class="action-buttons">
-        <button @click="saveCase" class="success-btn" :disabled="saving || props.disabled">
-          <i
-            class="fa-solid"
-            :class="saving ? 'fa-spinner fa-spin' : 'fa-save'"
-          ></i>
-          {{ saving ? "Saving..." : "Save Case Content" }}
-        </button>
-      </div>
-
-      <div v-if="saveMessage" :class="['save-message', saveMessage.type + '-message']">
-        <i
-          class="fa-solid"
-          :class="
-            saveMessage.type === 'success'
-              ? 'fa-circle-check'
-              : 'fa-circle-exclamation'
-          "
-        ></i>
-        {{ saveMessage.text }}
-      </div>
-    </div>
-  </div>
-</template>
-
 <script setup>
 import { ref, onMounted, watch } from "vue";
 import { QuillEditor } from "@vueup/vue-quill";
 import "@vueup/vue-quill/dist/vue-quill.snow.css";
-import { useAuth } from "@/composables/useAuth";
+import { useAuth } from "@/utils/useAuth";
 
 const props = defineProps({
   processId: {
@@ -182,6 +135,53 @@ onMounted(() => {
   fetchCaseContent();
 });
 </script>
+
+<template>
+  <div class="case-upload-step">
+    <h2>Case Content</h2>
+    <p class="description">
+      Write and format the case content that will be published.
+    </p>
+
+    <!-- <div v-if="loading" class="loading">
+      <i class="fa-solid fa-spinner fa-spin"></i> Loading...
+    </div> -->
+
+    <div class="editor-container">
+      <div class="editor-wrapper">
+        <QuillEditor
+          v-model:content="caseContent"
+          :options="editorOptions"
+          :readOnly="props.disabled"
+          contentType="html"
+          theme="snow"
+        />
+      </div>
+
+      <div class="action-buttons">
+        <button @click="saveCase" class="success-btn" :disabled="saving || props.disabled">
+          <i
+            class="fa-solid"
+            :class="saving ? 'fa-spinner fa-spin' : 'fa-save'"
+          ></i>
+          {{ saving ? "Saving..." : "Save Case Content" }}
+        </button>
+      </div>
+
+      <div v-if="saveMessage" :class="['save-message', saveMessage.type + '-message']">
+        <i
+          class="fa-solid"
+          :class="
+            saveMessage.type === 'success'
+              ? 'fa-circle-check'
+              : 'fa-circle-exclamation'
+          "
+        ></i>
+        {{ saveMessage.text }}
+      </div>
+    </div>
+  </div>
+</template>
 
 <style scoped lang="scss">
 .case-upload-step {

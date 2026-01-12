@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref, provide, watch } from "vue";
-import { useAuth } from "@/composables/useAuth";
+import { useAuth } from "@/utils/useAuth";
 import { useRoute } from "vue-router";
 import Header from "./components/Header.vue";
 import TabHeader from "./components/TabHeader.vue";
@@ -21,12 +21,12 @@ const updateBadgeCounts = async () => {
     });
     const data = await response.json();
 
-    // Calculate sales manager count (action-required processes)
+    // Calculate sales manager required actions
     if (isSalesManager.value && user.value?.id) {
       const userProcesses = data.filter(
         (process) => process.sale?.salesManager?.id === user.value.id
       );
-      const salesManagerSteps = [1, 4]; // Steps requiring sales manager action
+      const salesManagerSteps = [1, 4];
       const actionsRequired = userProcesses.filter(
         (process) =>
           salesManagerSteps.includes(process.currentStep) &&
@@ -35,14 +35,13 @@ const updateBadgeCounts = async () => {
       salesManagerCount.value = actionsRequired;
     }
 
-    // Calculate marketing manager count (action-required processes)
+    // Calculate marketing manager required actions
     if (isMarketingManager.value) {
-      const marketingManagerSteps = [3, 5, 6]; // Steps requiring marketing manager action
+      const marketingManagerSteps = [3, 5, 6];
       const actionsRequired = data.filter(
         (process) =>
           marketingManagerSteps.includes(process.currentStep) &&
-          process.status !== "completed" &&
-          process.status !== "done"
+          process.status !== "completed"
       ).length;
       marketingManagerCount.value = actionsRequired;
     }
@@ -56,7 +55,7 @@ onMounted(() => {
   updateBadgeCounts();
 });
 
-// Watch route changes and update badge counts when needed
+
 watch(
   () => route.path,
   (newPath) => {
@@ -70,7 +69,6 @@ watch(
   }
 );
 
-// Also update counts when user changes
 watch(
   () => user.value,
   () => {

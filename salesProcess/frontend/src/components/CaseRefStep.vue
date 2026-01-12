@@ -1,38 +1,3 @@
-<template>
-  <div class="case-ref-step">
-    <h3>Case & Reference Creation</h3>
-    <p>Download case data and images separately</p>
-
-    <div class="download-section">
-      <button
-        @click="generatePDF"
-        :disabled="props.disabled"
-        class="btn"
-      >
-        Download Sale Data (PDF)
-      </button>
-
-      <button
-        @click="downloadImages"
-        :disabled="props.disabled"
-        class="btn"
-      >
-        Download Images (ZIP)
-      </button>
-    </div>
-
-    <!-- Error Message -->
-    <div v-if="errorMessage" class="error-message">
-      {{ errorMessage }}
-    </div>
-
-    <!-- Success Message -->
-    <div v-if="successMessage" class="success-message">
-      {{ successMessage }}
-    </div>
-  </div>
-</template>
-
 <script setup>
 import { ref } from "vue";
 import { jsPDF } from "jspdf";
@@ -363,6 +328,41 @@ const downloadImages = async () => {
   }
 };
 </script>
+
+<template>
+  <div class="case-ref-step">
+    <h3>Case & Reference Creation</h3>
+    <p>Download case data and images separately</p>
+
+    <div class="download-section">
+      <button
+        @click="generatePDF"
+        :disabled="props.disabled"
+        class="btn"
+      >
+        Download Sale Data (PDF)
+      </button>
+
+      <button
+        @click="downloadImages"
+        :disabled="props.disabled"
+        class="btn"
+      >
+        Download Images (ZIP)
+      </button>
+    </div>
+
+    <!-- Error Message -->
+    <div v-if="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </div>
+
+    <!-- Success Message -->
+    <div v-if="successMessage" class="success-message">
+      {{ successMessage }}
+    </div>
+  </div>
+</template>
 
 <style scoped lang="scss">
 .case-ref-step {
