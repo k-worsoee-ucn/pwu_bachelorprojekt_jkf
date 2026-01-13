@@ -3,9 +3,6 @@ require('dotenv').config();
 
 class EncryptionUtil {
   constructor() {
-    if (!process.env.ENCRYPTION_KEY) {
-      throw new Error('ENCRYPTION_KEY environment variable is required');
-    }
     this.key = crypto.pbkdf2Sync(process.env.ENCRYPTION_KEY, 'salesprocess-salt', 100000, 32, 'sha256');
   }
 
