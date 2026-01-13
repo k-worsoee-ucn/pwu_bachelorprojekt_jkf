@@ -52,6 +52,8 @@ services:
   frontend:
     build: ./frontend
     container_name: sales_process_frontend
+    environment:
+      VITE_API_BASE_URL: http://backend:3000
     ports:
       - "${FRONTEND_PORT}:5173"
     depends_on:
