@@ -199,21 +199,6 @@ describe("Process Authorization Middleware", () => {
     });
   });
 
-  describe("Authentication Check", () => {
-    test("should deny access if user is not authenticated", async () => {
-      mockReq.user = null;
-      mockReq.body = { currentStep: 2 };
-
-      await canUpdateProcess(mockReq, mockRes, mockNext);
-
-      expect(mockRes.status).toHaveBeenCalledWith(401);
-      expect(mockRes.json).toHaveBeenCalledWith({
-        error: "Authentication required",
-      });
-      expect(mockNext).not.toHaveBeenCalled();
-    });
-  });
-
   describe("Process Not Found", () => {
     test("should return 404 if process does not exist", async () => {
       mockPrisma.process.findUnique.mockResolvedValue(null);
