@@ -73,13 +73,27 @@ The easiest way to get started is using Docker Compose, which sets up the entire
 
 2. **Set up environment files**
    
-   Create or configure the following environment files (templates and detailed documentation are available in the accompanying report):
-   - Root `.env` - Database and service configuration
-   - Backend `backend/.env` - Backend API configuration
-   - Backend `backend/.env.test` - Test environment configuration
-   - Frontend `frontend/.env` - Frontend API base URL configuration
+   Create environment files by copying the provided `.env.example` files:
    
-   > **Note**: The complete content and documentation for each environment file is available in the accompanying report.
+   ```bash
+   # Root directory
+   cp .env.example .env
+   
+   # Backend directory
+   cp backend/.env.example backend/.env
+   cp backend/.env.test.example backend/.env.test
+   
+   # Frontend directory
+   cp frontend/.env.example frontend/.env
+   ```
+   
+   Then configure each `.env` file with your specific values:
+   - **Root `.env`** - Database connection, ports, JWT secret, and registration access code
+   - **Backend `backend/.env`** - Database URL, encryption key, and API configuration
+   - **Backend `backend/.env.test`** - Test database configuration (for running tests)
+   - **Frontend `frontend/.env`** - API base URL for backend communication
+   
+   > **Note**: The `.env.example` files contain template values with descriptions. See each file for detailed documentation on required environment variables.
 
 3. **Start all services**
    ```bash
@@ -298,7 +312,50 @@ docker-compose logs -f
 docker-compose down
 ```
 
-## 🔒 Security Features
+## � Dependencies
+
+### Backend Dependencies
+
+**Production:**
+- `@prisma/client` (^6.19.0) - Prisma ORM client
+- `express` (^5.1.0) - Web application framework
+- `bcrypt` (^6.0.0) - Password hashing library
+- `jsonwebtoken` (^9.0.2) - JWT creation and verification
+- `dotenv` (^17.2.3) - Environment variable management
+- `helmet` (^8.1.0) - HTTP headers security
+- `cors` (^2.8.5) - Cross-Origin Resource Sharing
+- `express-validator` (^7.3.1) - Input validation middleware
+- `joi` (^18.0.2) - Schema validation
+- `express-rate-limit` (^8.2.1) - API rate limiting
+- `multer` (^2.0.2) - File upload handling
+- `cookie-parser` (^1.4.7) - Cookie parsing middleware
+- `pg` (^8.16.3) - PostgreSQL client
+
+**Development:**
+- `nodemon` (^3.1.11) - Development server with auto-reload
+- `jest` (^30.2.0) - Testing framework
+- `supertest` (^7.1.4) - HTTP assertion library for API testing
+- `prisma` (^6.19.0) - Prisma CLI and development tools
+- `@cyclonedx/cyclonedx-npm` (^4.1.1) - SBOM generation
+- `cross-env` (^7.0.3) - Cross-platform environment variable setting
+
+### Frontend Dependencies
+
+**Production:**
+- `vue` (^3.5.24) - JavaScript framework
+- `vue-router` (^4.6.3) - Client-side routing
+- `@vueup/vue-quill` (^1.2.0) - Rich text editor
+- `jspdf` (^4.0.0) - PDF generation
+- `jszip` (^3.10.1) - ZIP file creation
+- `countries-list` (^3.2.2) - Country data
+
+**Development:**
+- `vite` (^7.2.2) - Build tool and dev server
+- `@vitejs/plugin-vue` (^6.0.1) - Vue 3 support for Vite
+- `sass` (^1.94.2) - SCSS preprocessor
+- `sass-loader` (^16.0.6) - Sass loader for Vite
+
+## �🔒 Security Features
 
 - **Helmet**: HTTP headers security
 - **CORS**: Cross-Origin Resource Sharing configuration
