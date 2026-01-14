@@ -202,6 +202,34 @@ npm run prisma:seed
 npx prisma studio
 ```
 
+### Database Seeding
+
+The database includes seeding functionality to populate the application with sample data, allowing you to explore the application without creating users and processes from scratch.
+
+**What the Seeding Does:**
+- **Users**: Creates sample user accounts with different roles (sales manager, marketing manager, viewer)
+- **Customers**: Generates sample customer records associated with sales managers
+- **Products**: Populates the product catalog with sample items
+- **Sales**: Creates sample sales transactions that automatically trigger process creation
+- **Process Users**: Assigns users to auto-created processes based on sales data and user roles
+
+**Key Benefit**: This allows you to immediately log in with pre-created accounts and view existing processes, sales, customers, and products without needing to set up data manually first.
+
+**Seed Files:**
+- `seed.js` - Main seeding orchestrator that coordinates all individual seeders
+- `seeds/users.js` - Creates sample user accounts
+- `seeds/customers.js` - Creates sample customer data
+- `seeds/products.js` - Creates sample product catalog
+- `seeds/sales.js` - Creates sample sales and automatically generates processes
+- `seeds/processUsers.js` - Assigns users to processes
+
+**Running the Seed:**
+```bash
+# Docker Compose automatically runs seeding on first startup
+# For local development:
+npm run prisma:seed
+```
+
 ## 🧪 Testing
 
 Backend includes Jest test suite with unit and integration tests:
