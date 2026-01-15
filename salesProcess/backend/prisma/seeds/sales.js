@@ -1,0 +1,242 @@
+const { PrismaClient } = require("@prisma/client");
+const encryption = require("../../utils/encryption");
+
+async function seedSales(prisma, customers = []) {
+  console.log("Seeding sales (which auto-creates processes)...");
+
+  // Get a sales manager by role to ensure we always use the correct user
+  const salesManager = await prisma.user.findFirst({
+    where: { role: 'salesManager' },
+    select: { id: true }
+  });
+
+  if (!salesManager) {
+    throw new Error("At least one sales manager is required to seed sales");
+  }
+
+  const salesManagerId = salesManager.id;
+
+  const filterProducts = await prisma.product.findMany({
+    where: { category: "filtersAndSeparators" },
+    select: { id: true },
+  });
+  const fanProducts = await prisma.product.findMany({
+    where: { category: "fanSystems" },
+    select: { id: true },
+  });
+  const ductProducts = await prisma.product.findMany({
+    where: { category: "ductSystems" },
+    select: { id: true },
+  });
+
+  const salesDataWithRealIds = [
+    {
+      title: "Advanced Dust Collection System - Cabinet Manufacturing",
+      description: "Advanced dust collection for cabinet manufacturing",
+      endUser: "Premier Cabinet Works",
+      phoneNumber: "+49 30 12345678",
+      country: "Germany",
+      industry: "woodworking",
+      customIndustry: null,
+      plantType: "Cabinet Manufacturing",
+      filterType: "Bag Filter",
+      fanType: "Centrifugal",
+      dustType: "Fine Wood Particles",
+      ductSystem: "Centralized Branch Network",
+      totalExtractionVolume: 15000,
+      pressure: 1200,
+      volumeFlow: 25000,
+      customerId: customers[0]?.id || 1,
+      salesManagerId: salesManagerId,
+      selectedFilters: [filterProducts[0]?.id, filterProducts[1]?.id].filter(
+        (id) => id
+      ),
+      selectedFans: [fanProducts[0]?.id, fanProducts[1]?.id].filter((id) => id),
+      selectedDucts: [ductProducts[0]?.id].filter((id) => id),
+    },
+    {
+      title: "High-Volume Wood Chip Extraction - Furniture Factory",
+      description: "High-volume wood chip extraction system",
+      endUser: "Scandinavian Furniture Co",
+      phoneNumber: "+46 8 98765432",
+      country: "Sweden",
+      industry: "woodworking",
+      customIndustry: null,
+      plantType: "Furniture Manufacturing",
+      filterType: "Cyclone Separator",
+      fanType: "Axial",
+      dustType: "Wood Chips and Shavings",
+      ductSystem: "Main Trunk with Branches",
+      totalExtractionVolume: 50000,
+      pressure: 1500,
+      volumeFlow: 75000,
+      customerId: customers[1]?.id || 2,
+      salesManagerId: salesManagerId,
+      selectedFilters: [filterProducts[2]?.id].filter((id) => id),
+      selectedFans: [fanProducts[1]?.id, fanProducts[2]?.id].filter((id) => id),
+      selectedDucts: [ductProducts[1]?.id, ductProducts[2]?.id].filter(
+        (id) => id
+      ),
+    },
+    {
+      title: "Custom Cyclone Separator - Sawmill Operations",
+      description: "Custom cyclone separator for sawmill",
+      endUser: "Alpine Sawmill Group",
+      phoneNumber: "+43 1 23456789",
+      country: "Austria",
+      industry: "woodworking",
+      customIndustry: null,
+      plantType: "Sawmill",
+      filterType: "Cyclone with Secondary Filter",
+      fanType: "High-Pressure Centrifugal",
+      dustType: "Sawdust and Bark",
+      ductSystem: "Heavy-Duty Steel Ducting",
+      totalExtractionVolume: 80000,
+      pressure: 1800,
+      volumeFlow: 120000,
+      customerId: customers[2]?.id || 3,
+      salesManagerId: salesManagerId,
+      selectedFilters: [filterProducts[0]?.id, filterProducts[2]?.id].filter(
+        (id) => id
+      ),
+      selectedFans: [fanProducts[0]?.id].filter((id) => id),
+      selectedDucts: [ductProducts[2]?.id].filter((id) => id),
+    },
+    {
+      title: "Multi-Stage Filtration System - Plywood Manufacturing",
+      description: "Multi-stage HEPA filtration for plywood production",
+      endUser: "Baltic Plywood Industries",
+      phoneNumber: "+358 9 12345678",
+      country: "Finland",
+      industry: "woodworking",
+      customIndustry: null,
+      plantType: "Plywood Production",
+      filterType: "Multi-Stage HEPA",
+      fanType: "Variable Speed Centrifugal",
+      dustType: "Fine Veneer Dust",
+      ductSystem: "Stainless Steel Network",
+      totalExtractionVolume: 30000,
+      pressure: 1300,
+      volumeFlow: 45000,
+      customerId: customers[3]?.id || 4,
+      salesManagerId: salesManagerId,
+      selectedFilters: [filterProducts[1]?.id, filterProducts[2]?.id].filter(
+        (id) => id
+      ),
+      selectedFans: [fanProducts[1]?.id, fanProducts[2]?.id].filter((id) => id),
+      selectedDucts: [ductProducts[0]?.id, ductProducts[1]?.id].filter(
+        (id) => id
+      ),
+    },
+    {
+      title: "Pneumatic Conveying System - MDF Production",
+      description: "Pneumatic conveying with bag house filtration for MDF",
+      endUser: "European MDF Solutions",
+      phoneNumber: "+48 22 98765432",
+      country: "Poland",
+      industry: "woodworking",
+      customIndustry: null,
+      plantType: "MDF Manufacturing",
+      filterType: "Bag House with Pre-separator",
+      fanType: "High-Volume Axial",
+      dustType: "MDF Fiber and Dust",
+      ductSystem: "Pneumatic Transport Lines",
+      totalExtractionVolume: 100000,
+      pressure: 2000,
+      volumeFlow: 150000,
+      customerId: customers[4]?.id || 5,
+      salesManagerId: salesManagerId,
+      selectedFilters: [filterProducts[0]?.id].filter((id) => id),
+      selectedFans: [fanProducts[0]?.id, fanProducts[2]?.id].filter((id) => id),
+      selectedDucts: [ductProducts[1]?.id, ductProducts[2]?.id].filter(
+        (id) => id
+      ),
+    },
+  ];
+
+  let createdCount = 0;
+  let skippedCount = 0;
+
+  for (const saleData of salesDataWithRealIds) {
+    const existingSale = await prisma.sale.findFirst({
+      where: {
+        title: saleData.title,
+      },
+    });
+
+    if (existingSale) {
+      skippedCount++;
+      continue;
+    }
+
+    const lastProcess = await prisma.process.findFirst({
+      orderBy: { caseNo: "desc" },
+      select: { caseNo: true },
+    });
+    const nextCaseNo = (lastProcess?.caseNo || 0) + 1;
+
+    const allSelectedProducts = [
+      ...saleData.selectedFilters,
+      ...saleData.selectedFans,
+      ...saleData.selectedDucts,
+    ].filter((id) => id);
+
+    await prisma.$transaction(async (prisma) => {
+      const process = await prisma.process.create({
+        data: {
+          title: saleData.title,
+          caseNo: nextCaseNo,
+          status: "ongoing",
+          currentStep: 2,
+        },
+      });
+
+      const sale = await prisma.sale.create({
+        data: {
+          title: saleData.title,
+          description: saleData.description || null,
+          endUser: encryption.encrypt(saleData.endUser),
+          phoneNumber: saleData.phoneNumber,
+          country: saleData.country,
+          industry: saleData.industry,
+          customIndustry: saleData.customIndustry,
+          plantType: saleData.plantType,
+          filterType: saleData.filterType,
+          fanType: saleData.fanType,
+          dustType: saleData.dustType,
+          ductSystem: saleData.ductSystem,
+          totalExtractionVolume: saleData.totalExtractionVolume,
+          pressure: saleData.pressure,
+          volumeFlow: saleData.volumeFlow,
+          processId: process.id,
+          customerId: saleData.customerId,
+          salesManagerId: saleData.salesManagerId,
+        },
+      });
+
+      if (allSelectedProducts.length > 0) {
+        const saleProductData = allSelectedProducts.map((productId) => ({
+          saleId: sale.id,
+          productId: productId,
+          quantity: 1,
+        }));
+
+        await prisma.saleProduct.createMany({
+          data: saleProductData,
+          skipDuplicates: true,
+        });
+      }
+
+      console.log(
+        `Created sale and process: ${saleData.title} (Case #${nextCaseNo})`
+      );
+      createdCount++;
+    });
+  }
+
+  console.log(
+    `Seeded ${createdCount} sales with auto-created processes (skipped ${skippedCount} duplicates)`
+  );
+}
+
+module.exports = { seedSales };

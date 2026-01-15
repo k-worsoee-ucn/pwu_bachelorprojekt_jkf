@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -11,25 +10,42 @@ datasource db {
 // PREDEFINED VALUES (ENUMERATIONS)
 
 enum ProcessStatus {
-  done
-  ongoing
-  locked
+  completed @map("Completed")
+  ongoing   @map("Ongoing")
+  locked    @map("Locked")
 }
 
 enum UserRole {
-  salesManager
-  marketingManager
-  productionManager
-  viewer
+  salesManager     @map("Sales Manager")
+  marketingManager @map("Marketing Manager")
+  viewer           @map("Viewer")
+}
+
+enum Industry {
+  woodworking    @map("Woodworking")
+  agroAndMilling @map("Agro- and Milling")
+  recycling      @map("Recycling")
+  metalworking   @map("Metalworking")
+  paper          @map("Paper")
+  other          @map("Other")
+}
+
+enum ProductCategory {
+  filtersAndSeparators @map("Filters & Separators")
+  fanSystems           @map("Fan Systems")
+  ductSystems          @map("Duct Systems")
 }
 
 // MODELS
 
 model Process {
-  id     Int           @id @default(autoincrement())
-  title  String
-  caseNo Int           @unique
-  status ProcessStatus @default(ongoing)
+  id           Int           @id @default(autoincrement())
+  title        String
+  caseNo       Int           @unique
+  status       ProcessStatus @default(ongoing)
+  currentStep  Int           @default(1)
+  consent      Boolean       @default(false)
+  shippingDate String?       @map("shipping_date")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -40,16 +56,32 @@ model Process {
   // One-to-one relationship
   sale Sale?
 
+  // One-to-many relationships
+  references Reference[]
+  cases      Case[]
+  images     Image[]
+
   @@map("processes")
 }
 
 model Sale {
-  id               Int    @id @default(autoincrement())
-  filterType       String
-  fanType          String
-  ductSystem       String
-  extractionVolume Int
-  volumeFlow       Int
+  id                    Int      @id @default(autoincrement())
+  title                 String
+  description           String?
+  endUser               String   @map("end_user")
+  country               String
+  industry              Industry
+  customIndustry        String?  @map("custom_industry")
+  plantType             String   @map("plant_type")
+  filterType            String   @map("filter_type")
+  fanType               String   @map("fan_type")
+  dustType              String   @map("dust_type")
+  ductSystem            String   @map("duct_system")
+  totalExtractionVolume Int      @map("total_extraction_volume")
+  pressure              Int
+  volumeFlow            Int      @map("volume_flow")
+  phoneNumber           String?  @map("phone_number")
+  privacySettings       Json?    @map("privacy_settings")
 
   // FK
   processId      Int @unique @map("process_id")
@@ -64,7 +96,6 @@ model Sale {
   customer     Customer @relation(fields: [customerId], references: [id])
   salesManager User     @relation("OwnedSales", fields: [salesManagerId], references: [id])
 
-  // Many-to-many
   saleProducts SaleProduct[]
 
   @@map("sales")
@@ -72,9 +103,8 @@ model Sale {
 
 model User {
   id       Int      @id @default(autoincrement())
-  username String   @unique
   email    String   @unique
-  password String   @unique
+  password String
   name     String
   role     UserRole @default(viewer)
 
@@ -83,10 +113,8 @@ model User {
 
   processUsers ProcessUser[]
 
-  // Direct sale ownership  
   ownedSales Sale[] @relation("OwnedSales")
 
-  // Customer management - sales managers have assigned customers
   managedCustomers Customer[] @relation("CustomerSalesManager")
 
   @@map("users")
@@ -108,10 +136,9 @@ model ProcessUser {
 }
 
 model Customer {
-  id       Int    @id @default(autoincrement())
-  name     String @unique
-  industry String
-  country  String
+  id      Int     @id @default(autoincrement())
+  name    String  @unique
+  website String?
 
   // Each customer has exactly ONE sales manager
   salesManagerId Int @map("sales_manager_id")
@@ -126,9 +153,11 @@ model Customer {
 }
 
 model Product {
-  id    Int    @id @default(autoincrement())
+  id    Int             @id @default(autoincrement())
   title String
+  category    ProductCategory
 
+  // Relationships
   saleProducts SaleProduct[]
 
   @@map("products")
@@ -137,7 +166,7 @@ model Product {
 model SaleProduct {
   saleId    Int
   productId Int
-  quantity  Int      @default(1)
+  quantity  Int @default(1)
 
   createdAt DateTime @default(now())
 
@@ -149,18 +178,41 @@ model SaleProduct {
 }
 
 model Reference {
-  id Int @id @default(autoincrement())
+  id        Int  @id @default(autoincrement())
+  processId Int? @map("process_id")
 
   createdAt DateTime @default(now())
+
+  // Relationships
+  process  Process?  @relation(fields: [processId], references: [id])
+  cases    Case[]
 
   @@map("references")
 }
 
 model Case {
-  id      Int    @id @default(autoincrement())
-  content String
+  id          Int    @id @default(autoincrement())
+  content     String
+  processId   Int?   @map("process_id")
+  referenceId Int?   @map("reference_id")
 
   createdAt DateTime @default(now())
 
+  // Relationships
+  process   Process?   @relation(fields: [processId], references: [id])
+  reference Reference? @relation(fields: [referenceId], references: [id])
+
   @@map("cases")
+}
+
+model Image {
+  id        Int      @id @default(autoincrement())
+  url       String
+  filename  String
+  type      String   @default("production") // "production" or "installation"
+  createdAt DateTime @default(now())
+  process   Process  @relation(fields: [processId], references: [id])
+  processId Int
+
+  @@map("images")
 }

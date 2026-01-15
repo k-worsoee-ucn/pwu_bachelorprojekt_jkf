@@ -1,0 +1,93 @@
+.btn {
+  padding: 0.6rem 1.2rem;
+  background-color: $primary-jkf-blue;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: $jkf-hover-blue;
+  }
+  
+  &:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+.btn-no-fill {
+  text-decoration: none;
+  color: $primary-jkf-blue;
+  padding: 0.6rem 1.2rem;
+  border: 2px solid $primary-jkf-blue;
+  border-radius: 4px;
+  background-color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: $primary-jkf-blue;
+    color: white;
+    background-color: $primary-jkf-blue;
+  }
+
+  &.router-link-active {
+    background-color: $primary-jkf-blue;
+    color: white;
+    border-color: $primary-jkf-blue;
+  }
+}
+
+.error-btn {
+  background-color: $error-500-main;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: $error-600;
+  }
+}
+
+.success-btn{
+  background-color: $success-500-main;
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: $success-600;
+  }
+}
+
+.show-more-btn {
+  background-color: transparent;
+  border: none;
+  display: inline-block;
+  padding-inline: 4rem;
+  min-height: 4rem;
+  font-weight: 600;
+  line-height: 2rem;
+  cursor: pointer;
+  transition: all 0.1s ease-in-out;
+  vertical-align: middle;
+
+  &:hover {
+    // transform: scale(1.03);
+    font-size: 1.05rem;
+  }
+
+  .fa-chevron-down {
+    margin-left: 1rem;
+  }
+}

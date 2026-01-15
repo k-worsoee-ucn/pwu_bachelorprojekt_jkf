@@ -11,6 +11,11 @@ services:
       - "${DB_PORT}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       - sales_network
 
@@ -18,8 +23,10 @@ services:
   backend:
     build: ./backend
     container_name: sales_process_backend
+    command: sh -c "npm run prisma:push -- --accept-data-loss && node prisma/seed.js && npm start" # accept-data-loss for dev only
     environment:
       NODE_ENV: ${NODE_ENV}
+      PORT: 3000
       DB_HOST: ${DB_HOST}
       DB_PORT: ${DB_PORT}
       DB_NAME: ${POSTGRES_DB}
@@ -28,11 +35,16 @@ services:
       DATABASE_URL: ${DATABASE_URL}
       JWT_SECRET: ${JWT_SECRET}
       CORS_ORIGIN: ${CORS_ORIGIN}
+      REGISTRATION_ACCESS_CODE: ${REGISTRATION_ACCESS_CODE}
+      SEED_PASSWORD: ${SEED_PASSWORD}
     ports:
       - "${BACKEND_PORT}:3000"
       - "5555:5555"  # Prisma Studio
     depends_on:
-      - database
+      database:
+        condition: service_healthy
+    volumes:
+      - backend_uploads:/app/uploads
     networks:
       - sales_network
 
@@ -40,6 +52,8 @@ services:
   frontend:
     build: ./frontend
     container_name: sales_process_frontend
+    environment:
+      VITE_API_BASE_URL: http://backend:3000
     ports:
       - "${FRONTEND_PORT}:5173"
     depends_on:
@@ -49,6 +63,7 @@ services:
 
 volumes:
   postgres_data:
+  backend_uploads:
 
 networks:
   sales_network:

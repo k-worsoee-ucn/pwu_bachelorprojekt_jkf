@@ -1,0 +1,792 @@
+openapi: 3.0.0
+info:
+  title: Sales Process API
+  description: Backend API for sales process management system with multi-step workflows
+  version: 1.0.0
+  contact:
+    name: Project Team
+
+servers:
+  - url: http://localhost:3000/api
+    description: Development server
+  - url: https://api.example.com
+    description: Production server
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token in Authorization header
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        email:
+          type: string
+          format: email
+          example: sally@sales.com
+        name:
+          type: string
+          example: Sally Sales
+        role:
+          type: string
+          enum: [salesManager, marketingManager, viewer]
+          example: salesManager
+        createdAt:
+          type: string
+          format: date-time
+
+    Process:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: Dust Collection System
+        caseNo:
+          type: integer
+          example: 1001
+        status:
+          type: string
+          enum: [ongoing, completed, locked]
+          example: ongoing
+        currentStep:
+          type: integer
+          minimum: 1
+          maximum: 6
+          example: 3
+        consent:
+          type: boolean
+          example: false
+        shippingDate:
+          type: string
+          format: date
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Sale:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: Advanced Dust Collection System
+        description:
+          type: string
+          example: Advanced dust collection for cabinet manufacturing
+        endUser:
+          type: string
+          example: Premier Cabinet Works
+        country:
+          type: string
+          example: Germany
+        industry:
+          type: string
+          enum: [woodworking, agroAndMilling, recycling, metalworking, paper, other]
+          example: woodworking
+        customIndustry:
+          type: string
+          nullable: true
+        plantType:
+          type: string
+          example: Cabinet Manufacturing
+        filterType:
+          type: string
+          example: Bag Filter
+        fanType:
+          type: string
+          example: Centrifugal
+        dustType:
+          type: string
+          example: Fine Wood Particles
+        ductSystem:
+          type: string
+          example: Centralized Branch Network
+        totalExtractionVolume:
+          type: integer
+          example: 15000
+        pressure:
+          type: integer
+          example: 1200
+        volumeFlow:
+          type: integer
+          example: 25000
+        phoneNumber:
+          type: string
+          nullable: true
+        privacySettings:
+          type: object
+          nullable: true
+        processId:
+          type: integer
+          example: 1
+        customerId:
+          type: integer
+          example: 1
+        salesManagerId:
+          type: integer
+          example: 2
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: SBF220S 4,0 Super Blower Filter
+        category:
+          type: string
+          enum: [filtersAndSeparators, fanSystems, ductSystems]
+          example: filtersAndSeparators
+        createdAt:
+          type: string
+          format: date-time
+
+    Case:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        content:
+          type: string
+          description: HTML content from rich text editor
+          example: "<h2>Initial Consultation</h2><p>Meeting scheduled...</p>"
+        processId:
+          type: integer
+          nullable: true
+          example: 1
+        referenceId:
+          type: integer
+          nullable: true
+          example: 1
+        createdAt:
+          type: string
+          format: date-time
+
+    Reference:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        processId:
+          type: integer
+          nullable: true
+          example: 1
+        createdAt:
+          type: string
+          format: date-time
+
+    Customer:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: John Doe
+        email:
+          type: string
+          format: email
+          example: john@example.com
+        phone:
+          type: string
+          example: "+49301234567"
+        createdAt:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Resource not found
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: sally@sales.com
+        password:
+          type: string
+          format: password
+          example: password123
+
+    RegisterRequest:
+      type: object
+      required:
+        - email
+        - password
+        - name
+        - role
+      properties:
+        email:
+          type: string
+          format: email
+          example: newuser@example.com
+        password:
+          type: string
+          format: password
+          example: password123
+        name:
+          type: string
+          example: New User
+        role:
+          type: string
+          enum: [salesManager, marketingManager, viewer]
+          example: salesManager
+
+security:
+  - bearerAuth: []
+
+paths:
+  /users/login:
+    post:
+      summary: User login
+      tags:
+        - Authentication
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+                  token:
+                    type: string
+        '400':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users/register:
+    post:
+      summary: User registration
+      tags:
+        - Authentication
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Registration successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: '#/components/schemas/User'
+                  token:
+                    type: string
+        '400':
+          description: Registration failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /users/logout:
+    post:
+      summary: User logout
+      tags:
+        - Authentication
+      responses:
+        '200':
+          description: Logout successful
+
+  /users/me:
+    get:
+      summary: Get current user
+      tags:
+        - Users
+      responses:
+        '200':
+          description: Current user data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized
+    put:
+      summary: Update current user
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+      responses:
+        '200':
+          description: User updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /customers:
+    get:
+      summary: Get all customers
+      tags:
+        - Customers
+      responses:
+        '200':
+          description: List of all customers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Customer'
+
+  /processes:
+    get:
+      summary: Get all processes
+      tags:
+        - Processes
+      responses:
+        '200':
+          description: List of all processes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Process'
+
+  /processes/filter-options:
+    get:
+      summary: Get filter options for processes
+      tags:
+        - Processes
+      responses:
+        '200':
+          description: Available filter options
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /processes/{id}:
+    get:
+      summary: Get process by ID
+      tags:
+        - Processes
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Process data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Process'
+        '404':
+          description: Process not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      summary: Update process
+      tags:
+        - Processes
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                currentStep:
+                  type: integer
+                status:
+                  type: string
+                  enum: [ongoing, completed, locked]
+                consent:
+                  type: boolean
+      responses:
+        '200':
+          description: Process updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Process'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /sales:
+    post:
+      summary: Create new sale
+      tags:
+        - Sales
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - endUser
+                - country
+                - industry
+                - plantType
+                - filterType
+                - fanType
+                - dustType
+                - ductSystem
+                - totalExtractionVolume
+                - pressure
+                - volumeFlow
+                - customerId
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                endUser:
+                  type: string
+                country:
+                  type: string
+                industry:
+                  type: string
+                  enum: [woodworking, agroAndMilling, recycling, metalworking, paper, other]
+                customIndustry:
+                  type: string
+                plantType:
+                  type: string
+                filterType:
+                  type: string
+                fanType:
+                  type: string
+                dustType:
+                  type: string
+                ductSystem:
+                  type: string
+                totalExtractionVolume:
+                  type: integer
+                pressure:
+                  type: integer
+                volumeFlow:
+                  type: integer
+                phoneNumber:
+                  type: string
+                customerId:
+                  type: integer
+      responses:
+        '201':
+          description: Sale created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sale'
+        '403':
+          description: Forbidden (requires salesManager role)
+
+  /sales/{id}:
+    put:
+      summary: Update sale
+      tags:
+        - Sales
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                endUser:
+                  type: string
+                country:
+                  type: string
+                industry:
+                  type: string
+                customIndustry:
+                  type: string
+                plantType:
+                  type: string
+                filterType:
+                  type: string
+                fanType:
+                  type: string
+                dustType:
+                  type: string
+                ductSystem:
+                  type: string
+                totalExtractionVolume:
+                  type: integer
+                pressure:
+                  type: integer
+                volumeFlow:
+                  type: integer
+                phoneNumber:
+                  type: string
+      responses:
+        '200':
+          description: Sale updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sale'
+
+  /products:
+    get:
+      summary: Get all products
+      tags:
+        - Products
+      responses:
+        '200':
+          description: List of all products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+
+  /cases:
+    post:
+      summary: Create new case
+      tags:
+        - Cases
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - content
+                - processId
+              properties:
+                content:
+                  type: string
+                  description: HTML content from rich text editor
+                processId:
+                  type: integer
+      responses:
+        '201':
+          description: Case created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Case'
+        '403':
+          description: Forbidden (requires Step 6 access)
+
+  /cases/{id}:
+    put:
+      summary: Update case
+      tags:
+        - Cases
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                processId:
+                  type: integer
+      responses:
+        '200':
+          description: Case updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Case'
+
+  /cases/process/{processId}:
+    get:
+      summary: Get cases by process ID
+      tags:
+        - Cases
+      parameters:
+        - name: processId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of cases for process
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Case'
+
+
+  /processes/{processId}/images:
+    get:
+      summary: Get images for process
+      tags:
+        - Images
+      parameters:
+        - name: processId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [installation, production]
+          description: Filter images by type
+      responses:
+        '200':
+          description: List of process images
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  images:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        url:
+                          type: string
+                        type:
+                          type: string
+                        processId:
+                          type: integer
+
+    post:
+      summary: Upload image for process
+      tags:
+        - Images
+      parameters:
+        - name: processId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+                type:
+                  type: string
+                  enum: [installation, production]
+      responses:
+        '201':
+          description: Image uploaded successfully
+        '400':
+          description: Invalid request
+
+  /images/{id}:
+    delete:
+      summary: Delete image
+      tags:
+        - Images
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Image deleted
+        '403':
+          description: Forbidden
