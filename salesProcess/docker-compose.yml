@@ -58,6 +58,8 @@ services:
       - "${FRONTEND_PORT}:5173"
     depends_on:
       - backend
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - sales_network
 
