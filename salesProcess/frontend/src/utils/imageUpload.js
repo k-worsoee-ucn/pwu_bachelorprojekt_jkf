@@ -32,18 +32,25 @@ export const uploadImages = async (processId, selectedFiles, imageType) => {
   });
   formData.append("type", imageType);
 
-  const response = await fetch(`/api/processes/${processId}/images`, {
-    method: "POST",
-    credentials: "include",
-    body: formData,
-  });
+  try {
+    const response = await fetch(`/api/processes/${processId}/images`, {
+      method: "POST",
+      credentials: "include",
+      body: formData,
+    });
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || "Upload failed");
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || "Upload failed");
+    }
+
+    const result = await response.json();
+    console.log("Upload response:", result);
+    return result;
+  } catch (error) {
+    console.error("Upload error:", error);
+    throw error;
   }
-
-  return await response.json();
 };
 
 export const fetchUploadedImages = async (processId, imageType) => {
@@ -63,6 +70,7 @@ export const fetchUploadedImages = async (processId, imageType) => {
     return result.images || [];
   } catch (error) {
     console.error("Error fetching images:", error);
+    return [];
   }
 };
 

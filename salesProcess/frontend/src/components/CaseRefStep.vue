@@ -6,8 +6,6 @@ import { useAuth } from "../utils/useAuth";
 
 const { } = useAuth();
 
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-
 const props = defineProps({
   processId: {
     type: [String, Number],
@@ -35,7 +33,7 @@ const successMessage = ref("");
 const fetchImages = async (type) => {
   try {
     const response = await fetch(
-      `${apiBaseUrl}/api/processes/${props.processId}/images?type=${type}`,
+      `/api/processes/${props.processId}/images?type=${type}`,
       {
         credentials: 'include',
       }
@@ -277,8 +275,9 @@ const downloadImages = async () => {
       const productionFolder = zip.folder("production-images");
       for (let i = 0; i < productionImages.length; i++) {
         try {
+          const filename = productionImages[i].url.split('/').pop();
           const response = await fetch(
-            `${apiBaseUrl}${productionImages[i].url}`,
+            `/api/images/file/${filename}`,
             {
               credentials: 'include',
             }
@@ -296,8 +295,9 @@ const downloadImages = async () => {
       const installationFolder = zip.folder("installation-images");
       for (let i = 0; i < installationImages.length; i++) {
         try {
+          const filename = installationImages[i].url.split('/').pop();
           const response = await fetch(
-            `${apiBaseUrl}${installationImages[i].url}`,
+            `/api/images/file/${filename}`,
             {
               credentials: 'include',
             }

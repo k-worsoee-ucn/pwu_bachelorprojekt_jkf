@@ -292,10 +292,11 @@ onMounted(() => {
   loadFormData();
 });
 
-// Watch to retain privacy settings
+// Watch to reload form data when sale prop changes
 watch(
   () => props.sale,
   (newSale) => {
+    loadFormData();
     if (newSale?.privacySettings) {
       // Reset all to false first
       Object.keys(privacyFlags).forEach((key) => {

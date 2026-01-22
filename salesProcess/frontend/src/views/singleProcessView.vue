@@ -404,8 +404,8 @@ const handleStepCompleted = async () => {
           <InstallImgStep
             v-else-if="step.component === 'InstallImgStep'"
             :process-id="processId"
-            :sale="null"
-            :process="null"
+            :sale="process?.sale || null"
+            :process="process"
           />
           <CaseRefStep
             v-else-if="step.component === 'CaseRefStep'"
