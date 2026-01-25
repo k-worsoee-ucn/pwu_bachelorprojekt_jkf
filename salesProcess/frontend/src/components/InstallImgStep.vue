@@ -33,8 +33,6 @@ const props = defineProps({
 
 const emit = defineEmits(["consent-updated"]);
 
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-
 const fileInput = ref(null);
 const selectedFiles = ref([]);
 const uploadedImages = ref([]);
@@ -52,12 +50,23 @@ watch(
   }
 );
 
+watch(
+  () => props.processId,
+  async (newProcessId) => {
+    if (newProcessId) {
+      const images = await fetchUploadedImages(newProcessId, "installation");
+      console.log("Fetched images on processId change:", images);
+      uploadedImages.value = images || [];
+    }
+  }
+);
+
 const updateConsent = async () => {
   if (!props.processId) return;
 
   try {
     const response = await fetch(
-      `${apiBaseUrl}/api/processes/${props.processId}`,
+      `/api/processes/${props.processId}`,
       {
         method: "PUT",
         headers: {
@@ -89,6 +98,7 @@ const updateConsent = async () => {
 
 onMounted(async () => {
   const images = await fetchUploadedImages(props.processId, "installation");
+  console.log("Mounted - Fetched images:", images);
   uploadedImages.value = images || [];
 });
 
@@ -129,6 +139,7 @@ const uploadImagesToServer = async () => {
     }
 
     const images = await fetchUploadedImages(props.processId, "installation");
+    console.log("Fetched images after upload:", images);
     uploadedImages.value = images || [];
 
     setTimeout(() => {
@@ -136,6 +147,7 @@ const uploadImagesToServer = async () => {
     }, 3000);
   } catch (error) {
     errorMessage.value = error.message;
+    console.error("Upload error:", error);
   } finally {
     uploading.value = false;
   }

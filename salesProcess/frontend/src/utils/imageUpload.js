@@ -1,5 +1,3 @@
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-
 export const handleFileSelect = (event, selectedFiles) => {
   const files = Array.from(event.target.files);
 
@@ -34,24 +32,31 @@ export const uploadImages = async (processId, selectedFiles, imageType) => {
   });
   formData.append("type", imageType);
 
-  const response = await fetch(`${apiBaseUrl}/api/processes/${processId}/images`, {
-    method: "POST",
-    credentials: "include",
-    body: formData,
-  });
+  try {
+    const response = await fetch(`/api/processes/${processId}/images`, {
+      method: "POST",
+      credentials: "include",
+      body: formData,
+    });
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || "Upload failed");
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || "Upload failed");
+    }
+
+    const result = await response.json();
+    console.log("Upload response:", result);
+    return result;
+  } catch (error) {
+    console.error("Upload error:", error);
+    throw error;
   }
-
-  return await response.json();
 };
 
 export const fetchUploadedImages = async (processId, imageType) => {
   try {
     const response = await fetch(
-      `${apiBaseUrl}/api/processes/${processId}/images?type=${imageType}`,
+      `/api/processes/${processId}/images?type=${imageType}`,
       {
         credentials: "include",
       }
@@ -65,11 +70,12 @@ export const fetchUploadedImages = async (processId, imageType) => {
     return result.images || [];
   } catch (error) {
     console.error("Error fetching images:", error);
+    return [];
   }
 };
 
 export const deleteImage = async (imageId) => {
-  const response = await fetch(`${apiBaseUrl}/api/images/${imageId}`, {
+  const response = await fetch(`/api/images/${imageId}`, {
     method: "DELETE",
     credentials: "include",
   });
@@ -81,7 +87,9 @@ export const deleteImage = async (imageId) => {
 };
 
 export const getImageUrl = (url) => {
-  return `${apiBaseUrl}${url}`;
+  // Extract filename from URL like "/uploads/filename.jpg"
+  const filename = url.split('/').pop();
+  return `/api/images/file/${filename}`;
 };
 
 export const formatDate = (dateString) => {

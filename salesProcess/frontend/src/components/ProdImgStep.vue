@@ -10,8 +10,6 @@ import {
   getFilePreview,
 } from "@/utils/imageUpload";
 
-const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
-
 const props = defineProps({
   processId: {
     type: [String, Number],
